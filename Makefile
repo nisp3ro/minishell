@@ -1,10 +1,12 @@
 NAME		=		minishell
-SRCS		=		$(addprefix $(SRC_DIR)/, main.c)
+SRCS		=		$(addprefix $(SRC_DIR)/, main.c signals.c)
 OBJS		=		$(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 SRC_DIR		=		./src
 INC_DIR		=		./include
 OBJ_DIR		=		./$(SRC_DIR)/obj
 HEADER_FILE	=		$(INC_DIR)/minishell.h
+
+LIBFT		=		libft
 
 CFLAGS		=		#-Wall -Wextra -Werror
 LDFLAGS		=		-lreadline
@@ -19,9 +21,13 @@ NC			=		\033[0m # No color
 
 all:	$(NAME)
 
+lib:
+		make -C $(LIBFT)
+
 $(NAME):	$(OBJS)
 	@echo "$(YELLOW)Creating program...$(NC)"
-	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS)
+	@make -C $(LIBFT) 1> /dev/null
+	@$(CC) $(CFLAGS) $(OBJS) -L$(LIBFT) -lft -o $(NAME) $(LDFLAGS)
 	@echo  ""
 	@printf "$(UGREEN)%s$(NC)" "[minishell]"
 	@printf "$(GREEN)%s$(NC)\n" " Compiled successfully."
@@ -38,6 +44,7 @@ clean:
 fclean: clean
 	@rm -rf $(OBJ_DIR)
 	@rm -f $(NAME)
+	make -C $(LIBFT) fclean
 	@printf "$(RED)%s$(NC)\n" "[minishell] Cleaned successfully."
 
 re:	fclean all

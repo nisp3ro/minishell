@@ -5,4 +5,5 @@ Jaime:
     -La carpeta includes ahora se llama include, no includes (con s), y en el código cuando 
     se usa #include "../include/minishell.h" también ha sido cambiado.
     -Flags muteadas por pesadas :)
+    -ctrl+c y ctrl-d añadidos al toque papa
     

@@ -28,4 +28,8 @@ typedef struct s_data
     char	*oldpwd;
 }	t_data;
 
+//signals.c
+void	handle_ctrl_c(int sig);
+void	init_signal(void);
+
 #endif
