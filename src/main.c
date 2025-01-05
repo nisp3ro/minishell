@@ -1,4 +1,4 @@
-#include "../includes/minishell.h"
+#include "../include/minishell.h"
 /**
  * init_data - Initializes a `t_data` structure with environment data.
  */
