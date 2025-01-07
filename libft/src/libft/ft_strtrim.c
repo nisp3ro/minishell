@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/18 21:34:23 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/19 15:41:42 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/05 14:27:41 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,9 @@ char	*ft_strtrim(char const *s1, char const *set)
 
 	if (!s1 || !set)
 		return (NULL);
-	i = 0;
 	istart = 0;
 	iend = ft_strlen(s1);
-	while (ft_strchr(set, s1[istart]))
+	while (ft_strchr(set, s1[istart]) && s1[istart])
 		istart++;
 	while (iend > istart && ft_strchr(set, s1[iend - 1]))
 		iend--;
@@ -33,6 +32,7 @@ char	*ft_strtrim(char const *s1, char const *set)
 	res = (char *)malloc(sizeof(char) * (iend - istart + 1));
 	if (!res)
 		return (NULL);
+	i = 0;
 	while (istart < iend)
 		res[i++] = s1[istart++];
 	res[i] = '\0';

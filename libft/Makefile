@@ -6,7 +6,7 @@
 #    By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/20 20:10:56 by mrubal-c          #+#    #+#              #
-#    Updated: 2024/10/29 09:22:04 by mrubal-c         ###   ########.fr        #
+#    Updated: 2025/01/05 14:18:28 by mrubal-c         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,11 +28,12 @@ LIBFT_SRC =		$(LIBFT_DIR)/ft_isalpha.c $(LIBFT_DIR)/ft_isdigit.c $(LIBFT_DIR)/ft
 				$(LIBFT_DIR)/ft_calloc.c $(LIBFT_DIR)/ft_strdup.c $(LIBFT_DIR)/ft_substr.c\
 				$(LIBFT_DIR)/ft_strjoin.c $(LIBFT_DIR)/ft_strtrim.c $(LIBFT_DIR)/ft_split.c\
 				$(LIBFT_DIR)/ft_itoa.c $(LIBFT_DIR)/ft_strmapi.c $(LIBFT_DIR)/ft_striteri.c\
-				$(LIBFT_DIR)/ft_putchar_fd.c $(LIBFT_DIR)/ft_putstr_fd.c\
+				$(LIBFT_DIR)/ft_putchar_fd.c $(LIBFT_DIR)/ft_putstr_fd.c $(LIBFT_DIR)/ft_strcpy.c\
 				$(LIBFT_DIR)/ft_putendl_fd.c $(LIBFT_DIR)/ft_putnbr_fd.c $(LIBFT_DIR)/ft_lstnew.c\
 				$(LIBFT_DIR)/ft_lstadd_front.c $(LIBFT_DIR)/ft_lstsize.c $(LIBFT_DIR)/ft_lstlast.c\
-				$(LIBFT_DIR)/ft_lstadd_back.c $(LIBFT_DIR)/ft_lstdelone.c\
-				$(LIBFT_DIR)/ft_lstclear.c $(LIBFT_DIR)/ft_lstiter.c $(LIBFT_DIR)/ft_lstmap.c
+				$(LIBFT_DIR)/ft_lstadd_back.c $(LIBFT_DIR)/ft_lstdelone.c $(LIBFT_DIR)/ft_strcat.c\
+				$(LIBFT_DIR)/ft_lstclear.c $(LIBFT_DIR)/ft_lstiter.c $(LIBFT_DIR)/ft_lstmap.c\
+				$(LIBFT_DIR)/ft_strcmp.c $(LIBFT_DIR)/ft_isspace.c
 
 GNL_SRC = 		$(GNL_DIR)/get_next_line.c $(GNL_DIR)/get_next_line_utils.c
 

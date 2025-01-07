@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 15:45:42 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/23 18:11:30 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/05 14:18:08 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,17 +25,21 @@ int					ft_isdigit(int c);
 int					ft_isalnum(int c);
 int					ft_isascii(int c);
 int					ft_isprint(int c);
+int					ft_isspace(int c);
 size_t				ft_strlen(const char *str);
 void				*ft_memset(void *str, int c, size_t n);
 void				ft_bzero(void *str, size_t n);
 void				*ft_memcpy(void *dest, const void *src, size_t n);
 void				*ft_memmove(void *dest, const void *src, size_t n);
+char				*ft_strcpy(char *dest, char *src);
 size_t				ft_strlcpy(char *dst, const char *src, size_t dsize);
+char				*ft_strcat(char *dest, char *src);
 size_t				ft_strlcat(char *dst, const char *src, size_t dsize);
 int					ft_toupper(int ch);
 int					ft_tolower(int ch);
 char				*ft_strchr(const char *str, int tofind);
 char				*ft_strrchr(const char *str, int tofind);
+int					ft_strcmp(char *s1, char *s2);
 int					ft_strncmp(const char *str1, const char *str2, size_t n);
 void				*ft_memchr(const void *str, int c, size_t n);
 int					ft_memcmp(const void *str1, const void *str2, size_t n);

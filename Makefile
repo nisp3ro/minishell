@@ -1,5 +1,6 @@
 NAME		=		minishell
-SRCS		=		$(addprefix $(SRC_DIR)/, main.c signals.c)
+SRCS		=		$(addprefix $(SRC_DIR)/, main.c signals.c get_prompt.c \
+					utils.c init_data.c vars.c)
 OBJS		=		$(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 SRC_DIR		=		./src
 INC_DIR		=		./include
