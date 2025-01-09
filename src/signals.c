@@ -2,15 +2,23 @@
 
 void	handle_ctrl_c(int sig)
 {
-	printf("\nCtrl+C detected! Custom handler invoked.\n");
-	exit(1);
+	rl_replace_line("", 0);
+	write(1, "\n", 1);
+	rl_on_new_line();
+	rl_redisplay();
 }
 
-void	init_signal(void)
+void	init_signal(t_data *data)
 {
 	if (signal(SIGINT, handle_ctrl_c) == SIG_ERR)
 	{
-		perror("Error setting up signal handler");
+		int i;
+
+		i = 0;
+		while (data->envp[i])
+			free(data->envp[i++]);
+		free(data->envp);
+		perror("SIGINT");
 		exit(1);
 	}
 }

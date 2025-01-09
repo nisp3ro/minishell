@@ -1,111 +1,173 @@
 #include "../include/minishell.h"
 
-char *mini_getvars(char *var, t_vars *vars)
+char	*mini_getvars(t_vars *vars, const char *name)
 {
-    t_vars *tmp;
-
-    tmp = vars;
-    while (tmp)
-    {
-        if (ft_strcmp(tmp->name, var) == 0)
-            return (tmp->value);
-        tmp = tmp->next;
-    }
-    return (NULL);
+	t_vars *current = vars; // Initialize current to the head of the list
+	while (current != NULL)
+	{
+		if (current->name && strcmp(current->name, name) == 0)
+		{
+			return (current->value); // Variable found
+		}
+		current = current->next;
+	}
+	return (NULL); // Return NULL if the variable is not found
 }
 
-t_vars	*ft_lstnewvar(char *content)
+void	handle_variable_assignment(char *input, t_vars **env_vars)
 {
-    int i;
-    int len_name;
-    int len_value;
-    char *tmp;
-	t_vars	*newlist;
+	char	*equal_sign;
+	char	*name;
+	char	*value;
+	char	*tmp;
+	bool	in_simple_quotes;
+	bool	in_double_quotes;
+	int		i;
 
-    len_name = 0;
-    len_value = 0;
-    newlist = malloc(sizeof(t_vars));
-    while (content[len_name] && content[len_name] != '=')
-        len_name++;
-    while (content[len_value])
-        len_value++;
-    newlist->name = malloc(sizeof(char) * (len_name + 1));
-    newlist->value = malloc(sizeof(char) * (len_value + 1));
-    i = 0;
-    while (content[i] && content[i] != '=')
-    {
-        newlist->name[i] = content[i];
-        i++;
-    }
-    newlist->name[i] = '\0';
-    tmp = ft_strdup(content + i + 1);
-    newlist->value = ft_strtrim(tmp, "\"");
-    newlist->next = NULL;
-    return (newlist);
+	i = 0;
+	in_simple_quotes = false;
+	in_double_quotes = false;
+	equal_sign = ft_strchr(input, '=');
+	*equal_sign = '\0';
+	equal_sign++;
+	name = input;
+	tmp = equal_sign;
+	while (equal_sign[i] && (equal_sign[i] != ' ' || in_simple_quotes
+			|| in_double_quotes))
+	{
+		if (equal_sign[i] == '\'' && !in_simple_quotes && !in_double_quotes)
+		{
+			equal_sign++;
+			in_simple_quotes = true;
+		}
+		else if (equal_sign[i] == '\"' && !in_simple_quotes
+				&& !in_double_quotes)
+		{
+			equal_sign++;
+			in_double_quotes = true;
+		}
+		else if (equal_sign[i] == '\"' && in_double_quotes)
+		{
+			equal_sign++;
+			in_double_quotes = false;
+		}
+		else if (equal_sign[i] == '\'' && in_simple_quotes)
+		{
+			equal_sign++;
+			in_double_quotes = false;
+		}
+		else
+			i++;
+	}
+	value = (char *)malloc(sizeof(char) * (i + 1));
+	i = 0;
+	while (tmp[i] && (tmp[i] != ' ' || in_simple_quotes || in_double_quotes))
+	{
+		if (tmp[i] == '\'' && !in_simple_quotes && !in_double_quotes)
+		{
+			tmp++;
+			in_simple_quotes = true;
+		}
+		else if (tmp[i] == '\"' && !in_simple_quotes && !in_double_quotes)
+		{
+			tmp++;
+			in_double_quotes = true;
+		}
+		else if (tmp[i] == '\"' && in_double_quotes)
+		{
+			tmp++;
+			in_double_quotes = false;
+		}
+		else if (tmp[i] == '\'' && in_simple_quotes)
+		{
+			tmp++;
+			in_double_quotes = false;
+		}
+		else
+		{
+			value[i] = tmp[i];
+			i++;
+		}
+	}
+	set_variable(env_vars, name, value);
 }
 
-void expand_variables(char **full_cmd, char *envp[], t_data *data)
+void	set_variable(t_vars **env_vars, char *name, char *value)
 {
-    char *expanded;
-    char *tmp;
-    char *tmp2;
-    char *var;
-    char *value;
-    int i = 0;
-    int j = 0;
-    int k = 0;
+	t_vars	*new_var;
 
-    expanded = ft_calloc(sizeof(char), (strlen(*full_cmd) + 1));
-    if (!expanded)
-        return;
-    while ((*full_cmd)[i] != '\0')
-    {
-        if ((*full_cmd)[i] == '$')
-        {
-            j = i + 1;
-            while ((*full_cmd)[j] != '\0' && ft_isalnum((*full_cmd)[j]))
-                j++;
-            var = malloc(sizeof(char) * (j - i));
-            if (!var)
-            {
-                free(expanded);
-                return;
-            }
-            k = 0;
-            while (i < j)
-                var[k++] = (*full_cmd)[i++];
-            var[k] = '\0';
-            value = mini_getenv(var + 1, envp);
-            if (!value)
-            {   
-                data->vars = NULL;
-                data->vars = ft_lstnewvar("HOLA=\"fernandito\"");
-                value = mini_getvars(var + 1, data->vars);
-            }
-            if (!value)
-                value = "";
-            tmp = ft_strjoin(expanded, value);
-            free(expanded);
-            expanded = tmp;
-            free(var);
-        }
-        else
-        {
-            tmp = malloc(sizeof(char) * 2);
-            if (!tmp)
-            {
-                free(expanded);
-                return;
-            }
-            tmp[0] = (*full_cmd)[i];
-            tmp[1] = '\0';
-            tmp2 = ft_strjoin(expanded, tmp);
-            free(expanded);
-            free(tmp);
-            expanded = tmp2;
-            i++;
-        }
-    }
-    free(*full_cmd);
-    *full_cmd = expanded;
+	new_var = malloc(sizeof(t_vars));
+	if (!new_var)
+	{
+		perror("malloc");
+		return ;
+	}
+	new_var->name = ft_strdup(name);
+	new_var->value = value;
+	new_var->next = *env_vars;
+	*env_vars = new_var;
+}
+
+char	*expand_variables(char *token_value, char *envp[], t_data *data)
+{
+	char	*expanded;
+	char	*tmp;
+	char	*tmp2;
+	char	*var;
+	char	*value;
+	int		i;
+	int		j;
+	int		k;
+
+	i = 0;
+	j = 0;
+	k = 0;
+	expanded = ft_calloc(sizeof(char), (strlen(token_value) + 1));
+	if (!expanded)
+		return (NULL);
+	while (token_value[i] != '\0')
+	{
+		if (token_value[i] == '$')
+		{
+			j = i + 1;
+			while (token_value[j] != '\0' && ft_isalnum(token_value[j]))
+				j++;
+			var = malloc(sizeof(char) * (j - i));
+			if (!var)
+			{
+				free(expanded);
+				return (NULL);
+			}
+			k = 0;
+			while (i < j)
+				var[k++] = token_value[i++];
+			var[k] = '\0';
+			value = mini_getenv(var + 1, envp);
+			if (!value)
+				value = mini_getvars(data->vars, var + 1);
+			if (!value)
+				value = "";
+			tmp = ft_strjoin(expanded, value);
+			free(expanded);
+			expanded = tmp;
+			free(var);
+		}
+		else
+		{
+			tmp = malloc(sizeof(char) * 2);
+			if (!tmp)
+			{
+				free(expanded);
+				return (NULL);
+			}
+			tmp[0] = token_value[i];
+			tmp[1] = '\0';
+			tmp2 = ft_strjoin(expanded, tmp);
+			free(expanded);
+			free(tmp);
+			expanded = tmp2;
+			i++;
+		}
+	}
+	return (expanded);
 }

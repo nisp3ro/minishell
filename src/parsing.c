@@ -1,0 +1,69 @@
+#include "../include/minishell.h"
+
+t_command	*parse_tokens(t_token *tokens)
+{
+	t_command	*command;
+	t_token		*current;
+	int			arg_count;
+
+	command = malloc(sizeof(t_command));
+	command->args = NULL;
+	command->input_redirection = NULL;
+	command->output_redirection = NULL;
+	command->append = 0;
+	command->next = NULL;
+	current = tokens;
+	arg_count = 0;
+	while (current && current->type != TOKEN_PIPE)
+	{
+		if (current->type == TOKEN_WORD)
+		{
+			command->args = realloc(command->args, sizeof(char *) * (arg_count + 2)); //sustituir propio
+			command->args[arg_count++] = strdup(current->value);
+			command->args[arg_count] = NULL;
+		}
+		else if (current->type == TOKEN_REDIRECT_IN)
+		{
+			current = current->next;
+			if (current && current->type == TOKEN_WORD)
+				command->input_redirection = strdup(current->value);
+			else
+				return (NULL); // Manejar error de sintaxis
+		}
+		else if (current->type == TOKEN_REDIRECT_OUT || current->type == TOKEN_APPEND_OUT)
+		{
+			command->append = (current->type == TOKEN_APPEND_OUT);
+			current = current->next;
+			if (current && current->type == TOKEN_WORD)
+				command->output_redirection = strdup(current->value);
+			else
+				return (NULL); // Manejar error de sintaxis
+		}
+		current = current->next;
+	}
+	return (command);
+}
+
+t_command	*parse_pipeline(t_token *tokens)
+{
+	t_command	*head;
+	t_command	*current_command;
+	t_command	*new_command;
+
+	head = NULL;
+	current_command = NULL;
+	while (tokens)
+	{
+		new_command = parse_tokens(tokens);
+		if (!head)
+			head = new_command;
+		else
+			current_command->next = new_command;
+		current_command = new_command;
+		while (tokens && tokens->type != TOKEN_PIPE)
+			tokens = tokens->next;
+		if (tokens && tokens->type == TOKEN_PIPE)
+			tokens = tokens->next;
+	}
+	return (head);
+}

@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
+/*   Updated: 2025/01/09 16:45:10 by mrubal-c         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
@@ -20,43 +31,90 @@
 # include <sys/wait.h>
 # include <unistd.h>
 
+# define ERROR -1
+# define OK 0
+
+typedef enum e_token_type
+{
+	TOKEN_WORD,
+	TOKEN_PIPE,
+	TOKEN_REDIRECT_IN,
+	TOKEN_REDIRECT_OUT,
+	TOKEN_APPEND_OUT,
+	TOKEN_HEREDOC,
+	TOKEN_END,
+}						t_token_type;
+
+typedef struct s_token
+{
+	t_token_type		type;
+	char				*value;
+	struct s_token		*next;
+}						t_token;
+
+typedef struct s_command
+{
+	char				**args;
+	char				*input_redirection;
+	char				*output_redirection;
+	int					append;
+	struct s_command	*next;
+}						t_command;
+
 typedef struct s_vars
 {
-	char			*name;
-	char			*value;
-	struct s_vars	*next;
-}					t_vars;
+	char				*name;
+	char				*value;
+	struct s_vars		*next;
+}						t_vars;
 
 typedef struct s_data
 {
-	char			**envp;
-	//char    **cmd;
-	char			*home;
-	char			*pwd;
-	char			*oldpwd;
-	char			*prompt;
-	t_vars			*vars;
-}					t_data;
+	char				**envp;
+	char				*home;
+	char				*pwd;
+	char				*oldpwd;
+	char				*prompt;
+	t_vars				*vars;
+}						t_data;
 
 //signals.c
-void    handle_ctrl_c(int sig);
-void    init_signal(void);
+void					handle_ctrl_c(int sig);
+void					init_signal(t_data *data);
 
 //init_data.c
-char    **cpy_env(char *envp[]);
-void    init_data(t_data *data, char *envp[]);
+char					**cpy_env(char *envp[]);
+int						init_data(t_data *data, char *envp[]);
 
 //utils.c
-bool    is_all_spaces(char *str);
-bool    complete_quotes(char **full_cmd);
+bool					is_all_spaces(char *str);
+bool					complete_quotes(char **full_cmd);
 
 //get_prompt.c
-int    get_prompt(char **prompt, t_data *data);
-char    *mini_getenv(char *var, char *envp[]);
+int						get_prompt(char **prompt, t_data *data);
+char					*mini_getenv(char *var, char *envp[]);
 
 //vars.c
-void    expand_variables(char **full_cmd, char *envp[], t_data *data);
-t_vars  *ft_lstnewvar(char *content);
-char	*mini_getvars(char *var, t_vars *vars);
+char					*expand_variables(char *token_value, char *envp[],
+							t_data *data);
+char					*mini_getvars(t_vars *vars, const char *name);
+void					handle_variable_assignment(char *input,
+							t_vars **env_vars);
+void					set_variable(t_vars **env_vars, char *name,
+							char *value);
+
+//tokenizer.c
+int						is_delimiter(char c);
+int						is_quote(char c);
+t_token					*add_token(t_token **tokens, t_token_type type,
+							char *value);
+t_token					*tokenize(char *input, char **envp, t_data *data);
+
+//parsing.c
+t_command				*parse_tokens(t_token *tokens);
+t_command				*parse_pipeline(t_token *tokens);
+
+//exec.c
+void					execute_pipeline(t_command *cmd, char **envp);
 
 #endif

@@ -51,7 +51,7 @@ char	*mini_getenv(char *var, char *envp[])
 	while (envp[i])
 	{
 		j = 0;
-		while (envp[i][j] == var[j] && envp[i][j] != '=')
+		while (envp[i][j] && envp[i][j] == var[j] && envp[i][j] != '=')
 			j++;
 		if (envp[i][j] == '=' && var[j] == '\0')
 			return (envp[i] + j + 1);
@@ -100,15 +100,13 @@ int	get_prompt(char **prompt, t_data *data)
 		}
 	}
 	pwd = data->pwd;
-	if (!pwd)
-		pwd = "/unknown_directory";
 	*prompt = malloc(sizeof(char) * (ft_strlen(user) + ft_strlen(host)
-				+ ft_strlen(pwd) - ft_strlen(data->home) + 36));
+				+ ft_strlen(pwd) - ft_strlen(data->home) + 38));
 	if (!*prompt)
 	{
 		if (free_host)
 			free(host);
-		return (1);
+		return (ERROR);
 	}
 	ft_strcpy(*prompt, BBLUE);
 	ft_strcat(*prompt, user);
@@ -118,8 +116,8 @@ int	get_prompt(char **prompt, t_data *data)
 	ft_strcat(*prompt, " ~");
 	ft_strcat(*prompt, pwd + ft_strlen(data->home));
 	ft_strcat(*prompt, RESET_COLOR);
-	ft_strcat(*prompt, "$ ");
+	ft_strcat(*prompt, "$\n");
 	if (free_host)
 		free(host);
-	return (0);
+	return (OK);
 }

@@ -7,3 +7,5 @@ Jaime:
     -Flags muteadas por pesadas :)
     -ctrl+c y ctrl-d añadidos al toque papa
     
+Alberto:
+    -Entiende el codigo

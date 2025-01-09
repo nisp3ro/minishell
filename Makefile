@@ -1,6 +1,6 @@
 NAME		=		minishell
 SRCS		=		$(addprefix $(SRC_DIR)/, main.c signals.c get_prompt.c \
-					utils.c init_data.c vars.c)
+					utils.c init_data.c vars.c tokenizer.c parsing.c exec.c)
 OBJS		=		$(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 SRC_DIR		=		./src
 INC_DIR		=		./include
@@ -27,7 +27,7 @@ lib:
 
 $(NAME):	$(OBJS)
 	@echo "$(YELLOW)Creating program...$(NC)"
-	@make -C $(LIBFT) 1> /dev/null
+	@make -C $(LIBFT) plus 1> /dev/null
 	@$(CC) $(CFLAGS) $(OBJS) -L$(LIBFT) -lft -o $(NAME) $(LDFLAGS)
 	@echo  ""
 	@printf "$(UGREEN)%s$(NC)" "[minishell]"

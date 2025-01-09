@@ -22,7 +22,9 @@ bool complete_quotes(char **full_cmd)
     in_single_quotes = false;
     while ((*full_cmd)[++i] != '\0')
     {
-        if ((*full_cmd)[i] == '"' && !in_single_quotes)
+        if ((*full_cmd)[i] == '\\' && !in_single_quotes)
+            i++;
+        else if ((*full_cmd)[i] == '"' && !in_single_quotes)
         {
             if (in_double_quotes)
                 in_double_quotes = false;
