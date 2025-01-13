@@ -9,7 +9,7 @@ t_command	*parse_tokens(t_token *tokens)
 	command = malloc(sizeof(t_command));
 	command->args = NULL;
 	command->input_redirection = NULL;
-	command->output_redirection = NULL;
+	command->output_redirection = 0;
 	command->append = 0;
 	command->next = NULL;
 	current = tokens;
@@ -34,8 +34,12 @@ t_command	*parse_tokens(t_token *tokens)
 		{
 			command->append = (current->type == TOKEN_APPEND_OUT);
 			current = current->next;
-			if (current && current->type == TOKEN_WORD)
-				command->output_redirection = strdup(current->value);
+			if (current && current->type == TOKEN_WORD && command->append)
+				command->output_redirection = open(current->value,
+							O_WRONLY | O_CREAT | O_APPEND, 0644);
+			else if (current && current->type == TOKEN_WORD && !command->append)
+				command->output_redirection = open(current->value,
+							O_WRONLY | O_CREAT | O_TRUNC, 0644);
 			else
 				return (NULL); // Manejar error de sintaxis
 		}

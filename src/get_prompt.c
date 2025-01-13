@@ -116,7 +116,7 @@ int	get_prompt(char **prompt, t_data *data)
 	ft_strcat(*prompt, " ~");
 	ft_strcat(*prompt, pwd + ft_strlen(data->home));
 	ft_strcat(*prompt, RESET_COLOR);
-	ft_strcat(*prompt, "$\n");
+	ft_strcat(*prompt, "$ ");
 	if (free_host)
 		free(host);
 	return (OK);

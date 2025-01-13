@@ -1,5 +1,23 @@
 #include "../include/minishell.h"
 
+bool	check_builtin(t_command *command)
+{
+	int	i;
+
+	if (strcmp(command->args[0], "echo") == 0)
+	{
+		i = 0;
+		while (command->args[++i])
+		{
+			write(STDOUT_FILENO, command->args[i], ft_strlen(command->args[i]));
+			write(STDOUT_FILENO, " ", 1);
+		}
+		write(STDOUT_FILENO, "\n", 1);
+		return (true);
+	}
+	return (false);
+}
+
 // Función para liberar el array de cadenas (split)
 void	ft_free_split(char **split)
 {
@@ -43,7 +61,8 @@ char	*find_command_in_path(char *command, char **envp)
 		command_path = tmp;
 		// Verificar si el archivo existe y tiene permisos de ejecución
 		if (access(command_path, X_OK) == 0)
-			return (ft_free_split(directories), command_path); // Si se encontró, retornar la ruta
+			return (ft_free_split(directories), command_path);
+		// Si se encontró, retornar la ruta
 		free(command_path);
 		command_path = NULL;
 		i++;
@@ -61,6 +80,7 @@ void	execute_pipeline(t_command *command, char **envp)
 	char	*command_path;
 	int		fd_in;
 	int		fd_out;
+			char *pwd;
 
 	in_fd = STDIN_FILENO;
 	while (command)
@@ -71,13 +91,13 @@ void	execute_pipeline(t_command *command, char **envp)
 			if (pipe(pipefd) == -1)
 			{
 				perror("pipe");
-				exit(EXIT_FAILURE); //limpiar
+				exit(EXIT_FAILURE); // limpiar
 			}
 		}
 		if ((pid = fork()) == -1)
 		{
 			perror("fork");
-			exit(EXIT_FAILURE); //limpiar
+			exit(EXIT_FAILURE); // limpiar
 		}
 		if (pid == 0)
 		{ // Proceso hijo
@@ -92,7 +112,7 @@ void	execute_pipeline(t_command *command, char **envp)
 			if (command->next)
 			{
 				dup2(pipefd[1], STDOUT_FILENO); // Redirigir stdout al pipe
-				close(pipefd[0]);              
+				close(pipefd[0]);
 				// Cerrar el extremo de lectura del pipe
 			}
 			// Redirección de entrada
@@ -110,22 +130,17 @@ void	execute_pipeline(t_command *command, char **envp)
 			// Redirección de salida
 			if (command->output_redirection)
 			{
-                if (command->append)
-				    fd_out = open(command->output_redirection, O_WRONLY | O_CREAT | O_APPEND, 0644);
-				else
-                    fd_out = open(command->output_redirection, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-                if (fd_out < 0)
-				{
-					perror("open output");
-					exit(EXIT_FAILURE);
-				}
+				fd_out = command->output_redirection;
 				dup2(fd_out, STDOUT_FILENO);
 				close(fd_out);
 			}
-			// Ejecutar el comando con execve
-			execve(command_path, command->args, envp);
-            perror("execve");
-            exit(EXIT_FAILURE);
+			if (check_builtin(command) == false)
+			{ // Ejecutar el comando con execve
+				execve(command_path, command->args, envp);
+				perror("execve");
+				exit(EXIT_FAILURE);
+			}
+			exit(EXIT_SUCCESS);
 		}
 		else
 		{ // Proceso padre
@@ -136,9 +151,9 @@ void	execute_pipeline(t_command *command, char **envp)
 				close(in_fd);
 			if (command->next)
 			{
-				close(pipefd[1]);  // Cerrar el descriptor de escritura del pipe
+				close(pipefd[1]); // Cerrar el descriptor de escritura del pipe
 				in_fd = pipefd[0];
-					// Establecer la entrada para el siguiente comando
+				// Establecer la entrada para el siguiente comando
 			}
 		}
 		command = command->next; // Pasar al siguiente comando
