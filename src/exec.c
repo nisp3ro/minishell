@@ -1,23 +1,5 @@
 #include "../include/minishell.h"
 
-bool	check_builtin(t_command *command)
-{
-	int	i;
-
-	if (strcmp(command->args[0], "echo") == 0)
-	{
-		i = 0;
-		while (command->args[++i])
-		{
-			write(STDOUT_FILENO, command->args[i], ft_strlen(command->args[i]));
-			write(STDOUT_FILENO, " ", 1);
-		}
-		write(STDOUT_FILENO, "\n", 1);
-		return (true);
-	}
-	return (false);
-}
-
 // Función para liberar el array de cadenas (split)
 void	ft_free_split(char **split)
 {
@@ -71,20 +53,36 @@ char	*find_command_in_path(char *command, char **envp)
 	return (NULL); // Si no se encontró el comando
 }
 
-// Función para ejecutar una tubería de comandos con fork usando execve
-void	execute_pipeline(t_command *command, char **envp)
+void ft_create_custom_path(char **path, t_command *command)
 {
+    int i;
+    int len;
+
+	*path = command->args[0];
+    len = ft_strlen(command->args[0]);
+
+    i = len - 1;
+    while (i >= 0 && command->args[0][i] != '/')
+        i--;
+	command->args[0] += i;
+
+	printf("%s\n%s\n", *path, command->args[0]);
+}
+
+// Función para ejecutar una tubería de comandos con fork usando execve
+void	execute_pipeline(t_command *command, t_data *data, char **envp)
+{
+	int 	i;
 	int		pipefd[2];
 	pid_t	pid;
 	int		in_fd;
 	char	*command_path;
 	int		fd_in;
-	int		fd_out;
-			char *pwd;
 
 	in_fd = STDIN_FILENO;
 	while (command)
 	{
+		i++;
 		// Crear el pipe solo si hay más de un comando
 		if (command->next)
 		{
@@ -101,7 +99,12 @@ void	execute_pipeline(t_command *command, char **envp)
 		}
 		if (pid == 0)
 		{ // Proceso hijo
-			command_path = find_command_in_path(command->args[0], envp);
+			if (ft_strchr(command->args[0], '/') != 0)
+			{
+				ft_create_custom_path(&command_path, command);
+			}
+			else
+				command_path = find_command_in_path(command->args[0], envp);
 			// Redirigir la entrada si no es el primer comando
 			if (in_fd != STDIN_FILENO)
 			{
@@ -130,11 +133,10 @@ void	execute_pipeline(t_command *command, char **envp)
 			// Redirección de salida
 			if (command->output_redirection)
 			{
-				fd_out = command->output_redirection;
-				dup2(fd_out, STDOUT_FILENO);
-				close(fd_out);
+				dup2(command->output_redirection, STDOUT_FILENO);
+				close(command->output_redirection);
 			}
-			if (check_builtin(command) == false)
+			if (check_builtin(command, data) == false)
 			{ // Ejecutar el comando con execve
 				execve(command_path, command->args, envp);
 				perror("execve");
@@ -144,8 +146,6 @@ void	execute_pipeline(t_command *command, char **envp)
 		}
 		else
 		{ // Proceso padre
-			// Esperar a que termine el hijo y cerrar los pipes
-			waitpid(pid, NULL, 0);
 			// Cerrar los descriptores de pipes después de ser usados
 			if (in_fd != STDIN_FILENO)
 				close(in_fd);
@@ -157,5 +157,10 @@ void	execute_pipeline(t_command *command, char **envp)
 			}
 		}
 		command = command->next; // Pasar al siguiente comando
+	}
+	while (i)
+	{
+		waitpid(-1, NULL, 0);
+		i--;
 	}
 }

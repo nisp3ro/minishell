@@ -87,6 +87,7 @@ int	get_prompt(char **prompt, t_data *data)
 	if (!user)
 		user = "unknown_user";
 	host = mini_getenv("HOSTNAME", data->envp);
+	data->home = mini_getenv("HOME", data->envp);
 	free_host = 0;
 	if (!host)
 	{

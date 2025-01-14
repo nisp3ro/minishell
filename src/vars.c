@@ -104,6 +104,7 @@ void	set_variable(t_vars **env_vars, char *name, char *value)
 	}
 	new_var->name = ft_strdup(name);
 	new_var->value = value;
+	new_var->exported = false;
 	new_var->next = *env_vars;
 	*env_vars = new_var;
 }
@@ -127,7 +128,7 @@ char	*expand_variables(char *token_value, char *envp[], t_data *data)
 		return (NULL);
 	while (token_value[i] != '\0')
 	{
-		if (token_value[i] == '$')
+		if (token_value[i] == '$' && isalnum(token_value[i + 1]))
 		{
 			j = i + 1;
 			while (token_value[j] != '\0' && ft_isalnum(token_value[j]))

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/13 20:29:18 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/14 19:54:23 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,9 @@ typedef struct s_command
 {
 	char				**args;
 	char				*input_redirection;
-	int				output_redirection;
+	int					output_redirection;
 	int					append;
+	bool				isfather;
 	struct s_command	*next;
 }						t_command;
 
@@ -65,8 +66,10 @@ typedef struct s_vars
 {
 	char				*name;
 	char				*value;
+	bool				exported;
 	struct s_vars		*next;
 }						t_vars;
+
 
 typedef struct s_data
 {
@@ -98,8 +101,8 @@ char					*mini_getenv(char *var, char *envp[]);
 char					*expand_variables(char *token_value, char *envp[],
 							t_data *data);
 char					*mini_getvars(t_vars *vars, const char *name);
-void					handle_variable_assignment(char *input,
-							t_vars **env_vars);
+void	handle_variable_assignment(char *input,
+								t_vars **env_vars);
 void					set_variable(t_vars **env_vars, char *name,
 							char *value);
 
@@ -115,6 +118,9 @@ t_command				*parse_tokens(t_token *tokens);
 t_command				*parse_pipeline(t_token *tokens);
 
 //exec.c
-void					execute_pipeline(t_command *cmd, char **envp);
+void					execute_pipeline(t_command *cmd, t_data *data, char **envp);
+
+//built_in.c
+bool					check_builtin(t_command *command, t_data *data);
 
 #endif

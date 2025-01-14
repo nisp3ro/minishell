@@ -11,6 +11,7 @@ t_command	*parse_tokens(t_token *tokens)
 	command->input_redirection = NULL;
 	command->output_redirection = 0;
 	command->append = 0;
+	command->isfather = false;
 	command->next = NULL;
 	current = tokens;
 	arg_count = 0;

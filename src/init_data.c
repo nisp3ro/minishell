@@ -46,11 +46,11 @@ int    init_data(t_data *data, char *envp[])
     data->envp = cpy_env(envp);
     if (!data->envp)
         return (ERROR);
-    data->home = getenv("HOME");
+    data->home = NULL;
     data->pwd = getcwd(NULL, 0);
     if (!data->pwd)
         return(ERROR); //return(limpiar, ERROR);
-    data->oldpwd = NULL;
+    data->oldpwd = getcwd(NULL, 0);
     data->prompt = NULL;
     data->vars = NULL;
     return (OK);
