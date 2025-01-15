@@ -53,5 +53,6 @@ int    init_data(t_data *data, char *envp[])
     data->oldpwd = getcwd(NULL, 0);
     data->prompt = NULL;
     data->vars = NULL;
+    data->exp_vars = NULL;
     return (OK);
 }

@@ -123,8 +123,7 @@ void	set_variable(t_vars **env_vars, char *name, char *value)
 		return ;
 	}
 	new_var->name = ft_strdup(name);
-	new_var->value = value;
-	new_var->exported = false;
+	new_var->value = ft_strdup(value);
 	new_var->next = *env_vars;
 	*env_vars = new_var;
 }

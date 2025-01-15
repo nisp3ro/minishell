@@ -69,10 +69,8 @@ typedef struct s_vars
 {
 	char				*name;
 	char				*value;
-	bool				exported;
 	struct s_vars		*next;
 }						t_vars;
-
 
 typedef struct s_data
 {
@@ -82,6 +80,7 @@ typedef struct s_data
 	char				*oldpwd;
 	char				*prompt;
 	t_vars				*vars;
+	t_vars				*exp_vars;
 }						t_data;
 
 //signals.c
@@ -116,8 +115,8 @@ t_token					*add_token(t_token **tokens, t_token_type type,
 t_token					*tokenize(char *input, char **envp, t_data *data);
 
 //parsing.c
-t_command				*parse_tokens(t_token *tokens);
-t_command				*parse_pipeline(t_token *tokens);
+t_command				*parse_tokens(t_data *data, t_token *tokens);
+t_command				*parse_pipeline(t_data *data, t_token *tokens);
 
 //exec.c
 void					execute_pipeline(t_command *cmd, t_data *data, char **envp);

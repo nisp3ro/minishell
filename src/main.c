@@ -55,13 +55,10 @@ int	interactive_mode(t_data *data, char *envp[])
 		free(line);
 		if (full_cmd == NULL)
 			return (perror("Error"), ERROR);
-		tmp = ft_strchr(full_cmd, '=');
-		if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=')
-			handle_variable_assignment(full_cmd, &data->vars, data);
 		else if (full_cmd[0] != '\0')
 		{
 			tokens = tokenize(full_cmd, envp, data);
-			commands = parse_pipeline(tokens);
+			commands = parse_pipeline(data, tokens);
 			if (!commands || !commands->next && check_builtin(commands, data) == true)
 			{
 				free(data->prompt);
@@ -95,7 +92,7 @@ int	main(int argc, char *argv[], char *envp[])
 	else
 	{
 		t_token *tokens = tokenize(argv[2], envp, &data);
-		t_command *commands = parse_pipeline(tokens);
+		t_command *commands = parse_pipeline(&data, tokens);
 		if (!commands->next && check_builtin(commands, &data) == true)
 			return (OK); // return(limpiar, 0)
 		execute_pipeline(commands, &data, data.envp);

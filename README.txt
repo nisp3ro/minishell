@@ -1,6 +1,1 @@
-DFASDFASD
-ASDF
-ASDF
-ASDFASFD
-ASDF
-
+Arreglado export y unset.

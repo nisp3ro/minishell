@@ -1,10 +1,13 @@
 #include "../include/minishell.h"
 
-t_command	*parse_tokens(t_token *tokens)
+t_command	*parse_tokens(t_data *data, t_token *tokens)
 {
 	t_command	*command;
 	t_token		*current;
+	char		*tmp;
 	int			arg_count;
+	bool		first;
+	bool		export;
 
 	command = malloc(sizeof(t_command));
 	command->args = NULL;
@@ -15,9 +18,29 @@ t_command	*parse_tokens(t_token *tokens)
 	command->next = NULL;
 	current = tokens;
 	arg_count = 0;
+	first = true;
+	export = false;
 	while (current && current->type != TOKEN_PIPE)
 	{
-		if (current->type == TOKEN_HEREDOC)
+		if (first && current->type == TOKEN_WORD && ft_strchr(current->value, '='))
+		{
+			tmp = ft_strchr(current->value, '=');
+			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=')
+				handle_variable_assignment(current->value, &data->vars, data);
+		}
+		else if (export && current->type == TOKEN_WORD && ft_strchr(current->value, '='))
+		{
+			tmp = ft_strchr(current->value, '=');
+			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=')
+			{
+				handle_variable_assignment(current->value, &data->vars, data);
+				*tmp = '\0';
+				command->args = realloc(command->args, sizeof(char *) * (arg_count + 2)); //sustituir propio
+				command->args[arg_count++] = ft_strdup(current->value);
+				command->args[arg_count] = NULL;
+			}
+		}
+		else if (current->type == TOKEN_HEREDOC)
 		{
 			current = current->next;
 			if (current && current->type == TOKEN_WORD)
@@ -60,12 +83,14 @@ t_command	*parse_tokens(t_token *tokens)
 			else
 				return (NULL); // Manejar error de sintaxis
 		}
+		first = false;
+		export = (current->type == TOKEN_WORD && !ft_strcmp(current->value, "export"));
 		current = current->next;
 	}
 	return (command);
 }
 
-t_command	*parse_pipeline(t_token *tokens)
+t_command	*parse_pipeline(t_data *data, t_token *tokens)
 {
 	t_command	*head;
 	t_command	*current_command;
@@ -75,7 +100,7 @@ t_command	*parse_pipeline(t_token *tokens)
 	current_command = NULL;
 	while (tokens)
 	{
-		new_command = parse_tokens(tokens);
+		new_command = parse_tokens(data, tokens);
 		if (!head)
 			head = new_command;
 		else

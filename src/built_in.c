@@ -4,54 +4,24 @@
 #include <string.h>
 #include <unistd.h>
 
-bool	mark_as_exported(t_vars *vars, const char *name)
+void	set_exp(t_data *data, char* name, char *value)
 {
-	t_vars *current = vars;
-	while (current != NULL)
-	{
-		if (current->name && strcmp(current->name, name) == 0)
-		{
-			current->exported = true;
-			return (true);
-		}
-		current = current->next;
-	}
-	return (false);
-}
-
-void	ft_export(t_command *command, t_data *data)
-{
-	t_vars *tmp;
-	char *to_export;
 	int i;
-	
-	i = 1;
-	while (command->args[i])
-	{
-		to_export = mini_getenv(command->args[1], data->envp);
-		if (to_export)
-			set_variable(&data->vars, command->args[i], to_export);
-		else if (!mini_getvars(data->vars, command->args[i]))
-			set_variable(&data->vars, command->args[i], "");
-		mark_as_exported(data->vars, command->args[i]);
+
+	i = 0;
+	while (data->envp[i])
 		i++;
-	}
-	if (i == 1)
+	data->envp = realloc(data->envp, sizeof(char *) * (i + 2));
+	data->envp[i] = malloc(ft_strlen(name) + ft_strlen(value) + 2);
+	if (data->envp[i] == NULL)
 	{
-		tmp = data->vars;
-		while (tmp)
-		{
-			if(tmp->exported)
-			{
-				printf("declare -x %s", tmp->name);
-				if (tmp->value[0] != '\0')
-					printf("=\"%s\"", tmp->value);
-				printf("\n");
-			}
-			tmp = tmp->next;
-		}
+		perror("malloc");
+		return ;
 	}
-	g_error = 0;
+	ft_strcpy(data->envp[i], name);
+	ft_strcat(data->envp[i], "=");
+	ft_strcat(data->envp[i], value);
+	data->envp[i + 1] = NULL;
 }
 
 void	ft_cd(t_command *command, t_data *data)
@@ -189,6 +159,57 @@ void	ft_env(t_data *data)
 	}
 	g_error = 0;
 }
+void	unset_from_envp(t_command *command, t_data *data)
+{
+	int i;
+	int j;
+
+	i = 0;
+	if (!command->args[1])
+		return;
+	while (data->envp[i] != NULL)
+	{
+		if (ft_strncmp(data->envp[i], command->args[1], ft_strlen(command->args[1])) == 0)
+		{
+			free(data->envp[i]);
+			j = i;
+			while (data->envp[j] != NULL)
+			{
+				data->envp[j] = data->envp[j + 1];
+				j++;
+			}
+			break;
+		}
+		i++;
+	}
+	g_error = 0;
+}
+
+void	unset_from_vars(t_command *command, t_vars **vars)
+{
+	t_vars *tmp;
+	t_vars *prev;
+
+	tmp = *vars;
+	prev = NULL;
+	while (tmp)
+	{
+		if (strcmp(tmp->name, command->args[1]) == 0)
+		{
+			if (prev)
+				prev->next = tmp->next;
+			else
+				*vars = tmp->next;
+			free(tmp->name);
+			free(tmp->value);
+			free(tmp);
+			return ;
+		}
+		prev = tmp;
+		tmp = tmp->next;
+	}
+}
+
 void ft_unset(t_command *command, t_data *data)
 {
     int i;
@@ -197,21 +218,9 @@ void ft_unset(t_command *command, t_data *data)
 	i = 0;
 	if (!command->args[1])
 		return;
-    while (data->envp[i] != NULL)
-    {
-        if (ft_strncmp(data->envp[i], command->args[1], ft_strlen(command->args[1])) == 0)
-        {
-            free(data->envp[i]);
-            j = i;
-            while (data->envp[j] != NULL)
-            {
-                data->envp[j] = data->envp[j + 1];
-                j++;
-            }
-            break;
-        }
-        i++;
-    }
+	unset_from_envp(command, data);
+	unset_from_vars(command, &data->vars);
+	unset_from_vars(command, &data->exp_vars);
 	g_error = 0;
 }
 void	ft_pwd(t_data *data)
@@ -254,6 +263,48 @@ void	ft_exit(t_data *data, t_command *command)
 	exit(g_error);
 }
 
+void	ft_export(t_command *command, t_data *data)
+{
+	t_vars *tmp;
+	char *to_export;
+	int i;
+	
+	i = 1;
+	while (command->args[i])
+	{
+		to_export = mini_getenv(command->args[i], data->envp);
+		if (to_export)
+			set_variable(&data->exp_vars, command->args[i], to_export);
+		else if (!mini_getvars(data->vars, command->args[i]))
+		{
+			set_variable(&data->exp_vars, command->args[i], "");
+			set_exp(data, command->args[i], "");
+		}
+		else if (mini_getvars(data->vars, command->args[i]))
+		{
+			to_export = mini_getvars(data->vars, command->args[i]);
+			set_exp(data, command->args[i], to_export);
+			set_variable(&data->exp_vars, command->args[i], mini_getenv(command->args[i], data->envp));
+			unset_from_vars(command, &data->vars);
+		}
+		i++;
+	}
+	if (i == 1)
+	{
+		tmp = data->exp_vars;
+		while (tmp != NULL)
+		{
+			write(STDOUT_FILENO, "declare -x ", 11);
+			write(STDOUT_FILENO, tmp->name, ft_strlen(tmp->name));
+			write(STDOUT_FILENO, "=\"", 2);
+			write(STDOUT_FILENO, tmp->value, ft_strlen(tmp->value));
+			write(STDOUT_FILENO, "\"\n", 2);
+			tmp = tmp->next;
+		}
+	}
+	g_error = 0;
+}
+
 bool	check_builtin(t_command *command, t_data *data)
 {
 	if (!command->args)
@@ -274,3 +325,5 @@ bool	check_builtin(t_command *command, t_data *data)
 		return (ft_env(data), true);
 	return (false);
 }
+
+
