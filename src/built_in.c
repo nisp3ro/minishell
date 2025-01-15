@@ -153,7 +153,7 @@ void	ft_echo(t_command *command)
 	int	i;
 
 	i = 0;
-	if (ft_strcmp("-n", command->args[1]) == 0)
+	if (command->args[1] != NULL && ft_strcmp("-n", command->args[1]) == 0)
 		i++;
 	while (command->args[++i])
 	{
@@ -161,7 +161,7 @@ void	ft_echo(t_command *command)
 		if (command->args[i + 1])
 			write(STDOUT_FILENO, " ", 1);
 	}
-	if (ft_strcmp("-n", command->args[1]))
+	if (command->args[1] != NULL && ft_strcmp("-n", command->args[1]))
 		write(STDOUT_FILENO, "\n", 1);
 	if (command->isfather == false)
 		exit(OK);
@@ -206,6 +206,8 @@ void ft_unset(t_command *command, t_data *data)
 
 bool	check_builtin(t_command *command, t_data *data)
 {
+	if (!command->args)
+		return (false);
 	if (strcmp(command->args[0], "echo") == 0)
 		return (ft_echo(command), true);
 	if (strcmp(command->args[0], "cd") == 0)

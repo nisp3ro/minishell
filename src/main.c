@@ -1,5 +1,7 @@
 #include "../include/minishell.h"
 
+int g_error;
+
 int	interactive_mode(t_data *data, char *envp[])
 {
 	char		*line;
@@ -26,6 +28,7 @@ int	interactive_mode(t_data *data, char *envp[])
 		if (line[i] == '|')
 		{
 			printf("minishell: syntax error near unexpected token `|'\n");
+			g_error = 258;
 			free(line);
 			continue ;
 		}
@@ -90,11 +93,12 @@ int	main(int argc, char *argv[], char *envp[])
 {
 	t_data data;
 
+	g_error = 0;
 	if (argc == 2 || (argc > 2 && ft_strcmp(argv[1], "-c") != 0))
 		return (printf("You are doing it wrong!"), 127); // mensaje de error
 	if (init_data(&data, envp) == ERROR)
 		return (perror("Error"), 1);
-	init_signal(&data);
+	wait_signal(1);
 	if (argc == 1)
 	{
 		if (interactive_mode(&data, data.envp) == ERROR)

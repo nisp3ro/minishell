@@ -1,5 +1,7 @@
 #include "../include/minishell.h"
 
+extern int g_error;
+
 char	*mini_getvars(t_vars *vars, const char *name)
 {
 	t_vars *current = vars; // Initialize current to the head of the list
@@ -123,12 +125,12 @@ char	*expand_variables(char *token_value, char *envp[], t_data *data)
 	i = 0;
 	j = 0;
 	k = 0;
-	expanded = ft_calloc(sizeof(char), (strlen(token_value) + 1));
+	expanded = ft_calloc(sizeof(char), (ft_strlen(token_value) + 1));
 	if (!expanded)
 		return (NULL);
 	while (token_value[i] != '\0')
 	{
-		if (token_value[i] == '$' && isalnum(token_value[i + 1]))
+		if (token_value[i] == '$' && ft_isalnum(token_value[i + 1]))
 		{
 			j = i + 1;
 			while (token_value[j] != '\0' && ft_isalnum(token_value[j]))
@@ -153,6 +155,20 @@ char	*expand_variables(char *token_value, char *envp[], t_data *data)
 			expanded = tmp;
 			free(var);
 		}
+        else if (token_value[i] == '$' && token_value[i + 1] == '?')
+        {
+            tmp = ft_itoa(g_error);
+            if (!tmp)
+            {
+                perror("Error");
+                exit(1);  // En caso de error, salir con código de error
+            }
+            tmp2 = ft_strjoin(expanded, tmp);
+			free(tmp);
+            free(expanded);
+            expanded = tmp2;
+            i += 2;
+        }
 		else
 		{
 			tmp = malloc(sizeof(char) * 2);

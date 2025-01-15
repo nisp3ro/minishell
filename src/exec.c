@@ -1,5 +1,7 @@
 #include "../include/minishell.h"
 
+extern int g_error;
+
 // Función para liberar el array de cadenas (split)
 void	ft_free_split(char **split)
 {
@@ -68,6 +70,71 @@ void ft_create_custom_path(char **path, t_command *command)
 
 	printf("%s\n%s\n", *path, command->args[0]);
 }
+static void	wait_exit(int i, int pid, t_command **command)
+{
+	int	temp_pid;
+	int	temp;
+
+	//clear_lst(command);
+	while (i)
+	{
+		temp_pid = waitpid(-1, &g_error, 0);
+		if (WIFEXITED(g_error))
+			g_error = WEXITSTATUS(g_error);
+		if (temp_pid == pid)
+			temp = g_error;
+		if (g_error == 2 || g_error == 3)
+			g_error = g_error + 128;
+		else if (g_error != 0 && g_error != 1 && g_error != 127
+			&& g_error != 13 && g_error != 126)
+			perror(NULL);
+		i--;
+	}
+	g_error = temp;
+	wait_signal(1);
+}
+
+void	read_n_write(char *limiter, int *fd)
+{
+	char	*line;
+
+	line = readline("heredoc> ");
+	while (line)
+	{
+		if ((ft_strcmp(line, limiter) == 0) || !line)
+		{
+			if(line)
+				free(line);
+			break ;
+		}
+		write(fd[1], line, ft_strlen(line));
+		write(fd[1], "\n", 1);
+		free(line);
+		line = readline("heredoc> ");
+	}
+}
+void	here_doc(char *limiter)
+{
+	pid_t	reader;
+	int		fd[2];
+
+	if (pipe(fd) == -1)
+		exit(1); // limpiar
+	reader = fork();
+	if (reader == -1)
+		exit(1); // limpiar
+	if (reader == 0)
+	{
+		close(fd[0]);
+		read_n_write(limiter, fd);
+		close(fd[1]);
+		exit(EXIT_SUCCESS);
+	}
+	close(fd[1]);
+	dup2(fd[0], STDIN_FILENO);
+	close(fd[0]);
+	waitpid(reader, NULL, 0);
+}
 
 // Función para ejecutar una tubería de comandos con fork usando execve
 void	execute_pipeline(t_command *command, t_data *data, char **envp)
@@ -80,6 +147,8 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 	int		fd_in;
 
 	in_fd = STDIN_FILENO;
+	wait_signal(0);
+	i = 0;
 	while (command)
 	{
 		i++;
@@ -99,11 +168,11 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 		}
 		if (pid == 0)
 		{ // Proceso hijo
-			if (ft_strchr(command->args[0], '/') != 0)
+			if (command->args && ft_strchr(command->args[0], '/') != 0)
 			{
 				ft_create_custom_path(&command_path, command);
 			}
-			else
+			else if (command->args)
 				command_path = find_command_in_path(command->args[0], envp);
 			// Redirigir la entrada si no es el primer comando
 			if (in_fd != STDIN_FILENO)
@@ -112,23 +181,29 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 				close(in_fd);              // Cerrar el descriptor de entrada
 			}
 			// Redirigir la salida si es un comando intermedio o final
+
+			// Redirección de entrada
+			if (command->input_redirection)
+			{
+				if (ft_strcmp(command->input_redirection, "heredoc") == 0 && command->eof != NULL)
+					here_doc(command->eof);
+				else
+				{
+					fd_in = open(command->input_redirection, O_RDONLY);
+					if (fd_in < 0)
+					{
+						perror("open input");
+						exit(EXIT_FAILURE);
+					}
+					dup2(fd_in, STDIN_FILENO);
+					close(fd_in);
+				}
+			}
 			if (command->next)
 			{
 				dup2(pipefd[1], STDOUT_FILENO); // Redirigir stdout al pipe
 				close(pipefd[0]);
 				// Cerrar el extremo de lectura del pipe
-			}
-			// Redirección de entrada
-			if (command->input_redirection)
-			{
-				fd_in = open(command->input_redirection, O_RDONLY);
-				if (fd_in < 0)
-				{
-					perror("open input");
-					exit(EXIT_FAILURE);
-				}
-				dup2(fd_in, STDIN_FILENO);
-				close(fd_in);
 			}
 			// Redirección de salida
 			if (command->output_redirection)
@@ -136,7 +211,7 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 				dup2(command->output_redirection, STDOUT_FILENO);
 				close(command->output_redirection);
 			}
-			if (check_builtin(command, data) == false)
+			if (command->args && check_builtin(command, data) == false)
 			{ // Ejecutar el comando con execve
 				execve(command_path, command->args, envp);
 				perror("execve");
@@ -158,9 +233,5 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 		}
 		command = command->next; // Pasar al siguiente comando
 	}
-	while (i)
-	{
-		waitpid(-1, NULL, 0);
-		i--;
-	}
+	wait_exit(i, pid, &command);
 }

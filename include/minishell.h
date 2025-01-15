@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/14 19:54:23 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/15 11:10:33 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define MINISHELL_H
 
 # include "../libft/include/libft.h"
+# include "../libft/include/get_next_line.h"
 # include "colorsdef.h"
 # include <dirent.h>
 # include <errno.h>
@@ -55,6 +56,7 @@ typedef struct s_token
 typedef struct s_command
 {
 	char				**args;
+	char				*eof;
 	char				*input_redirection;
 	int					output_redirection;
 	int					append;
@@ -82,8 +84,7 @@ typedef struct s_data
 }						t_data;
 
 //signals.c
-void					handle_ctrl_c(int sig);
-void					init_signal(t_data *data);
+void					wait_signal(int i);
 
 //init_data.c
 char					**cpy_env(char *envp[]);
