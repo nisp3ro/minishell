@@ -16,24 +16,44 @@ char	*mini_getvars(t_vars *vars, const char *name)
 	return (NULL); // Return NULL if the variable is not found
 }
 
-void	handle_variable_assignment(char *input, t_vars **env_vars)
+void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 {
 	char	*equal_sign;
 	char	*name;
 	char	*value;
 	char	*tmp;
+	char	*expanded;
 	bool	in_simple_quotes;
 	bool	in_double_quotes;
 	int		i;
 
+	expanded = expand_variables(input, data->envp, data);
 	i = 0;
 	in_simple_quotes = false;
 	in_double_quotes = false;
-	equal_sign = ft_strchr(input, '=');
+	equal_sign = ft_strchr(expanded, '=');
 	*equal_sign = '\0';
 	equal_sign++;
-	name = input;
+	name = expanded;
 	tmp = equal_sign;
+	while (data->envp[i] != NULL)
+	{
+		if (ft_strncmp(data->envp[i], name, ft_strlen(name)) == 0)
+		{
+			free(data->envp[i]);
+			data->envp[i] = malloc(ft_strlen(name) + ft_strlen(equal_sign) + 0);
+			if (data->envp[i] == NULL)
+			{
+				perror("malloc");
+				return ;
+			}
+			ft_strcpy(data->envp[i], name);
+			ft_strcat(data->envp[i], "=");
+			ft_strcat(data->envp[i], equal_sign);
+			return ;
+		}
+		i++;
+	}
 	while (equal_sign[i] && (equal_sign[i] != ' ' || in_simple_quotes
 			|| in_double_quotes))
 	{

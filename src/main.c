@@ -65,7 +65,7 @@ int	interactive_mode(t_data *data, char *envp[])
 		}
 		tmp = ft_strchr(full_cmd, '=');
 		if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=')
-			handle_variable_assignment(full_cmd, &data->vars);
+			handle_variable_assignment(full_cmd, &data->vars, data);
 		else if (full_cmd[0] != '\0')
 		{
 			tokens = tokenize(full_cmd, envp, data);

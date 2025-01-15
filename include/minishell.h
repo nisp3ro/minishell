@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/15 11:10:33 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/15 12:56:59 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ char					*expand_variables(char *token_value, char *envp[],
 							t_data *data);
 char					*mini_getvars(t_vars *vars, const char *name);
 void	handle_variable_assignment(char *input,
-								t_vars **env_vars);
+								t_vars **env_vars, t_data *data);
 void					set_variable(t_vars **env_vars, char *name,
 							char *value);
 
