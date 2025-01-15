@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/15 12:56:59 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/15 19:31:54 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@
 # define ERROR -1
 # define OK 0
 
+extern int g_error;
+
 typedef enum e_token_type
 {
 	TOKEN_WORD,
@@ -57,10 +59,9 @@ typedef struct s_command
 {
 	char				**args;
 	char				*eof;
-	char				*input_redirection;
+	int				input_redirection;
 	int					output_redirection;
 	int					append;
-	bool				isfather;
 	struct s_command	*next;
 }						t_command;
 
@@ -109,7 +110,7 @@ void					set_variable(t_vars **env_vars, char *name,
 
 //tokenizer.c
 int						is_delimiter(char c);
-int						is_quote(char c);
+bool						is_quote(char c);
 t_token					*add_token(t_token **tokens, t_token_type type,
 							char *value);
 t_token					*tokenize(char *input, char **envp, t_data *data);

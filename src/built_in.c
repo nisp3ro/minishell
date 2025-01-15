@@ -51,6 +51,7 @@ void	ft_export(t_command *command, t_data *data)
 			tmp = tmp->next;
 		}
 	}
+	g_error = 0;
 }
 
 void	ft_cd(t_command *command, t_data *data)
@@ -73,15 +74,23 @@ void	ft_cd(t_command *command, t_data *data)
 			return ;
 		}
 	}
+	if (command->args[2])
+	{
+		write(STDERR_FILENO, " too many arguments\n", 20);
+		g_error = 1;
+		return ;
+	}
 	else if (chdir(command->args[1]) == -1)
 	{
 		perror("cd");
+		g_error = 1;
 		return ;
 	}
 	data->pwd = getcwd(NULL, 0);
 	if (data->pwd == NULL)
 	{
 		perror("getcwd");
+		g_error = 1;
 		return ;
 	}
 	while (data->envp[i] != NULL)
@@ -146,6 +155,7 @@ void	ft_cd(t_command *command, t_data *data)
 		ft_strcat(data->envp[i], data->oldpwd);
 		data->envp[i + 1] = NULL;
 	}
+	g_error = 0;
 }
 
 void	ft_echo(t_command *command)
@@ -155,16 +165,16 @@ void	ft_echo(t_command *command)
 	i = 0;
 	if (command->args[1] != NULL && ft_strcmp("-n", command->args[1]) == 0)
 		i++;
+	i++;
+	write(STDOUT_FILENO, command->args[i], ft_strlen(command->args[i]));
 	while (command->args[++i])
 	{
+		write(STDOUT_FILENO, " ", 1);
 		write(STDOUT_FILENO, command->args[i], ft_strlen(command->args[i]));
-		if (command->args[i + 1])
-			write(STDOUT_FILENO, " ", 1);
 	}
 	if (command->args[1] != NULL && ft_strcmp("-n", command->args[1]))
 		write(STDOUT_FILENO, "\n", 1);
-	if (command->isfather == false)
-		exit(OK);
+	g_error = 0;
 }
 void	ft_env(t_data *data)
 {
@@ -177,6 +187,7 @@ void	ft_env(t_data *data)
 		write(STDOUT_FILENO, "\n", 1);
 		i++;
 	}
+	g_error = 0;
 }
 void ft_unset(t_command *command, t_data *data)
 {
@@ -201,18 +212,60 @@ void ft_unset(t_command *command, t_data *data)
         }
         i++;
     }
+	g_error = 0;
 }
+void	ft_pwd(t_data *data)
+{
+	write(STDOUT_FILENO, data->pwd, ft_strlen(data->pwd));
+	write(STDOUT_FILENO, "\n", 1);
+	g_error = 0;
+}
+void	ft_exit(t_data *data, t_command *command)
+{
+	int i;
+	int j;
+	int num;
 
+	i = 0;
+	j = 0;
+	if (command->args[1] && command->args[2])
+	{
+		write(STDERR_FILENO, " too many arguments\n", 20);
+		exit(1);
+	}
+	if (command->args[1])
+	{
+		while (command->args[1][i])
+		{
+			if (!ft_isdigit(command->args[1][i]) && command->args[1][i] != '-' && command->args[1][i] != '+')
+			{
+				write(STDERR_FILENO, " numeric argument required\n", 27);
+				exit(2);
+			}
+			i++;
+		}
+		num = ft_atoi(command->args[1]);
+		while (num < 0)
+			num += 256;
+		g_error = num; 
+	}
+	else
+		g_error = 0;
+	exit(g_error);
+}
 
 bool	check_builtin(t_command *command, t_data *data)
 {
 	if (!command->args)
 		return (false);
+	if (strcmp(command->args[0], "exit") == 0)
+		return (ft_exit(data, command), true);
 	if (strcmp(command->args[0], "echo") == 0)
 		return (ft_echo(command), true);
 	if (strcmp(command->args[0], "cd") == 0)
 		return (ft_cd(command, data), true);
-	// if (strcmp(command->args[0], "pwd") == 0)
+	if (strcmp(command->args[0], "pwd") == 0)
+		return(ft_pwd(data), true);
 	if (strcmp(command->args[0], "export") == 0)
 		return(ft_export(command, data), true);
 	if (strcmp(command->args[0], "unset") == 0)

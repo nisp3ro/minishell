@@ -55,14 +55,6 @@ int	interactive_mode(t_data *data, char *envp[])
 		free(line);
 		if (full_cmd == NULL)
 			return (perror("Error"), ERROR);
-		if (ft_strcmp(full_cmd, "exit") == 0 || ft_strncmp(full_cmd, "exit ",
-				5) == 0)
-		// esto es un builtin
-		{
-			free(data->prompt);
-			free(full_cmd);
-			break ;
-		}
 		tmp = ft_strchr(full_cmd, '=');
 		if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=')
 			handle_variable_assignment(full_cmd, &data->vars, data);
@@ -70,23 +62,19 @@ int	interactive_mode(t_data *data, char *envp[])
 		{
 			tokens = tokenize(full_cmd, envp, data);
 			commands = parse_pipeline(tokens);
-			commands->isfather = true;
-			if (!commands->next && check_builtin(commands, data) == true)
+			if (!commands || !commands->next && check_builtin(commands, data) == true)
 			{
 				free(data->prompt);
 				free(full_cmd);
 				continue ;
 			}
 			else
-			{
-				commands->isfather = false;
 				execute_pipeline(commands, data, data->envp);
-			}
 		}
 		free(data->prompt);
 		free(full_cmd);
 	}
-	return (OK);
+	return (g_error);
 }
 
 int	main(int argc, char *argv[], char *envp[])
@@ -112,5 +100,5 @@ int	main(int argc, char *argv[], char *envp[])
 			return (OK); // return(limpiar, 0)
 		execute_pipeline(commands, &data, data.envp);
 	}
-	return (OK); // return(limpiar, 0)
+	return (g_error); // return(limpiar, 0)
 }

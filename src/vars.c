@@ -1,7 +1,5 @@
 #include "../include/minishell.h"
 
-extern int g_error;
-
 char	*mini_getvars(t_vars *vars, const char *name)
 {
 	t_vars *current = vars; // Initialize current to the head of the list

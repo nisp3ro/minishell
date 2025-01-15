@@ -5,9 +5,11 @@ int	is_delimiter(char c)
 	return (c == ' ' || c == '|' || c == '<' || c == '>');
 }
 
-int	is_quote(char c)
+bool	is_quote(char c)
 {
-	return (c == '\'' || c == '"');
+	if (c == '\'' || c == '\"')
+		return (true);
+	return (false);
 }
 
 t_token	*add_token(t_token **tokens, t_token_type type, char *value)
@@ -33,12 +35,25 @@ t_token	*add_token(t_token **tokens, t_token_type type, char *value)
 
 t_token	*tokenize(char *full_cmd, char **envp, t_data *data)
 {
-	t_token *tokens = NULL;
-	t_token *current = NULL;
-	int i = 0;
-	int tokeind = 0;
-	char quote = 0;
+	t_token	*tokens;
+	t_token	*current;
+	int		i;
+	int		start;
+	int		tokeind;
+	char	quote;
+	char	*token_value;
+	char	*tmp;
+	char	*tmp2;
 
+	tokens = NULL;
+	current = NULL;
+	i = 0;
+	start = 0;
+	tokeind = 0;
+	quote = 0;
+	token_value = NULL;
+	tmp = NULL;
+	tmp2 = NULL;
 	while (full_cmd[i])
 	{
 		if (is_delimiter(full_cmd[i]) && !quote)
@@ -59,47 +74,67 @@ t_token	*tokenize(char *full_cmd, char **envp, t_data *data)
 			}
 			else if (full_cmd[i] == '>')
 				current = add_token(&tokens, TOKEN_REDIRECT_OUT, ">");
-		}
-		else if (is_quote(full_cmd[i]))
-		{
-			// Se detecta una comilla simple o doble
-			quote = full_cmd[i];
-			int start = i + 1; // Ignorar la comilla de apertura
 			i++;
-
-			// Buscar la comilla de cierre correspondiente
-			while (full_cmd[i] && full_cmd[i] != quote)
-				i++;
-
-			// Si se encuentra la comilla de cierre, crear un token
-			if (full_cmd[i] == quote)
-			{
-				char *token_value = ft_substr(full_cmd, start, i - start);
-				if (quote != '\'')
-					token_value = expand_variables(token_value, envp, data);
-				current = add_token(&tokens, TOKEN_WORD, token_value);
-			}
-			i++; // Avanzamos para saltar la comilla de cierre
 		}
-		else if (!is_delimiter(full_cmd[i]))
+		else
 		{
-			// Palabra normal, fuera de comillas
-			int start = i;
-			while (full_cmd[i] && !is_delimiter(full_cmd[i])
-				&& !is_quote(full_cmd[i]))
-				i++;
-			char *token_value = ft_substr(full_cmd, start, i - start);
-
-			// Expansión de variables si no estamos dentro de comillas simples
-			if (quote != '\'')
+			while (1)
 			{
-				token_value = expand_variables(token_value, envp, data);
+				if (is_quote(full_cmd[i]))
+				{
+					quote = full_cmd[i];
+					i++;
+					start = i;
+					while (full_cmd[i] && full_cmd[i] != quote)
+					{
+						i++;
+					}
+					if (!full_cmd[i])
+					{
+						printf("minishell: syntax error\n");
+						exit(0);
+					}
+					tmp = ft_substr(full_cmd, start, i - start);
+					if (quote != '\'')
+					{
+						tmp = expand_variables(tmp, envp, data);
+					}
+					if (!token_value)
+						token_value = tmp;
+					else
+						token_value = ft_strjoin(token_value, tmp);
+					quote = 0;
+					i++;
+				}
+				else if (!is_delimiter(full_cmd[i]))
+				{
+					start = i;
+					while (full_cmd[i] && !is_delimiter(full_cmd[i])
+						&& !is_quote(full_cmd[i]))
+					{
+						i++;
+					}
+					tmp = ft_substr(full_cmd, start, i - start);
+					tmp = expand_variables(tmp, envp, data);
+					if (!token_value)
+						token_value = tmp;
+					else
+						token_value = ft_strjoin(token_value, tmp);
+					if (full_cmd[i] == '\0')
+					{
+						current = add_token(&tokens, TOKEN_WORD, token_value);
+						token_value = NULL;
+						break ;
+					}
+				}
+				else
+				{
+					current = add_token(&tokens, TOKEN_WORD, token_value);
+					token_value = NULL;
+					break ;
+				}
 			}
-
-			current = add_token(&tokens, TOKEN_WORD, token_value);
-			i--; // Retrocedemos 1 porque el bucle principal ya avanza i
 		}
-		i++;
 	}
 	return (tokens);
 }

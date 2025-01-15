@@ -9,10 +9,9 @@ t_command	*parse_tokens(t_token *tokens)
 	command = malloc(sizeof(t_command));
 	command->args = NULL;
 	command->eof = NULL;
-	command->input_redirection = NULL;
+	command->input_redirection = 0;
 	command->output_redirection = 0;
 	command->append = 0;
-	command->isfather = false;
 	command->next = NULL;
 	current = tokens;
 	arg_count = 0;
@@ -20,7 +19,6 @@ t_command	*parse_tokens(t_token *tokens)
 	{
 		if (current->type == TOKEN_HEREDOC)
 		{
-			command->input_redirection = ft_strdup("heredoc");
 			current = current->next;
 			if (current && current->type == TOKEN_WORD)
 				command->eof= ft_strdup(current->value);
@@ -37,7 +35,15 @@ t_command	*parse_tokens(t_token *tokens)
 		{
 			current = current->next;
 			if (current && current->type == TOKEN_WORD)
-				command->input_redirection = ft_strdup(current->value);
+			{
+				command->input_redirection = open(current->value, O_RDONLY);
+				if (command->input_redirection < 0)
+					{
+						perror(" ");
+						g_error = 1;
+						return(NULL);
+					}
+			}
 			else
 				return (NULL); // Manejar error de sintaxis
 		}

@@ -1,7 +1,5 @@
 #include "../include/minishell.h"
 
-extern int g_error;
-
 // Función para liberar el array de cadenas (split)
 void	ft_free_split(char **split)
 {
@@ -183,21 +181,13 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 			// Redirigir la salida si es un comando intermedio o final
 
 			// Redirección de entrada
-			if (command->input_redirection)
+			if (command->eof != NULL)
+				here_doc(command->eof);
+			else if (command->input_redirection)
 			{
-				if (ft_strcmp(command->input_redirection, "heredoc") == 0 && command->eof != NULL)
-					here_doc(command->eof);
-				else
-				{
-					fd_in = open(command->input_redirection, O_RDONLY);
-					if (fd_in < 0)
-					{
-						perror("open input");
-						exit(EXIT_FAILURE);
-					}
+					fd_in = command->input_redirection;
 					dup2(fd_in, STDIN_FILENO);
 					close(fd_in);
-				}
 			}
 			if (command->next)
 			{
@@ -217,7 +207,7 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 				perror("execve");
 				exit(EXIT_FAILURE);
 			}
-			exit(EXIT_SUCCESS);
+			exit(g_error);
 		}
 		else
 		{ // Proceso padre
