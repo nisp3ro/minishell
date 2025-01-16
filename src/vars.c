@@ -5,7 +5,7 @@ char	*mini_getvars(t_vars *vars, const char *name)
 	t_vars *current = vars; // Initialize current to the head of the list
 	while (current != NULL)
 	{
-		if (current->name && strcmp(current->name, name) == 0)
+		if (current->name && ft_strncmp(current->name, name, (ft_strlen(name) + 1)) == 0)
 		{
 			return (current->value); // Variable found
 		}
@@ -36,10 +36,10 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 	tmp = equal_sign;
 	while (data->envp[i] != NULL)
 	{
-		if (ft_strncmp(data->envp[i], name, ft_strlen(name)) == 0)
+		if (ft_strncmp(data->envp[i], name, ft_strlen(name)) == 0 && data->envp[i][ft_strlen(name)] == '=')
 		{
 			free(data->envp[i]);
-			data->envp[i] = malloc(ft_strlen(name) + ft_strlen(equal_sign) + 0);
+			data->envp[i] = malloc(ft_strlen(name) + ft_strlen(equal_sign));
 			if (data->envp[i] == NULL)
 			{
 				perror("malloc");
@@ -147,10 +147,10 @@ char	*expand_variables(char *token_value, char *envp[], t_data *data)
 		return (NULL);
 	while (token_value[i] != '\0')
 	{
-		if (token_value[i] == '$' && ft_isalnum(token_value[i + 1]))
+		if ((token_value[i] == '$' && ft_isalnum(token_value[i + 1])) || (token_value[i] == '$' && token_value[i + 1] == '_'))
 		{
 			j = i + 1;
-			while (token_value[j] != '\0' && ft_isalnum(token_value[j]))
+			while ((token_value[j] != '\0' && ft_isalnum(token_value[j])) || (token_value[j] != '\0' && token_value[j] == '_'))
 				j++;
 			var = malloc(sizeof(char) * (j - i));
 			if (!var)

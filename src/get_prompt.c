@@ -76,12 +76,13 @@ char	*mini_getenv(char *var, char *envp[])
  * Notes:
  *    - You must free the returned string when you are done with it.
  */
-int	get_prompt(char **prompt, t_data *data)
+int	get_prompt(char **p, t_data *data)
 {
 	char	*user;
 	char	*host;
 	char	*pwd;
 	int		free_host;
+	char	prompt[4096];
 
 	user = mini_getenv("USER", data->envp);
 	if (!user)
@@ -101,23 +102,16 @@ int	get_prompt(char **prompt, t_data *data)
 		}
 	}
 	pwd = data->pwd;
-	*prompt = malloc(sizeof(char) * (ft_strlen(user) + ft_strlen(host)
-				+ ft_strlen(pwd) - ft_strlen(data->home) + 38));
-	if (!*prompt)
-	{
-		if (free_host)
-			free(host);
-		return (ERROR);
-	}
-	ft_strcpy(*prompt, BBLUE);
-	ft_strcat(*prompt, user);
-	ft_strcat(*prompt, "@");
-	ft_strcat(*prompt, host);
-	ft_strcat(*prompt, RESET_COLOR BRIGHT_GREEN);
-	ft_strcat(*prompt, " ~");
-	ft_strcat(*prompt, pwd + ft_strlen(data->home));
-	ft_strcat(*prompt, RESET_COLOR);
-	ft_strcat(*prompt, "$ ");
+	ft_strcpy(prompt, BBLUE);
+	ft_strcat(prompt, user);
+	ft_strcat(prompt, "@");
+	ft_strcat(prompt, host);
+	ft_strcat(prompt, RESET_COLOR BRIGHT_GREEN);
+	ft_strcat(prompt, " ~");
+	ft_strcat(prompt, pwd + ft_strlen(data->home));
+	ft_strcat(prompt, RESET_COLOR);
+	ft_strcat(prompt, "$ ");
+	*p = prompt;
 	if (free_host)
 		free(host);
 	return (OK);

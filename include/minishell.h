@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/15 19:31:54 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/16 16:42:12 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,5 +123,8 @@ void					execute_pipeline(t_command *cmd, t_data *data, char **envp);
 
 //built_in.c
 bool					check_builtin(t_command *command, t_data *data);
+bool					check_builtin_prepipe(t_command *command, t_data *data);
+int						is_valid_identifier(const char *str);
+void					set_exp(t_data *data, char *name, char *value);
 
 #endif

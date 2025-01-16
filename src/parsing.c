@@ -25,10 +25,10 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 		if (first && current->type == TOKEN_WORD && ft_strchr(current->value, '='))
 		{
 			tmp = ft_strchr(current->value, '=');
-			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=')
+			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=' && is_valid_identifier(current->value) == OK)
 				handle_variable_assignment(current->value, &data->vars, data);
 		}
-		else if (export && current->type == TOKEN_WORD && ft_strchr(current->value, '='))
+		else if (export && current->type == TOKEN_WORD && ft_strchr(current->value, '=') && is_valid_identifier(current->value) == OK)
 		{
 			tmp = ft_strchr(current->value, '=');
 			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=')
@@ -84,7 +84,7 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 				return (NULL); // Manejar error de sintaxis
 		}
 		first = false;
-		export = (current->type == TOKEN_WORD && !ft_strcmp(current->value, "export"));
+		export = (current->type == TOKEN_WORD && !ft_strncmp(current->value, "export", 7));
 		current = current->next;
 	}
 	return (command);

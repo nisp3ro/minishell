@@ -44,6 +44,7 @@ t_token	*tokenize(char *full_cmd, char **envp, t_data *data)
 	char	*token_value;
 	char	*tmp;
 	char	*tmp2;
+	bool	in_here_doc;
 
 	tokens = NULL;
 	current = NULL;
@@ -54,33 +55,45 @@ t_token	*tokenize(char *full_cmd, char **envp, t_data *data)
 	token_value = NULL;
 	tmp = NULL;
 	tmp2 = NULL;
+	in_here_doc = false;
 	while (full_cmd[i])
 	{
 		if (is_delimiter(full_cmd[i]) && !quote)
 		{
 			if (full_cmd[i] == '|')
+			{
+				in_here_doc = false;
 				current = add_token(&tokens, TOKEN_PIPE, "|");
+			}
 			else if (full_cmd[i] == '<' && full_cmd[i + 1] == '<')
 			{
 				current = add_token(&tokens, TOKEN_HEREDOC, "<<");
 				i++;
+				in_here_doc = true;
 			}
 			else if (full_cmd[i] == '<')
+			{
+				in_here_doc = false;
 				current = add_token(&tokens, TOKEN_REDIRECT_IN, "<");
+			}
 			else if (full_cmd[i] == '>' && full_cmd[i + 1] == '>')
 			{
+				in_here_doc = false;
 				current = add_token(&tokens, TOKEN_APPEND_OUT, ">>");
 				i++;
 			}
 			else if (full_cmd[i] == '>')
+			{
+				in_here_doc = false;
 				current = add_token(&tokens, TOKEN_REDIRECT_OUT, ">");
+			}
 			i++;
 		}
 		else
 		{
 			while (1)
 			{
-				if (is_quote(full_cmd[i]))
+				if (is_quote(full_cmd[i]) && in_here_doc == false)
 				{
 					quote = full_cmd[i];
 					i++;
@@ -109,11 +122,11 @@ t_token	*tokenize(char *full_cmd, char **envp, t_data *data)
 				else if (!is_delimiter(full_cmd[i]))
 				{
 					start = i;
-					while (full_cmd[i] && !is_delimiter(full_cmd[i])
-						&& !is_quote(full_cmd[i]))
+					while (full_cmd[i] && !is_delimiter(full_cmd[i]) && !is_quote(full_cmd[i]) && in_here_doc == false || (full_cmd[i] && !is_delimiter(full_cmd[i]) && in_here_doc == true))
 					{
 						i++;
 					}
+					in_here_doc = false;
 					tmp = ft_substr(full_cmd, start, i - start);
 					tmp = expand_variables(tmp, envp, data);
 					if (!token_value)
@@ -129,6 +142,7 @@ t_token	*tokenize(char *full_cmd, char **envp, t_data *data)
 				}
 				else
 				{
+					in_here_doc = false;
 					current = add_token(&tokens, TOKEN_WORD, token_value);
 					token_value = NULL;
 					break ;

@@ -65,8 +65,6 @@ void ft_create_custom_path(char **path, t_command *command)
     while (i >= 0 && command->args[0][i] != '/')
         i--;
 	command->args[0] += i;
-
-	printf("%s\n%s\n", *path, command->args[0]);
 }
 static void	wait_exit(int i, int pid, t_command **command)
 {
@@ -92,26 +90,39 @@ static void	wait_exit(int i, int pid, t_command **command)
 	wait_signal(1);
 }
 
-void	read_n_write(char *limiter, int *fd)
+void	read_n_write(t_data *data, char *limiter, int *fd)
 {
 	char	*line;
+	char	*tmp;
 
 	line = readline("heredoc> ");
+	if ((limiter[1] != '\'' && limiter[ft_strlen(limiter) - 1] != '\'') || (limiter[1] != '\"' && limiter[ft_strlen(limiter) - 1] != '\"'))
+	{
+		if (limiter[0] == '\'')
+			tmp = ft_strtrim(limiter, "\'");
+		else
+			tmp = ft_strtrim(limiter, "\"");
+	}
+	else
+		tmp = ft_strdup(limiter);
 	while (line)
 	{
-		if ((ft_strcmp(line, limiter) == 0) || !line)
+		if ((ft_strncmp(line, tmp, (ft_strlen(tmp) + 1)) == 0) || !line)
 		{
 			if(line)
 				free(line);
 			break ;
 		}
+		if (ft_strchr(line, '$') && ((limiter[1] != '\'' && limiter[ft_strlen(limiter) - 1] != '\'') && (limiter[1] != '\"' && limiter[ft_strlen(limiter) - 1] != '\"')))
+			line = expand_variables(line, data->envp, data);
 		write(fd[1], line, ft_strlen(line));
 		write(fd[1], "\n", 1);
 		free(line);
 		line = readline("heredoc> ");
 	}
+	free(tmp);
 }
-void	here_doc(char *limiter)
+void	here_doc(t_data *data, char *limiter)
 {
 	pid_t	reader;
 	int		fd[2];
@@ -124,7 +135,7 @@ void	here_doc(char *limiter)
 	if (reader == 0)
 	{
 		close(fd[0]);
-		read_n_write(limiter, fd);
+		read_n_write(data, limiter, fd);
 		close(fd[1]);
 		exit(EXIT_SUCCESS);
 	}
@@ -182,7 +193,7 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 
 			// Redirección de entrada
 			if (command->eof != NULL)
-				here_doc(command->eof);
+				here_doc(data, command->eof);
 			else if (command->input_redirection)
 			{
 					fd_in = command->input_redirection;
@@ -204,8 +215,9 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 			if (command->args && check_builtin(command, data) == false)
 			{ // Ejecutar el comando con execve
 				execve(command_path, command->args, envp);
-				perror("execve");
-				exit(EXIT_FAILURE);
+				write(STDERR_FILENO, " command not found\n", 19);
+				g_error = 127;
+				exit(g_error);
 			}
 			exit(g_error);
 		}

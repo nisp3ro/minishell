@@ -2,6 +2,32 @@
 
 int g_error;
 
+void set_last_cmd_arg(t_data *data, char *name, char *value)
+{
+	int i;
+
+	i = 0;
+	while (data->envp[i] != NULL)
+	{
+		if (ft_strncmp(data->envp[i], name, ft_strlen(name)) == 0 && data->envp[i][ft_strlen(name)] == '=')
+		{
+			free(data->envp[i]);
+			data->envp[i] = malloc(ft_strlen(name) + ft_strlen(value) + 2);
+			if (data->envp[i] == NULL)
+			{
+				perror("malloc");
+				return ;
+			}
+			ft_strcpy(data->envp[i], name);
+			ft_strcat(data->envp[i], "=");
+			ft_strcat(data->envp[i], value);
+			return ;
+		}
+		i++;
+	}
+	set_exp(data, name, value);
+}
+
 int	interactive_mode(t_data *data, char *envp[])
 {
 	char		*line;
@@ -59,16 +85,31 @@ int	interactive_mode(t_data *data, char *envp[])
 		{
 			tokens = tokenize(full_cmd, envp, data);
 			commands = parse_pipeline(data, tokens);
-			if (!commands || !commands->next && check_builtin(commands, data) == true)
+
+			///no llega aca
+			i=0;
+			while(commands->args[i])
+				{
+					printf("%s\n", commands->args[i]);
+					i++;
+				}
+			//salida si null
+			i =  0;
+			if(commands->args && !commands->next)
 			{
-				free(data->prompt);
+				while (commands->args[i])
+					i++;
+				set_last_cmd_arg(data, "_", commands->args[i - 1]);					
+			}
+			if (!commands || !commands->next && check_builtin_prepipe(commands, data) == true)
+			{
+				
 				free(full_cmd);
 				continue ;
 			}
 			else
 				execute_pipeline(commands, data, data->envp);
 		}
-		free(data->prompt);
 		free(full_cmd);
 	}
 	return (g_error);
@@ -79,7 +120,7 @@ int	main(int argc, char *argv[], char *envp[])
 	t_data data;
 
 	g_error = 0;
-	if (argc == 2 || (argc > 2 && ft_strcmp(argv[1], "-c") != 0))
+	if (argc == 2 || (argc > 2 && ft_strncmp(argv[1], "-c", 3) != 0))
 		return (printf("You are doing it wrong!"), 127); // mensaje de error
 	if (init_data(&data, envp) == ERROR)
 		return (perror("Error"), 1);

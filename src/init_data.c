@@ -41,9 +41,26 @@ char    **cpy_env(char *envp[])
 /**
  * init_data - Initializes a `t_data` structure with environment data.
  */
+void create_envp(t_data *data)
+{
+    char *tmp;
+    data->envp = malloc(sizeof(char *) * 4);
+    if (!data->envp)
+        return ;
+    tmp = ft_strdup("PWD=");
+    data->envp[0] = ft_strjoin(tmp, getcwd(NULL, 0));
+    free(tmp);
+    data->envp[1] = ft_strdup("SHLVL= 0");
+    data->envp[2] = ft_strdup("_=]");
+    data->envp[3] = NULL;
+}
+
 int    init_data(t_data *data, char *envp[])
 {
-    data->envp = cpy_env(envp);
+    if (envp == NULL)
+        create_envp(data);
+    else
+        data->envp = cpy_env(envp);
     if (!data->envp)
         return (ERROR);
     data->home = NULL;

@@ -4,6 +4,27 @@
 #include <string.h>
 #include <unistd.h>
 
+// char **ft_realloc(char **envp, int size)
+// {
+// 	char **new;
+// 	int i;
+
+// 	i = 0;
+// 	new = malloc(sizeof(char *) * (size + 1));
+// 	if (new == NULL)
+// 	{
+// 		perror("malloc");
+// 		return (NULL);
+// 	}
+// 	while (i < size)
+// 	{
+// 		new[i] = envp[i];
+// 		i++;
+// 	}
+// 	new[i] = NULL;
+// 	return (new);
+// }
+
 void	set_exp(t_data *data, char* name, char *value)
 {
 	int i;
@@ -133,7 +154,7 @@ void	ft_echo(t_command *command)
 	int	i;
 
 	i = 0;
-	if (command->args[1] != NULL && ft_strcmp("-n", command->args[1]) == 0)
+	if (command->args[1] != NULL && ft_strncmp("-n", command->args[1], 3) == 0)
 		i++;
 	i++;
 	write(STDOUT_FILENO, command->args[i], ft_strlen(command->args[i]));
@@ -142,7 +163,7 @@ void	ft_echo(t_command *command)
 		write(STDOUT_FILENO, " ", 1);
 		write(STDOUT_FILENO, command->args[i], ft_strlen(command->args[i]));
 	}
-	if (command->args[1] != NULL && ft_strcmp("-n", command->args[1]))
+	if (command->args[1] != NULL && ft_strncmp("-n", command->args[1], 3))
 		write(STDOUT_FILENO, "\n", 1);
 	g_error = 0;
 }
@@ -169,7 +190,7 @@ void	unset_from_envp(t_command *command, t_data *data)
 		return;
 	while (data->envp[i] != NULL)
 	{
-		if (ft_strncmp(data->envp[i], command->args[1], ft_strlen(command->args[1])) == 0)
+		if (ft_strncmp(data->envp[i], command->args[1], ft_strlen(command->args[1])) == 0 && data->envp[i][ft_strlen(command->args[1])] == '=')
 		{
 			free(data->envp[i]);
 			j = i;
@@ -194,7 +215,7 @@ void	unset_from_vars(t_command *command, t_vars **vars)
 	prev = NULL;
 	while (tmp)
 	{
-		if (strcmp(tmp->name, command->args[1]) == 0)
+		if (ft_strncmp(tmp->name, command->args[1], ft_strlen(command->args[1])) == 0 && tmp->name[ft_strlen(command->args[1])] == '\0')
 		{
 			if (prev)
 				prev->next = tmp->next;
@@ -237,6 +258,7 @@ void	ft_exit(t_data *data, t_command *command)
 
 	i = 0;
 	j = 0;
+	write(STDOUT_FILENO, "exit\n", 5);
 	if (command->args[1] && command->args[2])
 	{
 		write(STDERR_FILENO, " too many arguments\n", 20);
@@ -263,6 +285,23 @@ void	ft_exit(t_data *data, t_command *command)
 	exit(g_error);
 }
 
+int is_valid_identifier(const char *str)
+{
+	int i;
+
+	i = 0;
+    if (ft_isdigit(str[0]) || str[0] == '=')
+        return (ERROR);
+    while (str[i] != '\0' && str[i] != '=') 
+	{
+        if (!ft_isalnum(str[i]) && str[i] != '_')
+            return (ERROR);
+        i++;
+    }
+
+    return (OK);
+}
+
 void	ft_export(t_command *command, t_data *data)
 {
 	t_vars *tmp;
@@ -270,8 +309,16 @@ void	ft_export(t_command *command, t_data *data)
 	int i;
 	
 	i = 1;
+
 	while (command->args[i])
 	{
+		if (is_valid_identifier(command->args[i]) == ERROR)
+		{
+			write(STDERR_FILENO, " not a valid identifier\n", 24);
+			g_error = 1;
+			i++;
+			continue ;
+		}
 		to_export = mini_getenv(command->args[i], data->envp);
 		if (to_export)
 			set_variable(&data->exp_vars, command->args[i], to_export);
@@ -288,6 +335,7 @@ void	ft_export(t_command *command, t_data *data)
 			unset_from_vars(command, &data->vars);
 		}
 		i++;
+		g_error = 0;
 	}
 	if (i == 1)
 	{
@@ -301,28 +349,43 @@ void	ft_export(t_command *command, t_data *data)
 			write(STDOUT_FILENO, "\"\n", 2);
 			tmp = tmp->next;
 		}
+		g_error = 0;
 	}
-	g_error = 0;
 }
 
 bool	check_builtin(t_command *command, t_data *data)
 {
 	if (!command->args)
 		return (false);
-	if (strcmp(command->args[0], "exit") == 0)
+	if (ft_strncmp(command->args[0], "exit", 5) == 0)
 		return (ft_exit(data, command), true);
-	if (strcmp(command->args[0], "echo") == 0)
+	if (ft_strncmp(command->args[0], "echo", 5) == 0)
 		return (ft_echo(command), true);
-	if (strcmp(command->args[0], "cd") == 0)
+	if (ft_strncmp(command->args[0], "cd", 3) == 0)
 		return (ft_cd(command, data), true);
-	if (strcmp(command->args[0], "pwd") == 0)
+	if (ft_strncmp(command->args[0], "pwd", 4) == 0)
 		return(ft_pwd(data), true);
-	if (strcmp(command->args[0], "export") == 0)
+	if (ft_strncmp(command->args[0], "export", 7) == 0)
 		return(ft_export(command, data), true);
-	if (strcmp(command->args[0], "unset") == 0)
+	if (ft_strncmp(command->args[0], "unset", 6) == 0)
 		return (ft_unset(command, data), true);
-	if (strcmp(command->args[0], "env") == 0)
+	if (ft_strncmp(command->args[0], "env", 4) == 0)
 		return (ft_env(data), true);
+	return (false);
+}
+
+bool	check_builtin_prepipe(t_command *command, t_data *data)
+{
+	if (!command->args)
+		return (false);
+	if (ft_strncmp(command->args[0], "exit", 5) == 0)
+		return (ft_exit(data, command), true);
+	if (ft_strncmp(command->args[0], "cd", 3) == 0)
+		return (ft_cd(command, data), true);
+	if (ft_strncmp(command->args[0], "export", 7) == 0)
+		return(ft_export(command, data), true);
+	if (ft_strncmp(command->args[0], "unset", 6) == 0)
+		return (ft_unset(command, data), true);
 	return (false);
 }
 
