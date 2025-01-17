@@ -55,12 +55,70 @@ void create_envp(t_data *data)
     data->envp[3] = NULL;
 }
 
+void create_exp_vars(t_data *data, t_vars **exp_vars, int flag)
+{
+    int i;
+    char *var;
+    char *equal_sign;
+
+    i = 0;
+    while (data->envp[i + flag])
+    {
+        var = ft_strdup(data->envp[i]);
+        if (!var)
+            return ;//salida de error
+        equal_sign = ft_strchr(var, '=');
+        *equal_sign = '\0';
+        equal_sign++;
+        set_variable(exp_vars, var, equal_sign);
+        free(var);
+        i++;
+    }
+}
+
+void sort_list(t_vars **head) 
+{
+    t_vars *sorted;
+    t_vars *current;
+    t_vars *next;
+
+    sorted = NULL;
+    current = *head;
+    while (current != NULL) {
+        t_vars *next = current->next;
+
+        if (sorted == NULL || ft_strcmp(current->name, sorted->name) < 0) {
+            current->next = sorted;
+            sorted = current;
+        } else {
+            t_vars *temp = sorted;
+            while (temp->next != NULL && ft_strcmp(temp->next->name, current->name) < 0) {
+                temp = temp->next;
+            }
+            current->next = temp->next;
+            temp->next = current;
+        }
+
+        current = next;
+    }
+
+    *head = sorted;
+}
+
 int    init_data(t_data *data, char *envp[])
 {
-    if (envp == NULL)
+    data->exp_vars = NULL;
+    if (envp == NULL || envp[0] == NULL || envp[0][0] == '\0')
+    {
         create_envp(data);
+        create_exp_vars(data, &data->exp_vars, 0);
+    }
     else
+    {
         data->envp = cpy_env(envp);
+        create_exp_vars(data, &data->exp_vars, 1);
+    }
+    sort_list(&data->exp_vars);
     if (!data->envp)
         return (ERROR);
     data->home = NULL;
@@ -70,6 +128,5 @@ int    init_data(t_data *data, char *envp[])
     data->oldpwd = getcwd(NULL, 0);
     data->prompt = NULL;
     data->vars = NULL;
-    data->exp_vars = NULL;
     return (OK);
 }

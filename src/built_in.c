@@ -320,12 +320,16 @@ void	ft_export(t_command *command, t_data *data)
 			continue ;
 		}
 		to_export = mini_getenv(command->args[i], data->envp);
-		if (to_export)
+		if (to_export && mini_getvars(data->exp_vars, command->args[i]) == NULL)
+		{
 			set_variable(&data->exp_vars, command->args[i], to_export);
-		else if (!mini_getvars(data->vars, command->args[i]))
+			sort_list(&data->exp_vars);
+		}
+		else if (!mini_getvars(data->vars, command->args[i]) && !mini_getvars(data->exp_vars, command->args[i]))
 		{
 			set_variable(&data->exp_vars, command->args[i], "");
 			set_exp(data, command->args[i], "");
+			sort_list(&data->exp_vars);
 		}
 		else if (mini_getvars(data->vars, command->args[i]))
 		{
@@ -333,6 +337,7 @@ void	ft_export(t_command *command, t_data *data)
 			set_exp(data, command->args[i], to_export);
 			set_variable(&data->exp_vars, command->args[i], mini_getenv(command->args[i], data->envp));
 			unset_from_vars(command, &data->vars);
+			sort_list(&data->exp_vars);
 		}
 		i++;
 		g_error = 0;

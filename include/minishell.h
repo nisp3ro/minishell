@@ -88,6 +88,7 @@ void					wait_signal(int i);
 
 //init_data.c
 char					**cpy_env(char *envp[]);
+void					sort_list(t_vars **head);
 int						init_data(t_data *data, char *envp[]);
 
 //utils.c
@@ -112,7 +113,7 @@ int						is_delimiter(char c);
 bool						is_quote(char c);
 t_token					*add_token(t_token **tokens, t_token_type type,
 							char *value);
-t_token					*tokenize(char *input, char **envp, t_data *data);
+t_token					*tokenize(char *input, t_data *data);
 
 //parsing.c
 t_command				*parse_tokens(t_data *data, t_token *tokens);

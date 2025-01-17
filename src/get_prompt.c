@@ -93,7 +93,8 @@ int	get_prompt(char **p, t_data *data)
 	if (!host)
 	{
 		host = mini_getenv("SESSION_MANAGER", data->envp);
-		host = host_trim(host);
+		if (host)
+			host = host_trim(host);
 		free_host = 1;
 		if (!host)
 		{

@@ -64,7 +64,7 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 					{
 						perror(" ");
 						g_error = 1;
-						return(NULL);
+						return(g_error);
 					}
 			}
 			else

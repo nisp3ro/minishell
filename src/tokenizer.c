@@ -33,7 +33,7 @@ t_token	*add_token(t_token **tokens, t_token_type type, char *value)
 	return (new_token);
 }
 
-t_token	*tokenize(char *full_cmd, char **envp, t_data *data)
+t_token	*tokenize(char *full_cmd, t_data *data)
 {
 	t_token	*tokens;
 	t_token	*current;
@@ -110,7 +110,7 @@ t_token	*tokenize(char *full_cmd, char **envp, t_data *data)
 					tmp = ft_substr(full_cmd, start, i - start);
 					if (quote != '\'')
 					{
-						tmp = expand_variables(tmp, envp, data);
+						tmp = expand_variables(tmp, data->envp, data);
 					}
 					if (!token_value)
 						token_value = tmp;
@@ -128,7 +128,8 @@ t_token	*tokenize(char *full_cmd, char **envp, t_data *data)
 					}
 					in_here_doc = false;
 					tmp = ft_substr(full_cmd, start, i - start);
-					tmp = expand_variables(tmp, envp, data);
+					int j = 0;
+					tmp = expand_variables(tmp, data->envp, data);
 					if (!token_value)
 						token_value = tmp;
 					else

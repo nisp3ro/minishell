@@ -83,27 +83,22 @@ int	interactive_mode(t_data *data, char *envp[])
 			return (perror("Error"), ERROR);
 		else if (full_cmd[0] != '\0')
 		{
-			tokens = tokenize(full_cmd, envp, data);
+			tokens = tokenize(full_cmd, data);
 			commands = parse_pipeline(data, tokens);
-
-			///no llega aca
-			i=0;
-			while(commands->args[i])
-				{
-					printf("%s\n", commands->args[i]);
-					i++;
-				}
-			//salida si null
-			i =  0;
 			if(commands->args && !commands->next)
 			{
-				while (commands->args[i])
-					i++;
-				set_last_cmd_arg(data, "_", commands->args[i - 1]);					
+				if (ft_strncmp(commands->args[0], "export", 7) == 0 && commands->args[1] == NULL)
+					set_last_cmd_arg(data, "_", commands->args[0]);
+				else if (ft_strncmp(commands->args[0], "export", 7) != 0)
+				{
+					i = 0;
+					while (commands->args[i])
+						i++;
+					set_last_cmd_arg(data, "_", commands->args[i - 1]);
+				}					
 			}
 			if (!commands || !commands->next && check_builtin_prepipe(commands, data) == true)
 			{
-				
 				free(full_cmd);
 				continue ;
 			}
@@ -132,7 +127,7 @@ int	main(int argc, char *argv[], char *envp[])
 	}
 	else
 	{
-		t_token *tokens = tokenize(argv[2], envp, &data);
+		t_token *tokens = tokenize(argv[2], &data);
 		t_command *commands = parse_pipeline(&data, tokens);
 		if (!commands->next && check_builtin(commands, &data) == true)
 			return (OK); // return(limpiar, 0)
