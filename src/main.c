@@ -98,18 +98,13 @@ int	interactive_mode(t_data *data, char *envp[])
 		else if (full_cmd[0] != '\0')
 		{
 			tokens = tokenize(full_cmd, data);
+			free(full_cmd);
 			if (tokens == NULL)
-			{
-				free(full_cmd);
 				continue ;
-			}
 			commands = parse_pipeline(data, tokens);
+			free_tokens(tokens);
 			if (commands == NULL)
-			{
-				free_tokens(tokens);
-				free(full_cmd);
 				continue ;
-			}
 			if(commands->args && !commands->next)
 			{
 				if (ft_strncmp(commands->args[0], "export", 7) == 0 && commands->args[1] == NULL)
@@ -141,7 +136,7 @@ int	main(int argc, char *argv[], char *envp[])
 
 	g_error = 0;
 	if (argc == 2 || (argc > 2 && ft_strncmp(argv[1], "-c", 3) != 0))
-		return (printf("You are doing it wrong!"), 127); // mensaje de error
+		return (write(STDERR_FILENO, "Error: Argument is not -c.\n", 28), 127);
 	if (init_data(&data, envp) == ERROR)
 		return (perror("Error"), 1);
 	wait_signal(1);

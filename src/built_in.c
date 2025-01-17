@@ -245,6 +245,8 @@ void	ft_unset(t_command *command, t_data *data)
 	i = 0;
 	if (!command->args[1])
 		return ;
+	// if (ft_strcmp(command->args[1], "HOME") == 0) //WTF?
+	// 	return ;
 	unset_from_envp(command, data);
 	unset_from_vars(command, &data->vars);
 	unset_from_vars(command, &data->exp_vars);
@@ -328,7 +330,7 @@ void	ft_export(t_command *command, t_data *data)
 		if (to_export && mini_getvars(data->exp_vars, command->args[i]) == NULL)
 		{
 			set_variable(&data->exp_vars, command->args[i], to_export);
-			sort_list(&data->exp_vars);
+			sort_list(&data->exp_vars, data->exp_vars);
 		}
 		else if (!mini_getvars(data->vars, command->args[i])
 				&& !mini_getvars(data->exp_vars, command->args[i]))
@@ -336,7 +338,7 @@ void	ft_export(t_command *command, t_data *data)
 			set_variable(&data->exp_vars, command->args[i], "");
 			if (ft_strchr(command->args[i], '='))
 				set_exp(data, command->args[i], "");
-			sort_list(&data->exp_vars);
+			sort_list(&data->exp_vars, data->exp_vars);
 		}
 		else if (mini_getvars(data->vars, command->args[i]))
 		{
@@ -345,7 +347,7 @@ void	ft_export(t_command *command, t_data *data)
 			set_variable(&data->exp_vars, command->args[i],
 					mini_getenv(command->args[i], data->envp));
 			unset_from_vars(command, &data->vars);
-			sort_list(&data->exp_vars);
+			sort_list(&data->exp_vars, data->exp_vars);
 		}
 		i++;
 		g_error = 0;
@@ -409,7 +411,7 @@ bool	check_redirs(t_command *command)
 			if (fd_in < 0)
 			{
 				perror("open");
-				return(false);
+				return (false);
 			}
 		}
 		else if (command->redir->type == OUTPUT)
@@ -419,14 +421,16 @@ bool	check_redirs(t_command *command)
 				close(fd_out);
 			if (command->append)
 				fd_out = open(command->redir->value,
-						O_WRONLY | O_CREAT | O_APPEND, 0644);
+								O_WRONLY | O_CREAT | O_APPEND,
+								0644);
 			else
 				fd_out = open(command->redir->value,
-						O_WRONLY | O_CREAT | O_TRUNC, 0644);
+								O_WRONLY | O_CREAT | O_TRUNC,
+								0644);
 			if (fd_out < 0)
 			{
 				perror("open");
-				return(false);
+				return (false);
 			}
 		}
 		command->redir = command->redir->next;

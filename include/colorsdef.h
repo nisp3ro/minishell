@@ -20,12 +20,12 @@
 # define BWHITE "\033[47m"
 
 // Colores brillantes
-# define BRIGHT_RED "\033[91m"
+# define BRIGHT_RED "\033[1;31m"
 # define BRIGHT_GREEN "\033[92m"
 # define BRIGHT_YELLOW "\033[93m"
-# define BRIGHT_BLUE "\033[94m"
+# define BRIGHT_BLUE "\033[1;94m"
 # define BRIGHT_MAGENTA "\033[95m"
-# define BRIGHT_CYAN "\033[96m"
+# define BRIGHT_CYAN "\033[1;96m"
 # define BRIGHT_WHITE "\033[97m"
 
 // Fondo brillante

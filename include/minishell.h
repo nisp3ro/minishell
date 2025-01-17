@@ -6,15 +6,15 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/17 14:51:42 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/17 17:44:22 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "../libft/include/libft.h"
 # include "../libft/include/get_next_line.h"
+# include "../libft/include/libft.h"
 # include "colorsdef.h"
 # include <dirent.h>
 # include <errno.h>
@@ -34,8 +34,9 @@
 
 # define ERROR -1
 # define OK 0
+# define PATH_MAX 4096
 
-extern int g_error;
+extern int				g_error;
 
 typedef enum e_token_type
 {
@@ -101,12 +102,13 @@ void					wait_signal(int i);
 
 //init_data.c
 char					**cpy_env(char *envp[]);
-void					sort_list(t_vars **head);
+void					sort_list(t_vars **head, t_vars *current);
 int						init_data(t_data *data, char *envp[]);
 
 //utils.c
 bool					is_all_spaces(char *str);
 bool					complete_quotes(char **full_cmd);
+void					sort_list(t_vars **head, t_vars *current);
 
 //get_prompt.c
 int						get_prompt(char **prompt, t_data *data);
@@ -117,13 +119,14 @@ char					*expand_variables(char *token_value, char *envp[],
 							t_data *data);
 char					*mini_getvars(t_vars *vars, const char *name);
 void	handle_variable_assignment(char *input,
-								t_vars **env_vars, t_data *data);
-void					set_variable(t_vars **env_vars, char *name,
+								t_vars **env_vars,
+								t_data *data);
+int						set_variable(t_vars **env_vars, char *name,
 							char *value);
 
 //tokenizer.c
 int						is_delimiter(char c);
-bool						is_quote(char c);
+bool					is_quote(char c);
 t_token					*add_token(t_token **tokens, t_token_type type,
 							char *value);
 t_token					*tokenize(char *input, t_data *data);
@@ -133,7 +136,8 @@ t_command				*parse_tokens(t_data *data, t_token *tokens);
 t_command				*parse_pipeline(t_data *data, t_token *tokens);
 
 //exec.c
-void					execute_pipeline(t_command *cmd, t_data *data, char **envp);
+void					execute_pipeline(t_command *cmd, t_data *data,
+							char **envp);
 bool					ensure_directory_exists(const char *file_path);
 
 //built_in.c
@@ -141,5 +145,9 @@ bool					check_builtin(t_command *command, t_data *data);
 bool					check_builtin_prepipe(t_command *command, t_data *data);
 int						is_valid_identifier(const char *str);
 void					set_exp(t_data *data, char *name, char *value);
+
+//cleaner.c
+void					clean_variables(t_vars *vars);
+void					clean_envp(char **envp);
 
 #endif

@@ -1,24 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_prompt.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/17 18:51:06 by mrubal-c          #+#    #+#             */
+/*   Updated: 2025/01/17 18:52:59 by mrubal-c         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/minishell.h"
 
-/**
- * host_trim - Trims a hostname to exclude domain and directory information.
- * 
- * This function processes a given hostname string to remove the domain part 
- * (after the first dot) and any directory path (before the first slash). It 
- * returns the trimmed portion of the hostname, which represents only the base 
- * hostname without additional details.
- * 
- * Parameters:
- *    - host: A pointer to the original hostname string.
- * 
- * Return:
- *    - A dynamically allocated string containing the trimmed hostname, 
- *      or NULL if memory allocation fails.
- * 
- * Note:
- *    - The caller is responsible for freeing the allocated memory for the 
- *      returned string.
- */
 char	*host_trim(char *host)
 {
 	char	*trimmed;
@@ -60,58 +53,139 @@ char	*mini_getenv(char *var, char *envp[])
 	return (NULL);
 }
 
-/**
- * get_prompt - Creates a custom shell prompt string.
- * 
- * This function builds a prompt using the current user's name, host name, 
- * current working directory, and color formatting. It retrieves environment 
- * variables (USER, HOSTNAME, PWD,
-		HOME) and uses default values if any are missing. 
- * The prompt includes user@host in a specified color and the current directory 
- * relative to the home directory.
- * 
- * Return:
- *    - A dynamically allocated string with the formatted prompt or NULL if 
- *      memory allocation fails.
- * Notes:
- *    - You must free the returned string when you are done with it.
- */
+char	*get_host(char **envp, int *free_host)
+{
+	char	*host;
+
+	host = mini_getenv("HOST", envp);
+	if (!host)
+		host = mini_getenv("HOSTNAME", envp);
+	if (!host)
+	{
+		host = mini_getenv("SESSION_MANAGER", envp);
+		if (host)
+		{
+			host = host_trim(host);
+			if (!host)
+				return (NULL);
+		}
+		*free_host = 1;
+		if (!host)
+		{
+			host = "42madrid";
+			*free_host = 0;
+		}
+	}
+	return (host);
+}
+
+bool	has_git_directory(const char *dir_path)
+{
+	DIR				*dir;
+	struct dirent	*entry;
+
+	dir = opendir(dir_path);
+	if (dir == NULL)
+	{
+		return (false);
+	}
+	entry = readdir(dir);
+	while (entry != NULL)
+	{
+		if (ft_strncmp(entry->d_name, ".git", 5) == 0)
+		{
+			closedir(dir);
+			return (true);
+		}
+		entry = readdir(dir);
+	}
+	closedir(dir);
+	return (false);
+}
+
+int	is_a_daddy(char *parent_dir, t_data *data, bool *git_found,
+		char *last_slash)
+{
+	parent_dir = ft_strdup(data->pwd);
+	if (!parent_dir)
+		return (ERROR);
+	while (parent_dir && *parent_dir)
+	{
+		if (has_git_directory(parent_dir))
+		{
+			*git_found = true;
+			break ;
+		}
+		last_slash = strrchr(parent_dir, '/');
+		if (last_slash)
+			*last_slash = '\0';
+		else
+			break ;
+	}
+	free(parent_dir);
+	return (OK);
+}
+
+int	is_a_git(t_data *data, bool *git_found)
+{
+	char	*tmp;
+	char	*parent_dir;
+	char	*last_slash;
+
+	*git_found = false;
+	tmp = ft_strjoin(data->pwd, "/.git");
+	if (!tmp)
+		return (ERROR);
+	*git_found = false;
+	if (access(tmp, F_OK) == 0)
+		*git_found = true;
+	else
+	{
+		if (is_a_daddy(parent_dir, data, git_found, last_slash) == ERROR)
+			return (free(tmp), ERROR);
+	}
+	free(tmp);
+	return (OK);
+}
+
+int	print_prompt(char *prompt, char *user, char *host, t_data *data)
+{
+	bool	git_found;
+
+	ft_strcpy(prompt, user);
+	ft_strcat(prompt, "@");
+	ft_strcat(prompt, host);
+	ft_strcat(prompt, ":" BRIGHT_CYAN "~");
+	if (is_a_git(data, &git_found) == ERROR)
+		return (ERROR);
+	ft_strcat(prompt, data->pwd + ft_strlen(data->home));
+	if (git_found)
+	{
+		ft_strcat(prompt, BRIGHT_BLUE);
+		ft_strcat(prompt, " git:(" BRIGHT_RED "main" BRIGHT_BLUE ")");
+		ft_strcat(prompt, RESET_COLOR);
+	}
+	ft_strcat(prompt, RESET_COLOR);
+	ft_strcat(prompt, "$ ");
+	return (OK);
+}
+
 int	get_prompt(char **p, t_data *data)
 {
 	char	*user;
 	char	*host;
-	char	*pwd;
 	int		free_host;
-	char	prompt[4096];
+	char	prompt[PATH_MAX];
 
+	data->home = mini_getenv("HOME", data->envp);
 	user = mini_getenv("USER", data->envp);
 	if (!user)
-		user = "unknown_user";
-	host = mini_getenv("HOSTNAME", data->envp);
-	data->home = mini_getenv("HOME", data->envp);
+		user = "minishell";
 	free_host = 0;
-	if (!host)
-	{
-		host = mini_getenv("SESSION_MANAGER", data->envp);
-		if (host)
-			host = host_trim(host);
-		free_host = 1;
-		if (!host)
-		{
-			host = "unknown_host";
-			free_host = 0;
-		}
-	}
-	pwd = data->pwd;
-	ft_strcpy(prompt, BBLUE);
-	ft_strcat(prompt, user);
-	ft_strcat(prompt, "@");
-	ft_strcat(prompt, host);
-	ft_strcat(prompt, RESET_COLOR BRIGHT_GREEN);
-	ft_strcat(prompt, " ~");
-	ft_strcat(prompt, pwd + ft_strlen(data->home));
-	ft_strcat(prompt, RESET_COLOR);
-	ft_strcat(prompt, "$ ");
+	host = get_host(data->envp, &free_host);
+	if (host == NULL)
+		return (ERROR);
+	print_prompt(prompt, user, host, data);
 	*p = prompt;
 	if (free_host)
 		free(host);

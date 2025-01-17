@@ -5,7 +5,8 @@ char	*mini_getvars(t_vars *vars, const char *name)
 	t_vars *current = vars; // Initialize current to the head of the list
 	while (current != NULL)
 	{
-		if (current->name && ft_strncmp(current->name, name, (ft_strlen(name) + 1)) == 0)
+		if (current->name && ft_strncmp(current->name, name, (ft_strlen(name)
+					+ 1)) == 0)
 		{
 			return (current->value); // Variable found
 		}
@@ -15,7 +16,7 @@ char	*mini_getvars(t_vars *vars, const char *name)
 }
 
 void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
-	{
+{
 	char	*existing_var;
 	char	*equal_sign;
 	char	*name;
@@ -40,7 +41,8 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 	env = false;
 	while (data->envp[i] != NULL)
 	{
-		if (ft_strncmp(data->envp[i], name, ft_strlen(name)) == 0 && data->envp[i][ft_strlen(name)] == '=')
+		if (ft_strncmp(data->envp[i], name, ft_strlen(name)) == 0
+			&& data->envp[i][ft_strlen(name)] == '=')
 		{
 			free(data->envp[i]);
 			data->envp[i] = malloc(ft_strlen(name) + ft_strlen(equal_sign));
@@ -134,20 +136,31 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 	}
 }
 
-void	set_variable(t_vars **env_vars, char *name, char *value)
+
+
+int	set_variable(t_vars **env_vars, char *name, char *value)
 {
 	t_vars	*new_var;
 
 	new_var = malloc(sizeof(t_vars));
-	if (!new_var)
-	{
-		perror("malloc");
-		return ;
-	}
+	if (new_var == NULL)
+		return (ERROR);
 	new_var->name = ft_strdup(name);
+	if (new_var->name == NULL)
+	{
+		free(new_var);
+		return (ERROR);
+	}
 	new_var->value = ft_strdup(value);
+	if (new_var->value == NULL)
+	{
+		free(new_var->name);
+		free(new_var);
+		return (ERROR);
+	}
 	new_var->next = *env_vars;
 	*env_vars = new_var;
+	return (OK);
 }
 
 char	*expand_variables(char *token_value, char *envp[], t_data *data)
@@ -169,10 +182,12 @@ char	*expand_variables(char *token_value, char *envp[], t_data *data)
 		return (NULL);
 	while (token_value[i] != '\0')
 	{
-		if ((token_value[i] == '$' && ft_isalnum(token_value[i + 1])) || (token_value[i] == '$' && token_value[i + 1] == '_'))
+		if ((token_value[i] == '$' && ft_isalnum(token_value[i + 1]))
+			|| (token_value[i] == '$' && token_value[i + 1] == '_'))
 		{
 			j = i + 1;
-			while ((token_value[j] != '\0' && ft_isalnum(token_value[j])) || (token_value[j] != '\0' && token_value[j] == '_'))
+			while ((token_value[j] != '\0' && ft_isalnum(token_value[j]))
+				|| (token_value[j] != '\0' && token_value[j] == '_'))
 				j++;
 			var = malloc(sizeof(char) * (j - i));
 			if (!var)
@@ -194,20 +209,20 @@ char	*expand_variables(char *token_value, char *envp[], t_data *data)
 			expanded = tmp;
 			free(var);
 		}
-        else if (token_value[i] == '$' && token_value[i + 1] == '?')
-        {
-            tmp = ft_itoa(g_error);
-            if (!tmp)
-            {
-                perror("Error");
-                exit(1);  // En caso de error, salir con código de error
-            }
-            tmp2 = ft_strjoin(expanded, tmp);
+		else if (token_value[i] == '$' && token_value[i + 1] == '?')
+		{
+			tmp = ft_itoa(g_error);
+			if (!tmp)
+			{
+				perror("Error");
+				exit(1); // En caso de error, salir con código de error
+			}
+			tmp2 = ft_strjoin(expanded, tmp);
 			free(tmp);
-            free(expanded);
-            expanded = tmp2;
-            i += 2;
-        }
+			free(expanded);
+			expanded = tmp2;
+			i += 2;
+		}
 		else
 		{
 			tmp = malloc(sizeof(char) * 2);
