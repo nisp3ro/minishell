@@ -1,5 +1,34 @@
 #include "../include/minishell.h"
 
+void free_commands(t_command *command)
+{
+	t_command	*tmp;
+	int i;
+
+	i = 0;
+	while (command)
+	{
+		tmp = command;
+		command = command->next;
+		if (tmp->args)
+		{
+			while (tmp->args[i])
+			{
+				free(tmp->args[i]);
+				i++;
+			}
+			free(tmp->args);
+		}
+		if (tmp->eof)
+			free(tmp->eof);
+		if (tmp->input_redirection)
+			close(tmp->input_redirection);
+		if (tmp->output_redirection)
+			close(tmp->output_redirection);
+		free(tmp);
+	}
+}
+
 t_command	*parse_tokens(t_data *data, t_token *tokens)
 {
 	t_command	*command;
@@ -22,20 +51,25 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 	export = false;
 	while (current && current->type != TOKEN_PIPE)
 	{
-		if (first && current->type == TOKEN_WORD && ft_strchr(current->value, '='))
+		if (first && current->type == TOKEN_WORD && ft_strchr(current->value,
+				'='))
 		{
 			tmp = ft_strchr(current->value, '=');
-			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=' && is_valid_identifier(current->value) == OK)
+			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '='
+				&& is_valid_identifier(current->value) == OK)
 				handle_variable_assignment(current->value, &data->vars, data);
 		}
-		else if (export && current->type == TOKEN_WORD && ft_strchr(current->value, '=') && is_valid_identifier(current->value) == OK)
+		else if (export && current->type == TOKEN_WORD
+				&& ft_strchr(current->value, '=')
+				&& is_valid_identifier(current->value) == OK)
 		{
 			tmp = ft_strchr(current->value, '=');
 			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=')
 			{
 				handle_variable_assignment(current->value, &data->vars, data);
 				*tmp = '\0';
-				command->args = realloc(command->args, sizeof(char *) * (arg_count + 2)); //sustituir propio
+				command->args = realloc(command->args, sizeof(char *)
+						* (arg_count + 2)); //sustituir propio
 				command->args[arg_count++] = ft_strdup(current->value);
 				command->args[arg_count] = NULL;
 			}
@@ -44,13 +78,18 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 		{
 			current = current->next;
 			if (current && current->type == TOKEN_WORD)
-				command->eof= ft_strdup(current->value);
+				command->eof = ft_strdup(current->value);
 			else
-				return(NULL); // Manejar error de sintaxis
+			{
+				write(STDERR_FILENO,
+						"syntax error near unexpected token `newline'\n", 45);
+				return (NULL);
+			}
 		}
 		else if (current->type == TOKEN_WORD)
 		{
-			command->args = realloc(command->args, sizeof(char *) * (arg_count + 2)); //sustituir propio
+			command->args = realloc(command->args, sizeof(char *) * (arg_count
+						+ 2)); //sustituir propio
 			command->args[arg_count++] = ft_strdup(current->value);
 			command->args[arg_count] = NULL;
 		}
@@ -61,30 +100,58 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 			{
 				command->input_redirection = open(current->value, O_RDONLY);
 				if (command->input_redirection < 0)
-					{
-						perror(" ");
-						g_error = 1;
-						return(g_error);
-					}
+				{
+					perror(" ");
+					g_error = 1;
+					return (NULL);
+				}
 			}
 			else
-				return (NULL); // Manejar error de sintaxis
+			{
+				write(STDERR_FILENO,
+						"syntax error near unexpected token `newline'\n", 45);
+				return (NULL);
+			}
 		}
-		else if (current->type == TOKEN_REDIRECT_OUT || current->type == TOKEN_APPEND_OUT)
+		else if (current->type == TOKEN_REDIRECT_OUT
+				|| current->type == TOKEN_APPEND_OUT)
 		{
 			command->append = (current->type == TOKEN_APPEND_OUT);
 			current = current->next;
 			if (current && current->type == TOKEN_WORD && command->append)
-				command->output_redirection = open(current->value,
-							O_WRONLY | O_CREAT | O_APPEND, 0644);
+			{
+				if (command->output_redirection)
+					close(command->output_redirection);
+				command->output_redirection = open(current->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
+				if (command->output_redirection < 0)
+				{
+					perror(" ");
+					g_error = 1;
+					return (NULL);
+				}
+			}
 			else if (current && current->type == TOKEN_WORD && !command->append)
-				command->output_redirection = open(current->value,
-							O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			{
+				if (command->output_redirection)
+					close(command->output_redirection);
+				command->output_redirection = open(current->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+				if (command->output_redirection < 0)
+				{
+					perror(" ");
+					g_error = 1;
+					return (NULL);
+				}
+			}
 			else
-				return (NULL); // Manejar error de sintaxis
+			{
+				write(STDERR_FILENO,
+						"syntax error near unexpected token `newline'\n", 45);
+				return (NULL);
+			}
 		}
 		first = false;
-		export = (current->type == TOKEN_WORD && !ft_strncmp(current->value, "export", 7));
+		export = (current->type == TOKEN_WORD && !ft_strncmp(current->value,
+					"export", 7));
 		current = current->next;
 	}
 	return (command);

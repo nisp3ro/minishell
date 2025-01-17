@@ -328,7 +328,8 @@ void	ft_export(t_command *command, t_data *data)
 		else if (!mini_getvars(data->vars, command->args[i]) && !mini_getvars(data->exp_vars, command->args[i]))
 		{
 			set_variable(&data->exp_vars, command->args[i], "");
-			set_exp(data, command->args[i], "");
+			if(ft_strchr(command->args[i], '='))
+				set_exp(data, command->args[i], "");
 			sort_list(&data->exp_vars);
 		}
 		else if (mini_getvars(data->vars, command->args[i]))
@@ -349,9 +350,9 @@ void	ft_export(t_command *command, t_data *data)
 		{
 			write(STDOUT_FILENO, "declare -x ", 11);
 			write(STDOUT_FILENO, tmp->name, ft_strlen(tmp->name));
-			write(STDOUT_FILENO, "=\"", 2);
+			write(STDOUT_FILENO, "=", 1);
 			write(STDOUT_FILENO, tmp->value, ft_strlen(tmp->value));
-			write(STDOUT_FILENO, "\"\n", 2);
+			write(STDOUT_FILENO, "\n", 1);
 			tmp = tmp->next;
 		}
 		g_error = 0;

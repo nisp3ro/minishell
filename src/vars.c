@@ -15,7 +15,8 @@ char	*mini_getvars(t_vars *vars, const char *name)
 }
 
 void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
-{
+	{
+	char	*existing_var;
 	char	*equal_sign;
 	char	*name;
 	char	*value;
@@ -23,8 +24,10 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 	char	*expanded;
 	bool	in_simple_quotes;
 	bool	in_double_quotes;
+	bool	env;
 	int		i;
 
+	existing_var = NULL;
 	expanded = expand_variables(input, data->envp, data);
 	i = 0;
 	in_simple_quotes = false;
@@ -34,6 +37,7 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 	equal_sign++;
 	name = expanded;
 	tmp = equal_sign;
+	env = false;
 	while (data->envp[i] != NULL)
 	{
 		if (ft_strncmp(data->envp[i], name, ft_strlen(name)) == 0 && data->envp[i][ft_strlen(name)] == '=')
@@ -48,7 +52,7 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 			ft_strcpy(data->envp[i], name);
 			ft_strcat(data->envp[i], "=");
 			ft_strcat(data->envp[i], equal_sign);
-			return ;
+			env = true;
 		}
 		i++;
 	}
@@ -109,7 +113,23 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 			i++;
 		}
 	}
-	set_variable(env_vars, name, value);
+	existing_var = mini_getvars(data->exp_vars, name);
+	if (existing_var)
+	{
+		free(existing_var);
+		existing_var = ft_strdup(value);
+	}
+	else if (!env)
+	{
+		existing_var = mini_getvars(data->vars, name);
+		if (existing_var)
+		{
+			free(existing_var);
+			existing_var = ft_strdup(value);
+		}
+		else
+			set_variable(env_vars, name, value);
+	}
 }
 
 void	set_variable(t_vars **env_vars, char *name, char *value)

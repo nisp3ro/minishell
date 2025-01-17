@@ -144,7 +144,8 @@ t_token	*tokenize(char *full_cmd, t_data *data)
 				else
 				{
 					in_here_doc = false;
-					current = add_token(&tokens, TOKEN_WORD, token_value);
+					if (token_value && token_value[0])
+						current = add_token(&tokens, TOKEN_WORD, token_value);
 					token_value = NULL;
 					break ;
 				}

@@ -28,6 +28,20 @@ void set_last_cmd_arg(t_data *data, char *name, char *value)
 	set_exp(data, name, value);
 }
 
+void free_tokens(t_token *tokens)
+{
+	t_token *tmp;
+
+	while (tokens)
+	{
+		tmp = tokens;
+		tokens = tokens->next;
+		if (tmp->type == TOKEN_WORD)
+			free(tmp->value);
+		free(tmp);
+	}
+}
+
 int	interactive_mode(t_data *data, char *envp[])
 {
 	char		*line;
@@ -84,7 +98,18 @@ int	interactive_mode(t_data *data, char *envp[])
 		else if (full_cmd[0] != '\0')
 		{
 			tokens = tokenize(full_cmd, data);
+			if (tokens == NULL)
+			{
+				free(full_cmd);
+				continue ;
+			}
 			commands = parse_pipeline(data, tokens);
+			if (commands == NULL)
+			{
+				free_tokens(tokens);
+				free(full_cmd);
+				continue ;
+			}
 			if(commands->args && !commands->next)
 			{
 				if (ft_strncmp(commands->args[0], "export", 7) == 0 && commands->args[1] == NULL)
