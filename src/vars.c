@@ -118,6 +118,8 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 	{
 		free(existing_var);
 		existing_var = ft_strdup(value);
+		if (!env)
+			set_exp(data, name, value);
 	}
 	else if (!env)
 	{

@@ -1,32 +1,24 @@
 #include "../include/minishell.h"
 
-void free_commands(t_command *command)
+t_redir	*add_redir(t_redir **redir, t_redir_type type, char *value)
 {
-	t_command	*tmp;
-	int i;
+	t_redir	*new_redir;
+	t_redir	*last;
 
-	i = 0;
-	while (command)
+	new_redir = malloc(sizeof(t_redir));
+	last = *redir;
+	new_redir->type = type;
+	new_redir->value = value;
+	new_redir->next = NULL;
+	if (!last)
 	{
-		tmp = command;
-		command = command->next;
-		if (tmp->args)
-		{
-			while (tmp->args[i])
-			{
-				free(tmp->args[i]);
-				i++;
-			}
-			free(tmp->args);
-		}
-		if (tmp->eof)
-			free(tmp->eof);
-		if (tmp->input_redirection)
-			close(tmp->input_redirection);
-		if (tmp->output_redirection)
-			close(tmp->output_redirection);
-		free(tmp);
+		*redir = new_redir;
+		return (new_redir);
 	}
+	while (last->next)
+		last = last->next;
+	last->next = new_redir;
+	return (new_redir);
 }
 
 t_command	*parse_tokens(t_data *data, t_token *tokens)
@@ -35,18 +27,22 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 	t_token		*current;
 	char		*tmp;
 	int			arg_count;
+	int			o_redir_count;
+	int			i_redir_count;
 	bool		first;
 	bool		export;
+	int			x;
 
 	command = malloc(sizeof(t_command));
 	command->args = NULL;
 	command->eof = NULL;
-	command->input_redirection = 0;
-	command->output_redirection = 0;
 	command->append = 0;
+	command->redir = NULL;
 	command->next = NULL;
 	current = tokens;
 	arg_count = 0;
+	o_redir_count = 0;
+	i_redir_count = 0;
 	first = true;
 	export = false;
 	while (current && current->type != TOKEN_PIPE)
@@ -82,7 +78,8 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 			else
 			{
 				write(STDERR_FILENO,
-						"syntax error near unexpected token `newline'\n", 45);
+						"syntax error near unexpected token `newline'\n",
+						45);
 				return (NULL);
 			}
 		}
@@ -97,19 +94,12 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 		{
 			current = current->next;
 			if (current && current->type == TOKEN_WORD)
-			{
-				command->input_redirection = open(current->value, O_RDONLY);
-				if (command->input_redirection < 0)
-				{
-					perror(" ");
-					g_error = 1;
-					return (NULL);
-				}
-			}
+				add_redir(&command->redir, INPUT, current->value);
 			else
 			{
 				write(STDERR_FILENO,
-						"syntax error near unexpected token `newline'\n", 45);
+						"syntax error near unexpected token `newline'\n",
+						45);
 				return (NULL);
 			}
 		}
@@ -118,36 +108,16 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 		{
 			command->append = (current->type == TOKEN_APPEND_OUT);
 			current = current->next;
-			if (current && current->type == TOKEN_WORD && command->append)
-			{
-				if (command->output_redirection)
-					close(command->output_redirection);
-				command->output_redirection = open(current->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
-				if (command->output_redirection < 0)
-				{
-					perror(" ");
-					g_error = 1;
-					return (NULL);
-				}
-			}
-			else if (current && current->type == TOKEN_WORD && !command->append)
-			{
-				if (command->output_redirection)
-					close(command->output_redirection);
-				command->output_redirection = open(current->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-				if (command->output_redirection < 0)
-				{
-					perror(" ");
-					g_error = 1;
-					return (NULL);
-				}
-			}
+			if (current && current->type == TOKEN_WORD)
+				add_redir(&command->redir, OUTPUT, current->value);
 			else
 			{
 				write(STDERR_FILENO,
-						"syntax error near unexpected token `newline'\n", 45);
+						"syntax error near unexpected token `newline'\n",
+						45);
 				return (NULL);
 			}
+			x = 0;
 		}
 		first = false;
 		export = (current->type == TOKEN_WORD && !ft_strncmp(current->value,
@@ -168,11 +138,19 @@ t_command	*parse_pipeline(t_data *data, t_token *tokens)
 	while (tokens)
 	{
 		new_command = parse_tokens(data, tokens);
-		if (!head)
-			head = new_command;
-		else
-			current_command->next = new_command;
-		current_command = new_command;
+		if (new_command->args == NULL || new_command->args[0] == NULL || new_command->args[0][0] == '\0')
+		{
+			new_command = NULL;
+			//free_command(new_command);
+		}
+		else 
+		{
+			if (!head)
+				head = new_command;
+			else
+				current_command->next = new_command;
+			current_command = new_command;
+		}
 		while (tokens && tokens->type != TOKEN_PIPE)
 			tokens = tokens->next;
 		if (tokens && tokens->type == TOKEN_PIPE)

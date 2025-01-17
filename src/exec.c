@@ -145,19 +145,25 @@ void	here_doc(t_data *data, char *limiter)
 	waitpid(reader, NULL, 0);
 }
 
-// Función para ejecutar una tubería de comandos con fork usando execve
 void	execute_pipeline(t_command *command, t_data *data, char **envp)
 {
 	int 	i;
 	int		pipefd[2];
 	pid_t	pid;
 	int		in_fd;
+	int		fd_out;
 	char	*command_path;
 	int		fd_in;
+	int		x;
+	bool	input_redirection;
+	bool	output_redirection;
 
 	in_fd = STDIN_FILENO;
+	fd_out = STDOUT_FILENO;
 	wait_signal(0);
 	i = 0;
+	input_redirection = false;
+	output_redirection = false;
 	while (command)
 	{
 		i++;
@@ -194,11 +200,36 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 			// Redirección de entrada
 			if (command->eof != NULL)
 				here_doc(data, command->eof);
-			else if (command->input_redirection)
+			while (command->redir)
 			{
-					fd_in = command->input_redirection;
-					dup2(fd_in, STDIN_FILENO);
-					close(fd_in);
+				if (command->redir->type == INPUT)
+				{	
+					input_redirection = true;
+					if (fd_in != STDIN_FILENO)
+						close(fd_in);
+					fd_in = open(command->redir->value, O_RDONLY);
+					if (fd_in < 0)
+					{
+						perror("open");
+						exit(EXIT_FAILURE); // limpiar
+					}
+				}
+				else if (command->redir->type == OUTPUT)
+				{
+					output_redirection = true;
+					if (fd_out != STDOUT_FILENO)
+						close(fd_out);
+					if (command->append)
+						fd_out = open(command->redir->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
+					else
+						fd_out = open(command->redir->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+					if (fd_out < 0)
+					{
+						perror("open");
+						exit(EXIT_FAILURE); // limpiar
+					}
+				}
+				command->redir = command->redir->next;
 			}
 			if (command->next)
 			{
@@ -206,18 +237,126 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 				close(pipefd[0]);
 				// Cerrar el extremo de lectura del pipe
 			}
-			// Redirección de salida
-			if (command->output_redirection)
+			if (input_redirection)
 			{
-				dup2(command->output_redirection, STDOUT_FILENO);
-				close(command->output_redirection);
+				dup2(fd_in, STDIN_FILENO);
+				close(fd_in);
 			}
+			if (output_redirection)
+			{
+				dup2(fd_out, STDOUT_FILENO);
+				close(fd_out);
+			}
+			// else if (command->input_redirection)
+			// {
+			// 	x = 0;
+			// 	while (command->input_redirection[x])
+			// 	{
+			// 		if (fd_in != STDIN_FILENO)
+			// 			close(fd_in);
+			// 		fd_in = open(command->input_redirection[x], O_RDONLY);
+			// 		if (fd_in < 0)
+			// 		{
+			// 			if (errno == EACCES || errno == ENOENT)
+			// 			{
+			// 				if (access (command->input_redirection[x], F_OK) == 0)
+			// 					write(STDERR_FILENO, " Permission denied\n", 19);
+			// 				else
+			// 					write(STDERR_FILENO, " No such file or directory\n", 27);
+			// 			}
+			// 			else if (errno == ENOEXEC)
+			// 				write(STDERR_FILENO, " Exec format error. Wrong Architecture.\n", 40);
+			// 			else if (errno == EISDIR)
+			// 				write(STDERR_FILENO, " Is a directory\n", 16);
+			// 			else if (errno == ENOTDIR)
+			// 				write(STDERR_FILENO, " Not a directory\n", 17);
+			// 			else
+			// 				write(STDERR_FILENO, " command not found\n", 19);
+			// 			g_error = 1;
+			// 			exit(g_error);
+			// 		}
+			// 		x++;
+			// 	}
+			// 		dup2(fd_in, STDIN_FILENO);
+			// 		close(fd_in);
+			// }
+
+			// Redirección de salida
+			// if (command->output_redirection && command->output_redirection[0])
+			// {
+			// 	x = 0;
+				
+			// 	while (command->output_redirection[x])
+			// 	{
+			// 		if (fd_out != STDOUT_FILENO)
+			// 			close(fd_in);
+			// 		if (command->append)
+			// 			fd_out = open(command->output_redirection[x], O_WRONLY | O_CREAT | O_APPEND, 0644);
+			// 		else
+			// 			fd_out = open(command->output_redirection[x], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			// 		if (fd_out < 0)
+			// 		{
+			// 			if (errno == EACCES)
+			// 			{
+			// 				if (access (command->output_redirection[x], X_OK) != 0)
+			// 					write(STDERR_FILENO, " Permission denied\n", 19);
+			// 				else
+			// 					write(STDERR_FILENO, " Is a directory\n", 16);
+			// 			}
+			// 			else if (errno == ENOEXEC)
+			// 				write(STDERR_FILENO, " Exec format error. Wrong Architecture.\n", 40);
+			// 			else if (errno == EISDIR)
+			// 				write(STDERR_FILENO, " Is a directory\n", 16);
+			// 			else if (errno == ENOTDIR)
+			// 				write(STDERR_FILENO, " Not a directory\n", 17);
+			// 			else if (errno == ENOENT)
+			// 				write(STDERR_FILENO, " No such file or directory\n", 27);
+			// 			else
+			// 				write(STDERR_FILENO, " command not found\n", 19);
+			// 			g_error = 1;
+			// 			exit(g_error);
+			// 		}
+			// 		x++;
+			// 	}
+			// 	dup2(fd_out, STDOUT_FILENO);
+			// 	close(fd_out);
+			// }
 			if (command->args && check_builtin(command, data) == false)
 			{ // Ejecutar el comando con execve
 				execve(command_path, command->args, envp);
-				write(STDERR_FILENO, " command not found\n", 19);
-				g_error = 127;
-				exit(g_error);
+				if (errno == EACCES)
+				{
+					if (access (command_path, X_OK) != 0)
+						write(STDERR_FILENO, " Permission denied\n", 19);
+					else
+						write(STDERR_FILENO, " Is a directory\n", 16);
+					exit(126);
+				}
+				else if (errno == ENOEXEC)
+				{
+					write(STDERR_FILENO, " Exec format error. Wrong Architecture.\n", 40);
+					exit(126);
+				}
+				else if (errno == EISDIR)
+				{
+					write(STDERR_FILENO, " Is a directory\n", 16);
+					exit(126);
+				}
+				else if (errno == ENOTDIR)
+				{
+					write(STDERR_FILENO, " Not a directory\n", 17);
+					exit(126);
+				}
+				else if (errno == ENOENT)
+				{
+					write(STDERR_FILENO, " No such file or directory\n", 27);
+					exit(127);
+				}
+				else
+				{
+					write(STDERR_FILENO, " command not found\n", 19);
+					exit(127);
+				}
 			}
 			exit(g_error);
 		}

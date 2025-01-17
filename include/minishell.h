@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/16 16:42:12 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/17 14:51:42 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,13 @@ typedef enum e_token_type
 	TOKEN_END,
 }						t_token_type;
 
+typedef enum e_redir_type
+{
+	INPUT,
+	OUTPUT,
+
+}						t_redir_type;
+
 typedef struct s_token
 {
 	t_token_type		type;
@@ -55,13 +62,19 @@ typedef struct s_token
 	struct s_token		*next;
 }						t_token;
 
+typedef struct s_redir
+{
+	t_redir_type		type;
+	char				*value;
+	struct s_redir		*next;
+}						t_redir;
+
 typedef struct s_command
 {
 	char				**args;
 	char				*eof;
-	int				input_redirection;
-	int					output_redirection;
 	int					append;
+	t_redir				*redir;
 	struct s_command	*next;
 }						t_command;
 
@@ -121,6 +134,7 @@ t_command				*parse_pipeline(t_data *data, t_token *tokens);
 
 //exec.c
 void					execute_pipeline(t_command *cmd, t_data *data, char **envp);
+bool					ensure_directory_exists(const char *file_path);
 
 //built_in.c
 bool					check_builtin(t_command *command, t_data *data);
