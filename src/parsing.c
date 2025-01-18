@@ -8,7 +8,7 @@ t_redir	*add_redir(t_redir **redir, t_redir_type type, char *value)
 	new_redir = malloc(sizeof(t_redir));
 	last = *redir;
 	new_redir->type = type;
-	new_redir->value = value;
+	new_redir->value = ft_strdup(value);
 	new_redir->next = NULL;
 	if (!last)
 	{

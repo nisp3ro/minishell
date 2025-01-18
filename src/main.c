@@ -118,14 +118,10 @@ int	interactive_mode(t_data *data, char *envp[])
 				}					
 			}
 			if (!commands || !commands->next && check_builtin_prepipe(commands, data) == true)
-			{
-				free(full_cmd);
 				continue ;
-			}
 			else
 				execute_pipeline(commands, data, data->envp);
 		}
-		free(full_cmd);
 	}
 	return (g_error);
 }
