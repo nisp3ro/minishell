@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/17 18:51:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/18 16:45:06 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/18 17:12:06 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,6 +126,44 @@ int	is_a_daddy(char *parent_dir, t_data *data, bool *git_found,
 	return (OK);
 }
 
+char *get_branch(const char *dir_path)
+{
+	char	*tmp;
+	char	*branch;
+	int		fd;
+
+	tmp = ft_strjoin(dir_path, "/.git/HEAD");
+	if (!tmp)
+		return (NULL);
+	fd = open(tmp, O_RDONLY);
+	free(tmp);
+	if (fd == -1)
+		return (NULL);
+	branch = NULL;
+	branch = get_next_line(fd);
+	close(fd);
+	if (!branch)
+		return (NULL);
+	if (ft_strncmp(branch, "ref: refs/heads/", 16) == 0)
+	{
+		tmp = branch;
+		branch = ft_strdup(branch + 16); //prteger
+		branch = ft_strtrim(branch, "\n"); //tmbn
+		free(tmp);
+		if (!branch)
+			return (NULL);
+	}
+	else
+	{
+		tmp = branch;
+		branch = ft_strdup(branch + 33); //proteger
+		branch = ft_strtrim(branch, "\n"); //tmbn
+		free(tmp);
+		return (NULL);
+	}
+	return (branch);
+}
+
 int	is_a_git(t_data *data, bool *git_found)
 {
 	char	*tmp;
@@ -151,6 +189,7 @@ int	is_a_git(t_data *data, bool *git_found)
 int	print_prompt(char *prompt, char *user, char *host, t_data *data)
 {
 	bool	git_found;
+	char	*tmp;
 
 	ft_strcpy(prompt, user);
 	ft_strcat(prompt, "@");
@@ -162,7 +201,14 @@ int	print_prompt(char *prompt, char *user, char *host, t_data *data)
 	if (git_found)
 	{
 		ft_strcat(prompt, BRIGHT_BLUE);
-		ft_strcat(prompt, " git:(" BRIGHT_RED "main" BRIGHT_BLUE ")");
+		ft_strcat(prompt, " git:("BRIGHT_RED);
+		tmp = get_branch(data->pwd);
+		if (tmp)
+		{
+			ft_strcat(prompt, tmp);
+			free(tmp);
+		}
+		ft_strcat(prompt, BRIGHT_BLUE")");
 		ft_strcat(prompt, RESET_COLOR);
 	}
 	ft_strcat(prompt, RESET_COLOR);
