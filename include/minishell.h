@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/17 17:44:22 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/18 19:30:13 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,7 @@ void					sort_list(t_vars **head, t_vars *current);
 //get_prompt.c
 int						get_prompt(char **prompt, t_data *data);
 char					*mini_getenv(char *var, char *envp[]);
+char					*get_branch(const char *dir_path);
 
 //vars.c
 char					*expand_variables(char *token_value, char *envp[],

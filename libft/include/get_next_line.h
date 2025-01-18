@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/28 13:58:37 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/28 14:07:48 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/18 17:21:17 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 42
+#  define BUFFER_SIZE 1000
 # endif
 
 # include <fcntl.h>

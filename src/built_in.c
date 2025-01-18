@@ -50,26 +50,46 @@ void	ft_cd(t_command *command, t_data *data)
 	int	i;
 	int	pwd_found;
 	int	oldpwd_found;
+	char	*tmp;
+	char	*tmp2;
 
 	i = 0;
 	pwd_found = 0;
 	oldpwd_found = 0;
-	if (!data->oldpwd)
-		free(data->oldpwd);
-	data->oldpwd = ft_strdup(mini_getenv("PWD", data->envp));
 	if (!command->args[1])
 	{
-		if (chdir(mini_getenv("HOME", data->envp)) == -1)
+		tmp = mini_getenv("HOME", data->envp);
+		if (chdir(tmp) == -1)
 		{
 			perror("cd");
 			return ;
 		}
 	}
-	if (command->args[2])
+	else if (command->args[2])
 	{
 		write(STDERR_FILENO, " too many arguments\n", 20);
 		g_error = 1;
 		return ;
+	}
+	else if (command->args[1][0] == '~')
+	{
+		tmp2 = mini_getenv("HOME", data->envp);
+		tmp = ft_strjoin(tmp2, command->args[1] + 1);
+		if (chdir(tmp) == -1)
+		{
+			perror("cd");
+			g_error = 1;
+			return ;
+		}
+	}
+	else if (ft_strncmp(command->args[1], "-", 2) == 0)
+	{
+		if (chdir(data->oldpwd) == -1)
+		{
+			perror("cd");
+			g_error = 1;
+			return ;
+		}
 	}
 	else if (chdir(command->args[1]) == -1)
 	{
@@ -77,6 +97,9 @@ void	ft_cd(t_command *command, t_data *data)
 		g_error = 1;
 		return ;
 	}
+	if (!data->oldpwd)
+		free(data->oldpwd);
+	data->oldpwd = data->pwd;
 	data->pwd = getcwd(NULL, 0);
 	if (data->pwd == NULL)
 	{

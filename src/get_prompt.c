@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/17 18:51:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/18 17:12:06 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/18 20:22:06 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,16 +103,19 @@ bool	has_git_directory(const char *dir_path)
 	return (false);
 }
 
-int	is_a_daddy(char *parent_dir, t_data *data, bool *git_found,
+char	*is_a_daddy(char *parent_dir, t_data *data, bool *git_found,
 		char *last_slash)
 {
+	char *name;
+
 	parent_dir = ft_strdup(data->pwd);
 	if (!parent_dir)
-		return (ERROR);
+		return (NULL);
 	while (parent_dir && *parent_dir)
 	{
 		if (has_git_directory(parent_dir))
 		{
+			name = get_branch(parent_dir);
 			*git_found = true;
 			break ;
 		}
@@ -123,13 +126,14 @@ int	is_a_daddy(char *parent_dir, t_data *data, bool *git_found,
 			break ;
 	}
 	free(parent_dir);
-	return (OK);
+	return (name);
 }
 
-char *get_branch(const char *dir_path)
+char *get_branch(const char *dir_path) //limpiartodo
 {
 	char	*tmp;
 	char	*branch;
+	char	*for_clean;
 	int		fd;
 
 	tmp = ft_strjoin(dir_path, "/.git/HEAD");
@@ -141,6 +145,7 @@ char *get_branch(const char *dir_path)
 		return (NULL);
 	branch = NULL;
 	branch = get_next_line(fd);
+	for_clean = get_next_line(fd); //miar si tiene perdidas pondria un whiule por si acaso
 	close(fd);
 	if (!branch)
 		return (NULL);
@@ -159,12 +164,11 @@ char *get_branch(const char *dir_path)
 		branch = ft_strdup(branch + 33); //proteger
 		branch = ft_strtrim(branch, "\n"); //tmbn
 		free(tmp);
-		return (NULL);
 	}
 	return (branch);
 }
 
-int	is_a_git(t_data *data, bool *git_found)
+int	is_a_git(t_data *data, bool *git_found, char **name)
 {
 	char	*tmp;
 	char	*parent_dir;
@@ -176,10 +180,15 @@ int	is_a_git(t_data *data, bool *git_found)
 		return (ERROR);
 	*git_found = false;
 	if (access(tmp, F_OK) == 0)
+	{
+		*name = get_branch(data->pwd);
 		*git_found = true;
+	}
 	else
 	{
-		if (is_a_daddy(parent_dir, data, git_found, last_slash) == ERROR)
+		*name = is_a_daddy(parent_dir, data, git_found, last_slash);
+
+		if (!name)
 			return (free(tmp), ERROR);
 	}
 	free(tmp);
@@ -189,24 +198,26 @@ int	is_a_git(t_data *data, bool *git_found)
 int	print_prompt(char *prompt, char *user, char *host, t_data *data)
 {
 	bool	git_found;
-	char	*tmp;
+	char	*name;
 
 	ft_strcpy(prompt, user);
 	ft_strcat(prompt, "@");
 	ft_strcat(prompt, host);
 	ft_strcat(prompt, ":" BRIGHT_CYAN "~");
-	if (is_a_git(data, &git_found) == ERROR)
+	if (is_a_git(data, &git_found, &name) == ERROR)
 		return (ERROR);
-	ft_strcat(prompt, data->pwd + ft_strlen(data->home));
+	if (ft_strncmp(data->pwd, data->home, ft_strlen(data->home)) == 0)
+		ft_strcat(prompt, data->pwd + ft_strlen(data->home));
+	else
+		ft_strcat(prompt, data->pwd);
 	if (git_found)
 	{
 		ft_strcat(prompt, BRIGHT_BLUE);
 		ft_strcat(prompt, " git:("BRIGHT_RED);
-		tmp = get_branch(data->pwd);
-		if (tmp)
+		if (name)
 		{
-			ft_strcat(prompt, tmp);
-			free(tmp);
+			ft_strcat(prompt, name);
+			//free(name);
 		}
 		ft_strcat(prompt, BRIGHT_BLUE")");
 		ft_strcat(prompt, RESET_COLOR);
