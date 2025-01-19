@@ -85,7 +85,7 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 		else
 			i++;
 	}
-	value = (char *)malloc(sizeof(char) * (i + 1));
+	value = (char *)ft_calloc(sizeof(char), (i + 1));
 	i = 0;
 	while (tmp[i] && (tmp[i] != ' ' || in_simple_quotes || in_double_quotes))
 	{
@@ -121,7 +121,8 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 		free(existing_var);
 		existing_var = ft_strdup(value);
 		if (!env)
-			set_exp(data, name, value);
+			if (set_exp(data, name, value) == ERROR)
+				return ; //limpiar y ver y tal
 	}
 	else if (!env)
 	{

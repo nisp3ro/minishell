@@ -4,45 +4,54 @@
 #include <string.h>
 #include <unistd.h>
 
-// char **ft_realloc(char **envp, int size)
-// {
-// 	char **new;
-// 	int i;
+char **ft_realloc(char **envp, int size)
+{
+	char **new;
+	int i;
 
-// 	i = 0;
-// 	new = malloc(sizeof(char *) * (size + 1));
-// 	if (new == NULL)
-// 	{
-// 		perror("malloc");
-// 		return (NULL);
-// 	}
-// 	while (i < size)
-// 	{
-// 		new[i] = envp[i];
-// 		i++;
-// 	}
-// 	new[i] = NULL;
-// 	return (new);
-// }
+	i = 0;
+	new = ft_calloc(sizeof(char *), (size + 1));
+	if (new == NULL)
+	{
+		perror("malloc");
+		return (NULL);
+	}
+	while (envp && envp[i] != NULL && envp[i][0] != '\0')
+	{
+		new[i] = ft_strdup(envp[i]);
+		i++;
+	}
+	new[i] = NULL;
+	i = 0;
+	while (envp && envp[i] != NULL)
+	{
+		free(envp[i]);
+		i++;
+	}
+	if (envp)
+		free(envp);
+	return (new);
+}
 
-void	set_exp(t_data *data, char *name, char *value)
+int	set_exp(t_data *data, char *name, char *value)
 {
 	int	i;
 
 	i = 0;
 	while (data->envp[i])
 		i++;
-	data->envp = realloc(data->envp, sizeof(char *) * (i + 2));
+	data->envp = ft_realloc(data->envp, sizeof(char *) * (i + 2));
 	data->envp[i] = malloc(ft_strlen(name) + ft_strlen(value) + 2);
 	if (data->envp[i] == NULL)
 	{
 		perror("malloc");
-		return ;
+		return (ERROR);
 	}
 	ft_strcpy(data->envp[i], name);
 	ft_strcat(data->envp[i], "=");
 	ft_strcat(data->envp[i], value);
 	data->envp[i + 1] = NULL;
+	return (OK);
 }
 
 void	ft_cd(t_command *command, t_data *data)
@@ -360,15 +369,17 @@ void	ft_export(t_command *command, t_data *data)
 		{
 			set_variable(&data->exp_vars, command->args[i], "");
 			if (ft_strchr(command->args[i], '='))
-				set_exp(data, command->args[i], "");
+				if (set_exp(data, command->args[i], "") == ERROR)
+					return ; //limpiar y ver y tal
 			sort_list(&data->exp_vars, data->exp_vars);
 		}
 		else if (mini_getvars(data->vars, command->args[i]))
 		{
 			to_export = mini_getvars(data->vars, command->args[i]);
-			set_exp(data, command->args[i], to_export);
+			if (set_exp(data, command->args[i], to_export) == ERROR)
+				return ; //limpiar y ver y tal
 			set_variable(&data->exp_vars, command->args[i],
-					mini_getenv(command->args[i], data->envp));
+					to_export);
 			unset_from_vars(command, &data->vars);
 			sort_list(&data->exp_vars, data->exp_vars);
 		}

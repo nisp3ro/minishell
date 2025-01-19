@@ -6,11 +6,40 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/17 16:42:19 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/17 16:46:04 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/19 12:08:41 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+
+int	update_envp(t_data *data)
+{
+	int		i;
+	int		lvl;
+	char	*tmp;
+
+	i = -1;
+	tmp = NULL;
+	while (data->envp[++i])
+	{
+		if (ft_strncmp(data->envp[i], "SHLVL=", 6) == 0)
+		{
+			lvl = ft_atoi(data->envp[i] + 6);
+			free(data->envp[i]);
+			tmp = ft_itoa(++lvl);
+			if (!tmp)
+				return (ERROR);
+			data->envp[i] = ft_strjoin("SHLVL=", tmp);
+			if (!data->envp[i])
+				return (free(tmp), ERROR);
+			return (free(tmp), OK);
+		}
+	}
+	if (!data->envp[i])
+		if (set_exp(data, "SHLVL", "1") == ERROR)
+			return (ERROR);
+	return (OK);
+}
 
 char	**cpy_env(char *envp[])
 {
@@ -59,7 +88,7 @@ int	create_envp(t_data *data)
 	free(tmp_cwd);
 	if (data->envp[0] == NULL)
 		return (clean_envp(data->envp), ERROR);
-	data->envp[1] = ft_strdup("SHLVL= 0");
+	data->envp[1] = ft_strdup("SHLVL= 1");
 	if (data->envp[1] == NULL)
 		return (clean_envp(data->envp), ERROR);
 	data->envp[2] = ft_strdup("_=]");
@@ -115,6 +144,8 @@ int	init_data(t_data *data, char *envp[])
 		data->envp = cpy_env(envp);
 		if (data->envp == NULL)
 			return (ERROR);
+		if (update_envp(data) == ERROR)
+			return (clean_envp(data->envp), ERROR);
 		if (create_exp_vars(data, &data->exp_vars, 1))
 			return (clean_envp(data->envp), ERROR);
 	}

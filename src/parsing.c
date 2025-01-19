@@ -61,14 +61,12 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 		{
 			tmp = ft_strchr(current->value, '=');
 			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=')
-			{
-				handle_variable_assignment(current->value, &data->vars, data);
+					handle_variable_assignment(current->value, &data->vars, data);
 				*tmp = '\0';
-				command->args = realloc(command->args, sizeof(char *)
+				command->args = ft_realloc(command->args, sizeof(char *)
 						* (arg_count + 2)); //sustituir propio
 				command->args[arg_count++] = ft_strdup(current->value);
 				command->args[arg_count] = NULL;
-			}
 		}
 		else if (current->type == TOKEN_HEREDOC)
 		{
@@ -85,8 +83,8 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 		}
 		else if (current->type == TOKEN_WORD)
 		{
-			command->args = realloc(command->args, sizeof(char *) * (arg_count
-						+ 2)); //sustituir propio
+			command->args = ft_realloc(command->args, sizeof(char *)
+					* (arg_count + 2)); //sustituir propio
 			command->args[arg_count++] = ft_strdup(current->value);
 			command->args[arg_count] = NULL;
 		}
@@ -138,12 +136,13 @@ t_command	*parse_pipeline(t_data *data, t_token *tokens)
 	while (tokens)
 	{
 		new_command = parse_tokens(data, tokens);
-		if (new_command->args == NULL || new_command->args[0] == NULL || new_command->args[0][0] == '\0')
+		if (new_command->args == NULL || new_command->args[0] == NULL
+			|| new_command->args[0][0] == '\0')
 		{
 			new_command = NULL;
 			//free_command(new_command);
 		}
-		else 
+		else
 		{
 			if (!head)
 				head = new_command;

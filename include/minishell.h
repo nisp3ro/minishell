@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/18 19:30:13 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/19 19:50:39 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,9 @@ typedef struct s_data
 	char				*pwd;
 	char				*oldpwd;
 	char				*prompt;
+	int 				fd;
+	char				history[1001][1024];
+	int					hist_size;
 	t_vars				*vars;
 	t_vars				*exp_vars;
 }						t_data;
@@ -145,7 +148,8 @@ bool					ensure_directory_exists(const char *file_path);
 bool					check_builtin(t_command *command, t_data *data);
 bool					check_builtin_prepipe(t_command *command, t_data *data);
 int						is_valid_identifier(const char *str);
-void					set_exp(t_data *data, char *name, char *value);
+int						set_exp(t_data *data, char *name, char *value);
+char 					**ft_realloc(char **envp, int size);
 
 //cleaner.c
 void					clean_variables(t_vars *vars);
