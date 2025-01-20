@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   history.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 11:20:00 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 12:59:20 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 16:43:10 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@ void	ft_save_history(t_data *data)
 	while (i < data->hist_size)
 	{
 		write(data->fd, data->history[i], ft_strlen(data->history[i]));
-		write(data->fd, "\n", 1);
+		if(data->history[i][0]  != '\0') // para no poner salto de linea  despues de truncar
+			write(data->fd, "\n", 1);
 		i++;
 	}
 	close(data->fd);

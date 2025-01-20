@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   built_in.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:24:46 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:35:15 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 16:32:29 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,14 @@ bool	check_builtin(t_command *command, t_data *data)
 		return (ft_unset(command, data), true);
 	if (ft_strncmp(command->args[0], "env", 4) == 0)
 		return (ft_env(data), true);
+	if (ft_strncmp(command->args[0], "history", 8) == 0 && !command->args[1])
+		return (print_history(data), true);
+	if (ft_strncmp(command->args[0], "history", 8) == 0
+		&& ft_strncmp(command->args[1], "-c", 2)  == 0 && command->args[1][2] != 'w')
+		return (rl_clear_history(), true);
+	if (ft_strncmp(command->args[0], "history", 8) == 0
+		&& ft_strncmp(command->args[1], "-cw", 4) == 0)
+		return (delete_history_file(data), true);
 	return (false);
 }
 
@@ -65,12 +73,10 @@ bool	check_redirs(t_command *command)
 				close(fd_out);
 			if (command->append)
 				fd_out = open(command->redir->value,
-								O_WRONLY | O_CREAT | O_APPEND,
-								0644);
+						O_WRONLY | O_CREAT | O_APPEND, 0644);
 			else
 				fd_out = open(command->redir->value,
-								O_WRONLY | O_CREAT | O_TRUNC,
-								0644);
+						O_WRONLY | O_CREAT | O_TRUNC, 0644);
 			if (fd_out < 0)
 			{
 				perror("open");
@@ -101,7 +107,7 @@ bool	check_builtin_prepipe(t_command *command, t_data *data)
 		if (check_redirs(command) == true)
 			return (ft_exit(data, command), true);
 		return (true);
-		//devuelve true aqui para que no entre en ejecutor porque hay fallo en las redirecciones
+		// devuelve true aqui para que no entre en ejecutor porque hay fallo en las redirecciones
 	}
 	if (ft_strncmp(command->args[0], "cd", 3) == 0)
 	{
@@ -121,5 +127,13 @@ bool	check_builtin_prepipe(t_command *command, t_data *data)
 			return (ft_unset(command, data), true);
 		return (true);
 	}
+	if (ft_strncmp(command->args[0], "history", 8) == 0 && !command->args[1])
+		return (print_history(data), true);
+	if (ft_strncmp(command->args[0], "history", 8) == 0
+		&& ft_strncmp(command->args[1], "-c", 2)  == 0 && command->args[1][2] != 'w')
+		return (rl_clear_history(), true);
+	if (ft_strncmp(command->args[0], "history", 8) == 0
+		&& ft_strncmp(command->args[1], "-cw", 4) == 0)
+		return (delete_history_file(data), true);
 	return (false);
 }
