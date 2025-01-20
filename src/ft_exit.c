@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:29:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 14:56:28 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 16:03:27 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,16 +34,23 @@ void	ft_exit(t_data *data, t_command *command)
 				&& command->args[1][i] != '+')
 			{
 				write(STDERR_FILENO, " numeric argument required\n", 27);
-				exit(2);
+				g_error = 2;
+				exit(g_error);
 			}
 			i++;
 		}
+		if ((ft_strlen(command->args[1]) == 19 && ft_strncmp(command->args[1], "9223372036854775807", 19) > 0)
+			|| (ft_strlen(command->args[1]) == 20 && ft_strncmp(command->args[1], "-9223372036854775808", 20) > 0)
+			|| ft_strlen(command->args[1]) > 21)
+		{
+			write(STDERR_FILENO, " numeric argument required\n", 27);
+			g_error = 2;
+			exit(g_error);
+		}
 		num = ft_atoi(command->args[1]);
-		while (num < 0)
-			num += 256;
+		if (num < 0)
+			num = 256 + num;
 		g_error = num;
 	}
-	else
-		g_error = 0;
-	exit(g_error); // OJO! limPiar!!!!
+	exit(g_error);
 }

@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:29:57 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:30:03 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 18:55:40 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,33 @@ int	is_valid_identifier(const char *str)
 	return (OK);
 }
 
+static void	unset_from_vars_export(char *command, t_vars **vars)
+{
+	t_vars	*tmp;
+	t_vars	*prev;
+
+	tmp = *vars;
+	prev = NULL;
+	while (tmp)
+	{
+		if (ft_strncmp(tmp->name, command,
+				ft_strlen(command)) == 0
+			&& tmp->name[ft_strlen(command)] == '\0')
+		{
+			if (prev)
+				prev->next = tmp->next;
+			else
+				*vars = tmp->next;
+			free(tmp->name);
+			free(tmp->value);
+			free(tmp);
+			return ;
+		}
+		prev = tmp;
+		tmp = tmp->next;
+	}
+}
+
 void	ft_export(t_command *command, t_data *data)
 {
 	t_vars	*tmp;
@@ -35,6 +62,7 @@ void	ft_export(t_command *command, t_data *data)
 	int		i;
 
 	i = 1;
+	g_error = 0;
 	while (command->args[i])
 	{
 		if (is_valid_identifier(command->args[i]) == ERROR)
@@ -65,11 +93,10 @@ void	ft_export(t_command *command, t_data *data)
 			if (set_exp(data, command->args[i], to_export) == ERROR)
 				return ; //limpiar y ver y tal
 			set_variable(&data->exp_vars, command->args[i], to_export);
-			unset_from_vars(command, &data->vars);
+			unset_from_vars_export(command->args[i], &data->vars);
 			sort_list(&data->exp_vars, data->exp_vars);
 		}
 		i++;
-		g_error = 0;
 	}
 	if (i == 1)
 	{
@@ -78,11 +105,10 @@ void	ft_export(t_command *command, t_data *data)
 		{
 			write(STDOUT_FILENO, "declare -x ", 11);
 			write(STDOUT_FILENO, tmp->name, ft_strlen(tmp->name));
-			write(STDOUT_FILENO, "=", 1);
+			write(STDOUT_FILENO, "=\"", 2);
 			write(STDOUT_FILENO, tmp->value, ft_strlen(tmp->value));
-			write(STDOUT_FILENO, "\n", 1);
+			write(STDOUT_FILENO, "\"\n", 2);
 			tmp = tmp->next;
 		}
-		g_error = 0;
 	}
 }

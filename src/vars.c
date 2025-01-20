@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:44:39 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:44:47 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 18:33:02 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 	bool	in_double_quotes;
 	bool	env;
 	int		i;
+	t_vars	*tmp2;
 
 	existing_var = NULL;
 	expanded = expand_variables(input, data->envp, data);
@@ -52,6 +53,7 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 			ft_strcat(data->envp[i], "=");
 			ft_strcat(data->envp[i], equal_sign);
 			env = true;
+			break ;
 		}
 		i++;
 	}
@@ -117,11 +119,11 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 	{
 		free(existing_var);
 		existing_var = ft_strdup(value);
-		if (!env)
+		if (env == false)
 			if (set_exp(data, name, value) == ERROR)
 				return ; //limpiar y ver y tal
 	}
-	else if (!env)
+	else if (env == false)
 	{
 		existing_var = mini_getvars(data->vars, name);
 		if (existing_var)

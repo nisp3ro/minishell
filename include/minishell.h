@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:58:54 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 15:52:42 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,5 +199,7 @@ char					*mini_getvars(t_vars *vars, const char *name);
 bool					is_all_spaces(char *str);
 bool					complete_quotes(char **full_cmd);
 void					sort_list(t_vars **head, t_vars *current);
-
+//ft_history (cambiar a history_utils??)
+void					print_history(t_data *data);
+void 					delete_history_file(t_data *data);
 #endif

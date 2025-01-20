@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:24:46 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:35:15 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 15:51:57 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,14 @@ bool	check_builtin(t_command *command, t_data *data)
 		return (ft_unset(command, data), true);
 	if (ft_strncmp(command->args[0], "env", 4) == 0)
 		return (ft_env(data), true);
+	// if (ft_strncmp(command->args[0], "history", 8) == 0  && !command->args[1])
+	// 	return(print_history(data), true);
+	// if (ft_strncmp(command->args[0], "history", 8) == 0  && 
+	// 	ft_strncmp(command->args[1], "-c", 2) && command->args[1][3] != 'w')
+	// 	return(rl_clear_history(), true);
+	// if (ft_strncmp(command->args[0], "history", 8) == 0  && 
+	// 	ft_strncmp(command->args[1], "-cw", 3))
+	// 	return(delete_history_file(data), true);
 	return (false);
 }
 

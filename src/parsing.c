@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:21:57 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:22:00 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 18:59:04 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,7 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 	int			arg_count;
 	int			o_redir_count;
 	int			i_redir_count;
-	bool		first;
 	bool		export;
-	int			x;
 
 	command = malloc(sizeof(t_command));
 	command->args = NULL;
@@ -55,19 +53,10 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 	arg_count = 0;
 	o_redir_count = 0;
 	i_redir_count = 0;
-	first = true;
 	export = false;
 	while (current && current->type != TOKEN_PIPE)
 	{
-		if (first && current->type == TOKEN_WORD && ft_strchr(current->value,
-				'='))
-		{
-			tmp = ft_strchr(current->value, '=');
-			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '='
-				&& is_valid_identifier(current->value) == OK)
-				handle_variable_assignment(current->value, &data->vars, data);
-		}
-		else if (export && current->type == TOKEN_WORD
+		if (export && current->type == TOKEN_WORD
 				&& ft_strchr(current->value, '=')
 				&& is_valid_identifier(current->value) == OK)
 		{
@@ -79,6 +68,15 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 					* (arg_count + 2)); //sustituir propio
 			command->args[arg_count++] = ft_strdup(current->value);
 			command->args[arg_count] = NULL;
+			export = true;
+		}
+		else if (current->type == TOKEN_WORD && ft_strchr(current->value,
+				'=') && is_valid_identifier(current->value) == OK)
+		{
+			tmp = ft_strchr(current->value, '=');
+			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '='
+				&& is_valid_identifier(current->value) == OK)
+				handle_variable_assignment(current->value, &data->vars, data);
 		}
 		else if (current->type == TOKEN_HEREDOC)
 		{
@@ -92,6 +90,7 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 						45);
 				return (NULL);
 			}
+			export = false;
 		}
 		else if (current->type == TOKEN_WORD)
 		{
@@ -99,6 +98,8 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 					* (arg_count + 2)); //sustituir propio
 			command->args[arg_count++] = ft_strdup(current->value);
 			command->args[arg_count] = NULL;
+			if (!ft_strncmp(current->value, "export", 7))
+			export = true;
 		}
 		else if (current->type == TOKEN_REDIRECT_IN)
 		{
@@ -112,6 +113,7 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 						45);
 				return (NULL);
 			}
+			export = false;
 		}
 		else if (current->type == TOKEN_REDIRECT_OUT
 				|| current->type == TOKEN_APPEND_OUT)
@@ -127,11 +129,8 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 						45);
 				return (NULL);
 			}
-			x = 0;
+			export = false;
 		}
-		first = false;
-		export = (current->type == TOKEN_WORD && !ft_strncmp(current->value,
-					"export", 7));
 		current = current->next;
 	}
 	return (command);
