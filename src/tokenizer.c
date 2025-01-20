@@ -1,16 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   tokenizer.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/20 13:20:49 by mrubal-c          #+#    #+#             */
+/*   Updated: 2025/01/20 13:21:11 by mrubal-c         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/minishell.h"
-
-int	is_delimiter(char c)
-{
-	return (c == ' ' || c == '|' || c == '<' || c == '>');
-}
-
-bool	is_quote(char c)
-{
-	if (c == '\'' || c == '\"')
-		return (true);
-	return (false);
-}
 
 t_token	*add_token(t_token **tokens, t_token_type type, char *value)
 {
@@ -45,6 +45,7 @@ t_token	*tokenize(char *full_cmd, t_data *data)
 	char	*tmp;
 	char	*tmp2;
 	bool	in_here_doc;
+	int		j;
 
 	tokens = NULL;
 	current = NULL;
@@ -122,13 +123,16 @@ t_token	*tokenize(char *full_cmd, t_data *data)
 				else if (!is_delimiter(full_cmd[i]))
 				{
 					start = i;
-					while (full_cmd[i] && !is_delimiter(full_cmd[i]) && !is_quote(full_cmd[i]) && in_here_doc == false || (full_cmd[i] && !is_delimiter(full_cmd[i]) && in_here_doc == true))
+					while (full_cmd[i] && !is_delimiter(full_cmd[i])
+						&& !is_quote(full_cmd[i]) && in_here_doc == false
+						|| (full_cmd[i] && !is_delimiter(full_cmd[i])
+							&& in_here_doc == true))
 					{
 						i++;
 					}
 					in_here_doc = false;
 					tmp = ft_substr(full_cmd, start, i - start);
-					int j = 0;
+					j = 0;
 					tmp = expand_variables(tmp, data->envp, data);
 					if (!token_value)
 						token_value = tmp;

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/20 13:21:57 by mrubal-c          #+#    #+#             */
+/*   Updated: 2025/01/20 13:22:00 by mrubal-c         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/minishell.h"
 
 t_redir	*add_redir(t_redir **redir, t_redir_type type, char *value)
@@ -61,12 +73,12 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 		{
 			tmp = ft_strchr(current->value, '=');
 			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=')
-					handle_variable_assignment(current->value, &data->vars, data);
-				*tmp = '\0';
-				command->args = ft_realloc(command->args, sizeof(char *)
-						* (arg_count + 2)); //sustituir propio
-				command->args[arg_count++] = ft_strdup(current->value);
-				command->args[arg_count] = NULL;
+				handle_variable_assignment(current->value, &data->vars, data);
+			*tmp = '\0';
+			command->args = ft_realloc(command->args, sizeof(char *)
+					* (arg_count + 2)); //sustituir propio
+			command->args[arg_count++] = ft_strdup(current->value);
+			command->args[arg_count] = NULL;
 		}
 		else if (current->type == TOKEN_HEREDOC)
 		{

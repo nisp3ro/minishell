@@ -1,19 +1,16 @@
-#include "../include/minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   vars.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/20 13:44:39 by mrubal-c          #+#    #+#             */
+/*   Updated: 2025/01/20 13:44:47 by mrubal-c         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-char	*mini_getvars(t_vars *vars, const char *name)
-{
-	t_vars *current = vars; // Initialize current to the head of the list
-	while (current != NULL)
-	{
-		if (current->name && ft_strncmp(current->name, name, (ft_strlen(name)
-					+ 1)) == 0)
-		{
-			return (current->value); // Variable found
-		}
-		current = current->next;
-	}
-	return (NULL); // Return NULL if the variable is not found
-}
+#include "../include/minishell.h"
 
 void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 {
@@ -136,8 +133,6 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 			set_variable(env_vars, name, value);
 	}
 }
-
-
 
 int	set_variable(t_vars **env_vars, char *name, char *value)
 {

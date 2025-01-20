@@ -1,55 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cleaner.c                                          :+:      :+:    :+:   */
+/*   ft_echo.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/17 16:43:15 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:41:11 by mrubal-c         ###   ########.fr       */
+/*   Created: 2025/01/20 13:25:38 by mrubal-c          #+#    #+#             */
+/*   Updated: 2025/01/20 13:26:17 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void	free_tokens(t_token *tokens)
-{
-	t_token	*tmp;
-
-	while (tokens)
-	{
-		tmp = tokens;
-		tokens = tokens->next;
-		if (tmp->type == TOKEN_WORD)
-			free(tmp->value);
-		free(tmp);
-	}
-}
-
-void	clean_variables(t_vars *vars)
-{
-	t_vars	*tmp;
-
-	while (vars)
-	{
-		tmp = vars;
-		vars = vars->next;
-		free(tmp->name);
-		free(tmp->value);
-		free(tmp);
-	}
-}
-
-void	clean_mtx(char **mtx)
+void	ft_echo(t_command *command)
 {
 	int	i;
 
 	i = 0;
-	while (mtx[i])
-	{
-		free(mtx[i]);
+	if (command->args[1] != NULL && ft_strncmp("-n", command->args[1], 3) == 0)
 		i++;
+	i++;
+	write(STDOUT_FILENO, command->args[i], ft_strlen(command->args[i]));
+	while (command->args[++i])
+	{
+		write(STDOUT_FILENO, " ", 1);
+		write(STDOUT_FILENO, command->args[i], ft_strlen(command->args[i]));
 	}
-	if (mtx)
-		free(mtx);
+	if (command->args[1] != NULL && ft_strncmp("-n", command->args[1], 3))
+		write(STDOUT_FILENO, "\n", 1);
+	g_error = 0;
 }

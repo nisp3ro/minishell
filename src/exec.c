@@ -1,20 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/20 13:40:12 by mrubal-c          #+#    #+#             */
+/*   Updated: 2025/01/20 13:40:23 by mrubal-c         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/minishell.h"
 
-// Función para liberar el array de cadenas (split)
-void	ft_free_split(char **split)
-{
-	int	i;
-
-	i = 0;
-	while (split[i])
-	{
-		free(split[i]);
-		i++;
-	}
-	free(split);
-}
-
-char	*find_command_in_path(char *command, char **envp)
+static char	*find_command_in_path(char *command, char **envp)
 {
 	char	*path;
 	char	**directories;
@@ -37,33 +35,32 @@ char	*find_command_in_path(char *command, char **envp)
 		// Construir la ruta completa
 		command_path = ft_strjoin(directories[i], "/");
 		if (!command_path)
-			return (ft_free_split(directories), NULL);
+			return (clean_mtx(directories), NULL);
 		tmp = ft_strjoin(command_path, command);
 		free(command_path);
 		command_path = tmp;
 		// Verificar si el archivo existe y tiene permisos de ejecución
 		if (access(command_path, X_OK) == 0)
-			return (ft_free_split(directories), command_path);
+			return (clean_mtx(directories), command_path);
 		// Si se encontró, retornar la ruta
 		free(command_path);
 		command_path = NULL;
 		i++;
 	}
-	ft_free_split(directories);
+	clean_mtx(directories);
 	return (NULL); // Si no se encontró el comando
 }
 
-void ft_create_custom_path(char **path, t_command *command)
+static void	ft_create_custom_path(char **path, t_command *command)
 {
-    int i;
-    int len;
+	int	i;
+	int	len;
 
 	*path = command->args[0];
-    len = ft_strlen(command->args[0]);
-
-    i = len - 1;
-    while (i >= 0 && command->args[0][i] != '/')
-        i--;
+	len = ft_strlen(command->args[0]);
+	i = len - 1;
+	while (i >= 0 && command->args[0][i] != '/')
+		i--;
 	command->args[0] += i;
 }
 static void	wait_exit(int i, int pid, t_command **command)
@@ -81,8 +78,8 @@ static void	wait_exit(int i, int pid, t_command **command)
 			temp = g_error;
 		if (g_error == 2 || g_error == 3)
 			g_error = g_error + 128;
-		else if (g_error != 0 && g_error != 1 && g_error != 127
-			&& g_error != 13 && g_error != 126)
+		else if (g_error != 0 && g_error != 1 && g_error != 127 && g_error != 13
+				&& g_error != 126)
 			perror(NULL);
 		i--;
 	}
@@ -90,13 +87,14 @@ static void	wait_exit(int i, int pid, t_command **command)
 	wait_signal(1);
 }
 
-void	read_n_write(t_data *data, char *limiter, int *fd)
+static void	read_n_write(t_data *data, char *limiter, int *fd)
 {
 	char	*line;
 	char	*tmp;
 
 	line = readline("heredoc> ");
-	if ((limiter[1] != '\'' && limiter[ft_strlen(limiter) - 1] != '\'') || (limiter[1] != '\"' && limiter[ft_strlen(limiter) - 1] != '\"'))
+	if ((limiter[1] != '\'' && limiter[ft_strlen(limiter) - 1] != '\'')
+		|| (limiter[1] != '\"' && limiter[ft_strlen(limiter) - 1] != '\"'))
 	{
 		if (limiter[0] == '\'')
 			tmp = ft_strtrim(limiter, "\'");
@@ -109,11 +107,14 @@ void	read_n_write(t_data *data, char *limiter, int *fd)
 	{
 		if ((ft_strncmp(line, tmp, (ft_strlen(tmp) + 1)) == 0) || !line)
 		{
-			if(line)
+			if (line)
 				free(line);
 			break ;
 		}
-		if (ft_strchr(line, '$') && ((limiter[1] != '\'' && limiter[ft_strlen(limiter) - 1] != '\'') && (limiter[1] != '\"' && limiter[ft_strlen(limiter) - 1] != '\"')))
+		if (ft_strchr(line, '$') && ((limiter[1] != '\''
+					&& limiter[ft_strlen(limiter) - 1] != '\'')
+				&& (limiter[1] != '\"' && limiter[ft_strlen(limiter)
+					- 1] != '\"')))
 			line = expand_variables(line, data->envp, data);
 		write(fd[1], line, ft_strlen(line));
 		write(fd[1], "\n", 1);
@@ -147,7 +148,7 @@ void	here_doc(t_data *data, char *limiter)
 
 void	execute_pipeline(t_command *command, t_data *data, char **envp)
 {
-	int 	i;
+	int		i;
 	int		pipefd[2];
 	pid_t	pid;
 	int		in_fd;
@@ -196,14 +197,13 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 				close(in_fd);              // Cerrar el descriptor de entrada
 			}
 			// Redirigir la salida si es un comando intermedio o final
-
 			// Redirección de entrada
 			if (command->eof != NULL)
 				here_doc(data, command->eof);
 			while (command->redir)
 			{
 				if (command->redir->type == INPUT)
-				{	
+				{
 					input_redirection = true;
 					if (fd_in != STDIN_FILENO)
 						close(fd_in);
@@ -220,9 +220,13 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 					if (fd_out != STDOUT_FILENO)
 						close(fd_out);
 					if (command->append)
-						fd_out = open(command->redir->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
+						fd_out = open(command->redir->value,
+										O_WRONLY | O_CREAT | O_APPEND,
+										0644);
 					else
-						fd_out = open(command->redir->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+						fd_out = open(command->redir->value,
+										O_WRONLY | O_CREAT | O_TRUNC,
+										0644);
 					if (fd_out < 0)
 					{
 						perror("open");
@@ -252,7 +256,7 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 				execve(command_path, command->args, envp);
 				if (errno == EACCES)
 				{
-					if (access (command_path, X_OK) != 0)
+					if (access(command_path, X_OK) != 0)
 						write(STDERR_FILENO, " Permission denied\n", 19);
 					else
 						write(STDERR_FILENO, " Is a directory\n", 16);
@@ -260,7 +264,9 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 				}
 				else if (errno == ENOEXEC)
 				{
-					write(STDERR_FILENO, " Exec format error. Wrong Architecture.\n", 40);
+					write(STDERR_FILENO,
+							" Exec format error. Wrong Architecture.\n",
+							40);
 					exit(126);
 				}
 				else if (errno == EISDIR)

@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/19 19:50:39 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 13:58:54 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@ typedef enum e_redir_type
 {
 	INPUT,
 	OUTPUT,
-
 }						t_redir_type;
 
 typedef struct s_token
@@ -93,66 +92,112 @@ typedef struct s_data
 	char				*pwd;
 	char				*oldpwd;
 	char				*prompt;
-	int 				fd;
+	int					fd;
 	char				history[1001][1024];
 	int					hist_size;
 	t_vars				*vars;
 	t_vars				*exp_vars;
 }						t_data;
 
+// init_data.c
+int						ft_init_history(char history[1001][1024], t_data *data);
+void					ft_recover_history(t_data *data);
+int						create_exp_vars(t_data *data, t_vars **exp_v, int flag);
+int						handle_no_env(t_data *data);
+int						init_data(t_data *data, char *envp[]);
+
+// env.c
+int						set_exp(t_data *data, char *name, char *value);
+void					set_last_cmd_arg(t_data *data, char *name, char *value);
+int						update_envp(t_data *data);
+char					**cpy_env(char *envp[]);
+int						create_envp(t_data *data);
+
+// history.c
+void					ft_save_history(t_data *data);
+void					ft_write_history(t_data *data, char *line);
+char					*make_path(char *name);
+char					*ft_get_user_home(t_data *data);
+
 //signals.c
 void					wait_signal(int i);
 
-//init_data.c
-char					**cpy_env(char *envp[]);
-void					sort_list(t_vars **head, t_vars *current);
-int						init_data(t_data *data, char *envp[]);
+// loop.c
+int						interactive_mode(t_data *data, char *envp[]);
 
-//utils.c
-bool					is_all_spaces(char *str);
-bool					complete_quotes(char **full_cmd);
-void					sort_list(t_vars **head, t_vars *current);
+// get_prompt.c
+char					*get_host(char **envp, int *free_host);
+int						get_prompt(char **p, t_data *data);
 
-//get_prompt.c
-int						get_prompt(char **prompt, t_data *data);
-char					*mini_getenv(char *var, char *envp[]);
+// git_handler.c
+bool					has_git_directory(const char *dir_path);
+char					*is_a_daddy(char *parent_dir, t_data *data,
+							bool *git_found, char *last_slash);
 char					*get_branch(const char *dir_path);
+int						is_a_git(t_data *data, bool *git_found, char **name);
 
-//vars.c
-char					*expand_variables(char *token_value, char *envp[],
-							t_data *data);
-char					*mini_getvars(t_vars *vars, const char *name);
+// tokenize.c
+t_token					*add_token(t_token **tokens, t_token_type type,
+							char *value);
+t_token					*tokenize(char *line, t_data *data);
+
+// parser.c
+t_redir					*add_redir(t_redir **redir, t_redir_type type,
+							char *value);
+t_command				*parse_tokens(t_data *data, t_token *tokens);
+t_command				*parse_pipeline(t_data *data, t_token *tokens);
+
+// vars.c
 void	handle_variable_assignment(char *input,
 								t_vars **env_vars,
 								t_data *data);
 int						set_variable(t_vars **env_vars, char *name,
 							char *value);
+char					*expand_variables(char *token_value, char *envp[],
+							t_data *data);
 
-//tokenizer.c
+// builtin.c
+bool					check_builtin(t_command *command, t_data *data);
+bool					check_redirs(t_command *command);
+bool					check_builtin_prepipe(t_command *command, t_data *data);
+
+//BULTINS
+// ft_cd.c
+void					ft_cd(t_command *command, t_data *data);
+// ft_echo.c
+void					ft_echo(t_command *command);
+// ft_env.c
+void					ft_env(t_data *data);
+// ft_exit.c
+void					ft_exit(t_data *data, t_command *command);
+// ft_export.c
+int						is_valid_identifier(const char *str);
+void					ft_export(t_command *command, t_data *data);
+// ft_pwd.c
+void					ft_pwd(t_data *data);
+// ft_unset.c
+void				unset_from_envp(t_command *command, t_data *data);
+void					unset_from_vars(t_command *command, t_vars **vars);
+void					ft_unset(t_command *command, t_data *data);
+
+// execute.c
+void					here_doc(t_data *data, char *limiter);
+void					execute_pipeline(t_command *command, t_data *data,
+							char **envp);
+
+// cleaner.c
+void					free_tokens(t_token *tokens);
+void					clean_variables(t_vars *vars);
+void					clean_mtx(char **mtx);
+
+// utils.c
+char					**ft_realloc(char **envp, int size);
 int						is_delimiter(char c);
 bool					is_quote(char c);
-t_token					*add_token(t_token **tokens, t_token_type type,
-							char *value);
-t_token					*tokenize(char *input, t_data *data);
-
-//parsing.c
-t_command				*parse_tokens(t_data *data, t_token *tokens);
-t_command				*parse_pipeline(t_data *data, t_token *tokens);
-
-//exec.c
-void					execute_pipeline(t_command *cmd, t_data *data,
-							char **envp);
-bool					ensure_directory_exists(const char *file_path);
-
-//built_in.c
-bool					check_builtin(t_command *command, t_data *data);
-bool					check_builtin_prepipe(t_command *command, t_data *data);
-int						is_valid_identifier(const char *str);
-int						set_exp(t_data *data, char *name, char *value);
-char 					**ft_realloc(char **envp, int size);
-
-//cleaner.c
-void					clean_variables(t_vars *vars);
-void					clean_envp(char **envp);
+char					*mini_getenv(char *var, char *envp[]);
+char					*mini_getvars(t_vars *vars, const char *name);
+bool					is_all_spaces(char *str);
+bool					complete_quotes(char **full_cmd);
+void					sort_list(t_vars **head, t_vars *current);
 
 #endif

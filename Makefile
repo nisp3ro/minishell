@@ -1,7 +1,9 @@
 NAME		=		minishell
-SRCS		=		$(addprefix $(SRC_DIR)/, main.c signals.c get_prompt.c \
-					utils.c init_data.c vars.c tokenizer.c parsing.c exec.c \
-					built_in.c cleaner.c)
+SRCS		=		$(addprefix $(SRC_DIR)/, built_in.c cleaner.c env.c \
+					exec.c ft_cd.c ft_echo.c ft_env.c ft_exit.c ft_export.c \
+					ft_pwd.c ft_unset.c get_prompt.c git_handler.c history.c \
+					init_data.c loop.c main.c parsing.c signals.c tokenizer.c \
+					utils.c vars.c)
 OBJS		=		$(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 SRC_DIR		=		./src
 INC_DIR		=		./include

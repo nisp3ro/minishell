@@ -1,55 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cleaner.c                                          :+:      :+:    :+:   */
+/*   ft_env.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/17 16:43:15 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:41:11 by mrubal-c         ###   ########.fr       */
+/*   Created: 2025/01/20 13:26:02 by mrubal-c          #+#    #+#             */
+/*   Updated: 2025/01/20 13:26:12 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void	free_tokens(t_token *tokens)
-{
-	t_token	*tmp;
-
-	while (tokens)
-	{
-		tmp = tokens;
-		tokens = tokens->next;
-		if (tmp->type == TOKEN_WORD)
-			free(tmp->value);
-		free(tmp);
-	}
-}
-
-void	clean_variables(t_vars *vars)
-{
-	t_vars	*tmp;
-
-	while (vars)
-	{
-		tmp = vars;
-		vars = vars->next;
-		free(tmp->name);
-		free(tmp->value);
-		free(tmp);
-	}
-}
-
-void	clean_mtx(char **mtx)
+void	ft_env(t_data *data)
 {
 	int	i;
 
 	i = 0;
-	while (mtx[i])
+	while (data->envp[i])
 	{
-		free(mtx[i]);
+		write(STDOUT_FILENO, data->envp[i], ft_strlen(data->envp[i]));
+		write(STDOUT_FILENO, "\n", 1);
 		i++;
 	}
-	if (mtx)
-		free(mtx);
+	g_error = 0;
 }
