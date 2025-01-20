@@ -6,7 +6,7 @@
 /*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 15:57:35 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/20 17:40:26 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@
 # define ERROR -1
 # define OK 0
 # define PATH_MAX 4096
-# define HISORY_ROWS 1001
+# define HISTORY_ROWS 1001
 # define HISTORY_COLUMNS 1024
 
 extern int				g_error;
@@ -95,7 +95,7 @@ typedef struct s_data
 	char				*oldpwd;
 	char				*prompt;
 	int					fd;
-	char				history[HISORY_ROWS][HISTORY_COLUMNS];
+	char				history[HISTORY_ROWS][HISTORY_COLUMNS];
 	int					hist_size;
 	t_vars				*vars;
 	t_vars				*exp_vars;
@@ -200,8 +200,10 @@ char					*mini_getvars(t_vars *vars, const char *name);
 bool					is_all_spaces(char *str);
 bool					complete_quotes(char **full_cmd);
 void					sort_list(t_vars **head, t_vars *current);
-// ft_history (cambiar a history_utils??)
+// history_utils.c
 void					print_history(t_data *data);
 void					delete_history_file(t_data *data);
+bool					exist_on_history(char *line,
+							char history[HISTORY_ROWS][HISTORY_COLUMNS]);
 
 #endif
