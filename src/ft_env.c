@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:26:02 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:26:12 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 20:06:12 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,5 +23,5 @@ void	ft_env(t_data *data)
 		write(STDOUT_FILENO, "\n", 1);
 		i++;
 	}
-	g_error = 0;
+	g_exit_code = 0;
 }

@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:44:39 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 18:33:02 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 20:06:55 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,7 +209,7 @@ char	*expand_variables(char *token_value, char *envp[], t_data *data)
 		}
 		else if (token_value[i] == '$' && token_value[i + 1] == '?')
 		{
-			tmp = ft_itoa(g_error);
+			tmp = ft_itoa(g_exit_code);
 			if (!tmp)
 			{
 				perror("Error");

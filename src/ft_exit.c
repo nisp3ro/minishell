@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:29:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 16:03:27 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 20:06:21 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ void	ft_exit(t_data *data, t_command *command)
 				&& command->args[1][i] != '+')
 			{
 				write(STDERR_FILENO, " numeric argument required\n", 27);
-				g_error = 2;
-				exit(g_error);
+				g_exit_code = 2;
+				exit(g_exit_code);
 			}
 			i++;
 		}
@@ -44,13 +44,13 @@ void	ft_exit(t_data *data, t_command *command)
 			|| ft_strlen(command->args[1]) > 21)
 		{
 			write(STDERR_FILENO, " numeric argument required\n", 27);
-			g_error = 2;
-			exit(g_error);
+			g_exit_code = 2;
+			exit(g_exit_code);
 		}
 		num = ft_atoi(command->args[1]);
 		if (num < 0)
 			num = 256 + num;
-		g_error = num;
+		g_exit_code = num;
 	}
-	exit(g_error);
+	exit(g_exit_code);
 }

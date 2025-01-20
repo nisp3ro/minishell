@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:26:34 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:58:59 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 20:18:44 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,69 +16,85 @@ void	unset_from_envp(t_command *command, t_data *data)
 {
 	int	i;
 	int	j;
+	int	k;
 
-	i = 0;
+	k = 0;
 	if (!command->args[1])
 		return ;
-	while (data->envp[i] != NULL)
+	while (command->args[++k])
 	{
-		if (ft_strncmp(data->envp[i], command->args[1],
-				ft_strlen(command->args[1])) == 0
-			&& data->envp[i][ft_strlen(command->args[1])] == '=')
+		i = -1;
+		while (data->envp[++i] != NULL)
 		{
-			free(data->envp[i]);
-			j = i;
-			while (data->envp[j] != NULL)
+			if (ft_strncmp(data->envp[i], command->args[k],
+					ft_strlen(command->args[k])) == 0
+				&& data->envp[i][ft_strlen(command->args[k])] == '=')
 			{
-				data->envp[j] = data->envp[j + 1];
-				j++;
+				free(data->envp[i]);
+				j = i - 1;
+				while (data->envp[++j] != NULL)
+					data->envp[j] = data->envp[j + 1];
+				break ;
 			}
-			break ;
 		}
-		i++;
 	}
-	g_error = 0;
+	g_exit_code = 0;
 }
 
 void	unset_from_vars(t_command *command, t_vars **vars)
 {
 	t_vars	*tmp;
 	t_vars	*prev;
+	int		i;
 
 	tmp = *vars;
 	prev = NULL;
-	while (tmp)
+	i = 0;
+	while (command->args[++i])
 	{
-		if (ft_strncmp(tmp->name, command->args[1],
-				ft_strlen(command->args[1])) == 0
-			&& tmp->name[ft_strlen(command->args[1])] == '\0')
+		while (tmp)
 		{
-			if (prev)
-				prev->next = tmp->next;
-			else
-				*vars = tmp->next;
-			free(tmp->name);
-			free(tmp->value);
-			free(tmp);
-			return ;
+			if (ft_strncmp(tmp->name, command->args[i],
+					ft_strlen(command->args[i])) == 0
+				&& tmp->name[ft_strlen(command->args[i])] == '\0')
+			{
+				if (prev)
+					prev->next = tmp->next;
+				else
+					*vars = tmp->next;
+				return (free(tmp->name), free(tmp->value), free(tmp));
+			}
+			prev = tmp;
+			tmp = tmp->next;
 		}
-		prev = tmp;
-		tmp = tmp->next;
 	}
 }
 
-void	ft_unset(t_command *command, t_data *data)
+static int	is_valid_identifier_unset(const char *str)
 {
 	int	i;
-	int	j;
 
 	i = 0;
+	if (ft_strchr(str, '=') != NULL && ft_isdigit(str[0]))
+		return (ERROR);
+	while (str[i] != '\0')
+	{
+		if (!ft_isalnum(str[i]) && str[i] != '_')
+			return (ERROR);
+		i++;
+	}
+	return (OK);
+}
+
+// For minishell tester
+// if (ft_strcmp(command->args[1], "HOME") == 0) //WTF?
+// 	return ;
+void	ft_unset(t_command *command, t_data *data)
+{
 	if (!command->args[1])
 		return ;
-	// if (ft_strcmp(command->args[1], "HOME") == 0) //WTF?
-	// 	return ;
 	unset_from_envp(command, data);
 	unset_from_vars(command, &data->vars);
 	unset_from_vars(command, &data->exp_vars);
-	g_error = 0;
+	g_exit_code = 0;
 }

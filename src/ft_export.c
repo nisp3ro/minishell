@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:29:57 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 18:55:40 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 20:06:26 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,13 +62,13 @@ void	ft_export(t_command *command, t_data *data)
 	int		i;
 
 	i = 1;
-	g_error = 0;
+	g_exit_code = 0;
 	while (command->args[i])
 	{
 		if (is_valid_identifier(command->args[i]) == ERROR)
 		{
 			write(STDERR_FILENO, " not a valid identifier\n", 24);
-			g_error = 1;
+			g_exit_code = 1;
 			i++;
 			continue ;
 		}

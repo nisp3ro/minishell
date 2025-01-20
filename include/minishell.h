@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 15:52:42 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 20:21:12 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,10 @@
 # define ERROR -1
 # define OK 0
 # define PATH_MAX 4096
+# define HISTORY_ROWS 1001
+# define HISTORY_COLUMNS 1024
 
-extern int				g_error;
+extern int				g_exit_code;
 
 typedef enum e_token_type
 {
@@ -93,7 +95,7 @@ typedef struct s_data
 	char				*oldpwd;
 	char				*prompt;
 	int					fd;
-	char				history[1001][1024];
+	char				history[HISTORY_ROWS][HISTORY_COLUMNS];
 	int					hist_size;
 	t_vars				*vars;
 	t_vars				*exp_vars;
@@ -119,7 +121,7 @@ void					ft_write_history(t_data *data, char *line);
 char					*make_path(char *name);
 char					*ft_get_user_home(t_data *data);
 
-//signals.c
+// signals.c
 void					wait_signal(int i);
 
 // loop.c
@@ -148,9 +150,8 @@ t_command				*parse_tokens(t_data *data, t_token *tokens);
 t_command				*parse_pipeline(t_data *data, t_token *tokens);
 
 // vars.c
-void	handle_variable_assignment(char *input,
-								t_vars **env_vars,
-								t_data *data);
+void					handle_variable_assignment(char *input,
+							t_vars **env_vars, t_data *data);
 int						set_variable(t_vars **env_vars, char *name,
 							char *value);
 char					*expand_variables(char *token_value, char *envp[],
@@ -161,7 +162,7 @@ bool					check_builtin(t_command *command, t_data *data);
 bool					check_redirs(t_command *command);
 bool					check_builtin_prepipe(t_command *command, t_data *data);
 
-//BULTINS
+// BULTINS
 // ft_cd.c
 void					ft_cd(t_command *command, t_data *data);
 // ft_echo.c
@@ -176,7 +177,7 @@ void					ft_export(t_command *command, t_data *data);
 // ft_pwd.c
 void					ft_pwd(t_data *data);
 // ft_unset.c
-void				unset_from_envp(t_command *command, t_data *data);
+void					unset_from_envp(t_command *command, t_data *data);
 void					unset_from_vars(t_command *command, t_vars **vars);
 void					ft_unset(t_command *command, t_data *data);
 
@@ -199,7 +200,10 @@ char					*mini_getvars(t_vars *vars, const char *name);
 bool					is_all_spaces(char *str);
 bool					complete_quotes(char **full_cmd);
 void					sort_list(t_vars **head, t_vars *current);
-//ft_history (cambiar a history_utils??)
+// history_utils.c
 void					print_history(t_data *data);
-void 					delete_history_file(t_data *data);
+void					delete_history_file(t_data *data);
+bool					exist_on_history(char *line,
+							t_data *data);
+
 #endif

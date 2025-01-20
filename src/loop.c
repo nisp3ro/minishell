@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:10:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:10:21 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 20:06:42 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ int	interactive_mode(t_data *data, char *envp[])
 		if (line[i] == '|')
 		{
 			printf("minishell: syntax error near unexpected token `|'\n");
-			g_error = 258;
+			g_exit_code = 258;
 			free(line);
 			continue ;
 		}
@@ -103,5 +103,5 @@ int	interactive_mode(t_data *data, char *envp[])
 				execute_pipeline(commands, data, data->envp);
 		}
 	}
-	return (g_error);
+	return (g_exit_code);
 }

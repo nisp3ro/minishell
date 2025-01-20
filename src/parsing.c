@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:21:57 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 18:59:04 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 19:46:59 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 	int			o_redir_count;
 	int			i_redir_count;
 	bool		export;
+	bool		first;
 
 	command = malloc(sizeof(t_command));
 	command->args = NULL;
@@ -54,11 +55,10 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 	o_redir_count = 0;
 	i_redir_count = 0;
 	export = false;
+	first = true;
 	while (current && current->type != TOKEN_PIPE)
 	{
-		if (export && current->type == TOKEN_WORD
-				&& ft_strchr(current->value, '=')
-				&& is_valid_identifier(current->value) == OK)
+		if (export && current->type == TOKEN_WORD && ft_strchr(current->value, '=') && is_valid_identifier(current->value) == OK)
 		{
 			tmp = ft_strchr(current->value, '=');
 			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=')
@@ -70,8 +70,7 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 			command->args[arg_count] = NULL;
 			export = true;
 		}
-		else if (current->type == TOKEN_WORD && ft_strchr(current->value,
-				'=') && is_valid_identifier(current->value) == OK)
+		else if (current->type == TOKEN_WORD && ft_strchr(current->value, '=') && is_valid_identifier(current->value) == OK && first)
 		{
 			tmp = ft_strchr(current->value, '=');
 			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '='
@@ -131,6 +130,7 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 			}
 			export = false;
 		}
+		first = false;
 		current = current->next;
 	}
 	return (command);

@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:40:12 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:40:23 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 20:05:58 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,19 +71,19 @@ static void	wait_exit(int i, int pid, t_command **command)
 	//clear_lst(command);
 	while (i)
 	{
-		temp_pid = waitpid(-1, &g_error, 0);
-		if (WIFEXITED(g_error))
-			g_error = WEXITSTATUS(g_error);
+		temp_pid = waitpid(-1, &g_exit_code, 0);
+		if (WIFEXITED(g_exit_code))
+			g_exit_code = WEXITSTATUS(g_exit_code);
 		if (temp_pid == pid)
-			temp = g_error;
-		if (g_error == 2 || g_error == 3)
-			g_error = g_error + 128;
-		else if (g_error != 0 && g_error != 1 && g_error != 127 && g_error != 13
-				&& g_error != 126)
+			temp = g_exit_code;
+		if (g_exit_code == 2 || g_exit_code == 3)
+			g_exit_code = g_exit_code + 128;
+		else if (g_exit_code != 0 && g_exit_code != 1 && g_exit_code != 127 && g_exit_code != 13
+				&& g_exit_code != 126)
 			perror(NULL);
 		i--;
 	}
-	g_error = temp;
+	g_exit_code = temp;
 	wait_signal(1);
 }
 
@@ -290,7 +290,7 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 					exit(127);
 				}
 			}
-			exit(g_error);
+			exit(g_exit_code);
 		}
 		else
 		{ // Proceso padre

@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:25:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:25:14 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 20:06:04 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	ft_cd(t_command *command, t_data *data)
 	else if (command->args[2])
 	{
 		write(STDERR_FILENO, " too many arguments\n", 20);
-		g_error = 1;
+		g_exit_code = 1;
 		return ;
 	}
 	else if (command->args[1][0] == '~')
@@ -45,7 +45,7 @@ void	ft_cd(t_command *command, t_data *data)
 		if (chdir(tmp) == -1)
 		{
 			perror("cd");
-			g_error = 1;
+			g_exit_code = 1;
 			return ;
 		}
 	}
@@ -54,14 +54,14 @@ void	ft_cd(t_command *command, t_data *data)
 		if (chdir(data->oldpwd) == -1)
 		{
 			perror("cd");
-			g_error = 1;
+			g_exit_code = 1;
 			return ;
 		}
 	}
 	else if (chdir(command->args[1]) == -1)
 	{
 		perror("cd");
-		g_error = 1;
+		g_exit_code = 1;
 		return ;
 	}
 	if (!data->oldpwd)
@@ -71,7 +71,7 @@ void	ft_cd(t_command *command, t_data *data)
 	if (data->pwd == NULL)
 	{
 		perror("getcwd");
-		g_error = 1;
+		g_exit_code = 1;
 		return ;
 	}
 	while (data->envp[i] != NULL)
@@ -138,5 +138,5 @@ void	ft_cd(t_command *command, t_data *data)
 		ft_strcat(data->envp[i], data->oldpwd);
 		data->envp[i + 1] = NULL;
 	}
-	g_error = 0;
+	g_exit_code = 0;
 }

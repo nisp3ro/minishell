@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   history.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 11:20:00 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 12:59:20 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 19:22:25 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,32 +28,39 @@ void	ft_save_history(t_data *data)
 	while (i < data->hist_size)
 	{
 		write(data->fd, data->history[i], ft_strlen(data->history[i]));
-		write(data->fd, "\n", 1);
+		if (data->history[i][0] != '\0')
+			// para no poner salto de linea  despues de truncar
+			write(data->fd, "\n", 1);
 		i++;
 	}
 	close(data->fd);
 }
 
-void	ft_write_history(t_data *data, char *line)
+void ft_write_history(t_data *data, char *line)
 {
-	int	i;
+    int i;
 
-	i = 0;
-	add_history(line);
-	if (data->hist_size >= 1000)
-	{
-		while (i < 1000)
-		{
-			ft_strcpy(data->history[i], data->history[i + 1]);
-			i++;
-		}
-		ft_strcpy(data->history[999], line);
-		ft_save_history(data);
-		return ;
-	}
-	ft_strcpy(data->history[data->hist_size], line);
-	data->hist_size++;
-	ft_save_history(data);
+    i = 0;
+
+    if (exist_on_history(line, data) == false)
+    {
+        add_history(line);
+        if (data->hist_size >= HISTORY_ROWS)
+        {
+            while (i < HISTORY_ROWS - 1)
+            {
+                ft_strcpy(data->history[i], data->history[i + 1]);
+                i++;
+            }
+            ft_strcpy(data->history[HISTORY_ROWS - 1], line);
+        }
+        else
+        {
+            ft_strcpy(data->history[data->hist_size], line);
+            data->hist_size++;
+        }
+        ft_save_history(data);
+    }
 }
 
 char	*make_path(char *name)

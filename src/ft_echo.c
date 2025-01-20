@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:25:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:26:17 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/20 20:06:16 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,5 +28,5 @@ void	ft_echo(t_command *command)
 	}
 	if (command->args[1] != NULL && ft_strncmp("-n", command->args[1], 3))
 		write(STDOUT_FILENO, "\n", 1);
-	g_error = 0;
+	g_exit_code = 0;
 }
