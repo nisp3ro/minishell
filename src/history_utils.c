@@ -6,7 +6,7 @@
 /*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 15:12:06 by jvidal-t          #+#    #+#             */
-/*   Updated: 2025/01/20 17:51:15 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/20 19:24:55 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,17 +58,10 @@ void	print_history(t_data *data)
 	close(data->fd);
 }
 
-bool	exist_on_history(char *line,
-		char history[HISTORY_ROWS][HISTORY_COLUMNS])
+bool	exist_on_history(char *line, t_data *data)
 {
-	int	i;
-
-	i = 0;
-	while (i < HISTORY_ROWS && history[i][0] != '\0')
-	{
-		if (ft_strnstr(history[i], line, ft_strlen(history[i])) != NULL)
-			return (true);
-		i++;
-	}
+	if (ft_strnstr(data->history[data->hist_size - 1], line,
+			ft_strlen(data->history[data->hist_size - 1])) != NULL)
+		return (true);
 	return (false);
 }

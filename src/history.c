@@ -6,7 +6,7 @@
 /*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 11:20:00 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 19:08:10 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/20 19:22:25 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void ft_write_history(t_data *data, char *line)
 
     i = 0;
 
-    if (exist_on_history(line, data->history) == false)
+    if (exist_on_history(line, data) == false)
     {
         add_history(line);
         if (data->hist_size >= HISTORY_ROWS)

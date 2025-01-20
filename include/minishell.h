@@ -6,7 +6,7 @@
 /*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 17:40:26 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/20 19:22:42 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,6 +204,6 @@ void					sort_list(t_vars **head, t_vars *current);
 void					print_history(t_data *data);
 void					delete_history_file(t_data *data);
 bool					exist_on_history(char *line,
-							char history[HISTORY_ROWS][HISTORY_COLUMNS]);
+							t_data *data);
 
 #endif
