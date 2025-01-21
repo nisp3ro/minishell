@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:21:57 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/21 16:34:52 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/21 19:09:00 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,6 +136,36 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 	return (command);
 }
 
+static void	here_doc_no_cmd(t_data *data, char *limiter)
+{
+	char	*line;
+	char	*tmp;
+
+	line = readline("heredoc> ");
+	if ((limiter[1] != '\'' && limiter[ft_strlen(limiter) - 1] != '\'')
+		|| (limiter[1] != '\"' && limiter[ft_strlen(limiter) - 1] != '\"'))
+	{
+		if (limiter[0] == '\'')
+			tmp = ft_strtrim(limiter, "\'");
+		else
+			tmp = ft_strtrim(limiter, "\"");
+	}
+	else
+		tmp = ft_strdup(limiter);
+	while (line)
+	{
+		if ((ft_strncmp(line, tmp, (ft_strlen(tmp) + 1)) == 0) || !line)
+		{
+			if (line)
+				free(line);
+			break ;
+		}
+		free(line);
+		line = readline("heredoc> ");
+	}
+	free(tmp);
+}
+
 t_command	*parse_pipeline(t_data *data, t_token *tokens)
 {
 	t_command	*head;
@@ -150,8 +180,11 @@ t_command	*parse_pipeline(t_data *data, t_token *tokens)
 		if (new_command->args == NULL || new_command->args[0] == NULL
 			|| new_command->args[0][0] == '\0')
 		{
+			if (new_command->eof)
+				here_doc_no_cmd(data, new_command->eof);
+			//if redirs
 			new_command = NULL;
-			//free_command(new_command);
+			//free_command(new_command); liberear redir y cosas alocadas de haberlas
 		}
 		else
 		{

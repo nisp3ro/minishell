@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:40:12 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/21 14:12:25 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/21 18:54:44 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,32 +23,27 @@ static char	*find_command_in_path(char *command, char **envp)
 	path = mini_getenv("PATH", envp);
 	if (!path)
 		return (NULL);
-	// Dividir el PATH en directorios
 	directories = ft_split(path, ':');
 	if (!directories)
 		return (NULL);
 	command_path = NULL;
 	i = 0;
-	// Buscar el comando en cada directorio
 	while (directories[i])
 	{
-		// Construir la ruta completa
 		command_path = ft_strjoin(directories[i], "/");
 		if (!command_path)
 			return (clean_mtx(directories), NULL);
 		tmp = ft_strjoin(command_path, command);
 		free(command_path);
 		command_path = tmp;
-		// Verificar si el archivo existe y tiene permisos de ejecución
 		if (access(command_path, X_OK) == 0)
 			return (clean_mtx(directories), command_path);
-		// Si se encontró, retornar la ruta
 		free(command_path);
 		command_path = NULL;
 		i++;
 	}
 	clean_mtx(directories);
-	return (NULL); // Si no se encontró el comando
+	return (NULL);
 }
 
 static void	ft_create_custom_path(char **path, t_command *command)
@@ -63,6 +58,7 @@ static void	ft_create_custom_path(char **path, t_command *command)
 		i--;
 	command->args[0] += i;
 }
+
 static void	wait_exit(int i, int pid, t_command **command)
 {
 	int	temp_pid;
@@ -79,7 +75,7 @@ static void	wait_exit(int i, int pid, t_command **command)
 		if (g_exit_code == 2 || g_exit_code == 3)
 			g_exit_code = g_exit_code + 128;
 		else if (g_exit_code != 0 && g_exit_code != 1 && g_exit_code != 127
-			&& g_exit_code != 13 && g_exit_code != 126)
+				&& g_exit_code != 13 && g_exit_code != 126)
 			perror(NULL);
 		i--;
 	}
@@ -123,6 +119,7 @@ static void	read_n_write(t_data *data, char *limiter, int *fd)
 	}
 	free(tmp);
 }
+
 void	here_doc(t_data *data, char *limiter)
 {
 	pid_t	reader;
@@ -146,29 +143,95 @@ void	here_doc(t_data *data, char *limiter)
 	waitpid(reader, NULL, 0);
 }
 
+char	*manage_redirs(t_command *command, char **envp, int in_fd, int pipefd[2], t_data *data)
+{
+    int		fd_in;
+    int		fd_out;
+    char	*command_path;
+    bool	input_redirection;
+    bool	output_redirection;
+
+    fd_in = STDIN_FILENO;
+    fd_out = STDOUT_FILENO;
+    input_redirection = false;
+    output_redirection = false;
+	if (command->args && ft_strchr(command->args[0], '/') != 0)
+		ft_create_custom_path(&command_path, command);
+	else if (command->args)
+		command_path = find_command_in_path(command->args[0], envp);
+	if (in_fd != STDIN_FILENO)
+	{
+		dup2(in_fd, STDIN_FILENO); // Redirigir stdin
+		close(in_fd);              // Cerrar el descriptor de entrada
+	}
+	if (command->eof != NULL)
+		here_doc(data, command->eof);
+	while (command->redir) //DIV REDIR
+	{
+		if (command->redir->type == INPUT)
+		{
+			input_redirection = true;
+			if (fd_in != STDIN_FILENO)
+				close(fd_in);
+			fd_in = open(command->redir->value, O_RDONLY);
+			if (fd_in < 0)
+			{
+				perror("open");
+				exit(EXIT_FAILURE); // limpiar
+			}
+		}
+		else if (command->redir->type == OUTPUT)
+		{
+			output_redirection = true;
+			if (fd_out != STDOUT_FILENO)
+				close(fd_out);
+			if (command->append)
+				fd_out = open(command->redir->value,
+								O_WRONLY | O_CREAT | O_APPEND,
+								0644);
+			else
+				fd_out = open(command->redir->value,
+								O_WRONLY | O_CREAT | O_TRUNC,
+								0644);
+			if (fd_out < 0)
+			{
+				perror("open");
+				exit(EXIT_FAILURE); // limpiar
+			}
+		}
+		command->redir = command->redir->next;
+	} //END DIV REDIR
+	if (command->next)
+	{
+		dup2(pipefd[1], STDOUT_FILENO);
+		close(pipefd[0]);
+	}
+	if (input_redirection)
+	{
+		dup2(fd_in, STDIN_FILENO);
+		close(fd_in);
+	}
+	if (output_redirection)
+	{
+		dup2(fd_out, STDOUT_FILENO);
+		close(fd_out);
+	}
+    return (command_path);
+}
+
 void	execute_pipeline(t_command *command, t_data *data, char **envp)
 {
 	int		i;
 	int		pipefd[2];
 	pid_t	pid;
 	int		in_fd;
-	int		fd_out;
 	char	*command_path;
-	int		fd_in;
-	int		x;
-	bool	input_redirection;
-	bool	output_redirection;
 
 	in_fd = STDIN_FILENO;
-	fd_out = STDOUT_FILENO;
-	wait_signal(0);
 	i = 0;
-	input_redirection = false;
-	output_redirection = false;
-	while (command)
+	while (command != NULL)
 	{
 		i++;
-		// Crear el pipe solo si hay más de un comando
 		if (command->next)
 		{
 			if (pipe(pipefd) == -1)
@@ -183,76 +246,12 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 			exit(EXIT_FAILURE); // limpiar
 		}
 		if (pid == 0)
-		{ // Proceso hijo
-			if (command->args && ft_strchr(command->args[0], '/') != 0)
-			{
-				ft_create_custom_path(&command_path, command);
-			}
-			else if (command->args)
-				command_path = find_command_in_path(command->args[0], envp);
-			// Redirigir la entrada si no es el primer comando
-			if (in_fd != STDIN_FILENO)
-			{
-				dup2(in_fd, STDIN_FILENO); // Redirigir stdin
-				close(in_fd);              // Cerrar el descriptor de entrada
-			}
-			// Redirigir la salida si es un comando intermedio o final
-			// Redirección de entrada
-			if (command->eof != NULL)
-				here_doc(data, command->eof);
-			while (command->redir)
-			{
-				if (command->redir->type == INPUT)
-				{
-					input_redirection = true;
-					if (fd_in != STDIN_FILENO)
-						close(fd_in);
-					fd_in = open(command->redir->value, O_RDONLY);
-					if (fd_in < 0)
-					{
-						perror("open");
-						exit(EXIT_FAILURE); // limpiar
-					}
-				}
-				else if (command->redir->type == OUTPUT)
-				{
-					output_redirection = true;
-					if (fd_out != STDOUT_FILENO)
-						close(fd_out);
-					if (command->append)
-						fd_out = open(command->redir->value,
-								O_WRONLY | O_CREAT | O_APPEND, 0644);
-					else
-						fd_out = open(command->redir->value,
-								O_WRONLY | O_CREAT | O_TRUNC, 0644);
-					if (fd_out < 0)
-					{
-						perror("open");
-						exit(EXIT_FAILURE); // limpiar
-					}
-				}
-				command->redir = command->redir->next;
-			}
-			if (command->next)
-			{
-				dup2(pipefd[1], STDOUT_FILENO); // Redirigir stdout al pipe
-				close(pipefd[0]);
-				// Cerrar el extremo de lectura del pipe
-			}
-			if (input_redirection)
-			{
-				dup2(fd_in, STDIN_FILENO);
-				close(fd_in);
-			}
-			if (output_redirection)
-			{
-				dup2(fd_out, STDOUT_FILENO);
-				close(fd_out);
-			}
+		{
+			command_path = manage_redirs(command, envp, in_fd, pipefd, data);
 			if (command->args && check_builtin(command, data) == false)
 			{ // Ejecutar el comando con execve
 				execve(command_path, command->args, envp);
-				if (errno == EACCES)
+				if (errno == EACCES) // DIV ERROR_EXIT
 				{
 					if (access(command_path, X_OK) != 0)
 						write(STDERR_FILENO, " Permission denied\n", 19);
@@ -263,7 +262,8 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 				else if (errno == ENOEXEC)
 				{
 					write(STDERR_FILENO,
-						" Exec format error. Wrong Architecture.\n", 40);
+							" Exec format error. Wrong Architecture.\n",
+							40);
 					exit(126);
 				}
 				else if (errno == EISDIR)
@@ -284,10 +284,10 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 				else
 				{
 					write(STDERR_FILENO, command->args[0],
-						ft_strlen(command->args[0]));
+							ft_strlen(command->args[0]));
 					write(STDERR_FILENO, ": command not found\n", 20);
 					exit(127);
-				}
+				} //END DIV ERROR_EXIT
 			}
 			exit(g_exit_code);
 		}

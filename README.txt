@@ -1,7 +1,5 @@
-export tiene valores por defecto
-export mete en env si tiene valor
-si no no lo mete en env pero si en export
+ gestionar redirecciones si no hay comando
+ dentro de parsing
+    crea output
+    syntax error input
 
-si ejecuto minishell sin env cuidao!
-
-LEVEL!
