@@ -13,7 +13,7 @@ HEADER_FILE	=		$(INC_DIR)/minishell.h
 LIBFT		=		libft
 
 CFLAGS		=		#-Wall -Wextra -Werror
-LDFLAGS		=		-lreadline
+LDFLAGS		=		-lreadline -lhistory
 CC			=		cc
 
 # Colors
