@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:21:57 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 19:46:59 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/21 16:34:52 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 		if (export && current->type == TOKEN_WORD && ft_strchr(current->value, '=') && is_valid_identifier(current->value) == OK)
 		{
 			tmp = ft_strchr(current->value, '=');
-			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=')
+			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '=' && current->next == NULL)
 				handle_variable_assignment(current->value, &data->vars, data);
 			*tmp = '\0';
 			command->args = ft_realloc(command->args, sizeof(char *)
@@ -74,7 +74,7 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 		{
 			tmp = ft_strchr(current->value, '=');
 			if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '='
-				&& is_valid_identifier(current->value) == OK)
+				&& is_valid_identifier(current->value) == OK && current->next == NULL)
 				handle_variable_assignment(current->value, &data->vars, data);
 		}
 		else if (current->type == TOKEN_HEREDOC)

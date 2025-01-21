@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:40:12 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 20:05:58 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/21 14:12:25 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ static void	wait_exit(int i, int pid, t_command **command)
 	int	temp_pid;
 	int	temp;
 
-	//clear_lst(command);
+	// clear_lst(command);
 	while (i)
 	{
 		temp_pid = waitpid(-1, &g_exit_code, 0);
@@ -78,8 +78,8 @@ static void	wait_exit(int i, int pid, t_command **command)
 			temp = g_exit_code;
 		if (g_exit_code == 2 || g_exit_code == 3)
 			g_exit_code = g_exit_code + 128;
-		else if (g_exit_code != 0 && g_exit_code != 1 && g_exit_code != 127 && g_exit_code != 13
-				&& g_exit_code != 126)
+		else if (g_exit_code != 0 && g_exit_code != 1 && g_exit_code != 127
+			&& g_exit_code != 13 && g_exit_code != 126)
 			perror(NULL);
 		i--;
 	}
@@ -221,12 +221,10 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 						close(fd_out);
 					if (command->append)
 						fd_out = open(command->redir->value,
-										O_WRONLY | O_CREAT | O_APPEND,
-										0644);
+								O_WRONLY | O_CREAT | O_APPEND, 0644);
 					else
 						fd_out = open(command->redir->value,
-										O_WRONLY | O_CREAT | O_TRUNC,
-										0644);
+								O_WRONLY | O_CREAT | O_TRUNC, 0644);
 					if (fd_out < 0)
 					{
 						perror("open");
@@ -265,8 +263,7 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 				else if (errno == ENOEXEC)
 				{
 					write(STDERR_FILENO,
-							" Exec format error. Wrong Architecture.\n",
-							40);
+						" Exec format error. Wrong Architecture.\n", 40);
 					exit(126);
 				}
 				else if (errno == EISDIR)
@@ -286,7 +283,9 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 				}
 				else
 				{
-					write(STDERR_FILENO, " command not found\n", 19);
+					write(STDERR_FILENO, command->args[0],
+						ft_strlen(command->args[0]));
+					write(STDERR_FILENO, ": command not found\n", 20);
 					exit(127);
 				}
 			}
