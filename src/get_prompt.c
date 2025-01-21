@@ -116,8 +116,8 @@ static int	print_prompt(char *prompt, char *user, char *host, t_data *data)
 		ft_strcat(prompt, BRIGHT_BLUE ")");
 		ft_strcat(prompt, RESET_COLOR);
 	}
+	ft_strcat(prompt, YELLOW" ✗ ");
 	ft_strcat(prompt, RESET_COLOR);
-	ft_strcat(prompt, "$ ");
 	return (OK);
 }
 
