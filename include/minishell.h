@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 20:21:12 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:18:59 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,33 @@ typedef struct s_data
 	t_vars				*vars;
 	t_vars				*exp_vars;
 }						t_data;
+
+typedef struct s_redir_vars
+{
+	int					fd_in;
+	int					fd_out;
+	char				*command_path;
+	bool				input_redirection;
+	bool				output_redirection;
+}						t_redir_vars;
+
+typedef struct s_pipe_vars
+{
+	int					i;
+	int					pipefd[2];
+	pid_t				pid;
+	int					in_fd;
+	char				*command_path;
+}						t_pip_vars;
+
+typedef struct s_search_command
+{
+	char				*path;
+	char				**directories;
+	char				*command_path;
+	int					i;
+	char				*tmp;
+}						t_search_command;
 
 // init_data.c
 int						ft_init_history(char history[1001][1024], t_data *data);
@@ -203,7 +230,6 @@ void					sort_list(t_vars **head, t_vars *current);
 // history_utils.c
 void					print_history(t_data *data);
 void					delete_history_file(t_data *data);
-bool					exist_on_history(char *line,
-							t_data *data);
+bool					exist_on_history(char *line, t_data *data);
 
 #endif

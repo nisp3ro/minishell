@@ -3,46 +3,47 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:40:12 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/21 18:54:44 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:30:23 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
+void	init_search_command_vars(t_search_command *vars)
+{
+	vars->command_path = NULL;
+	vars->i = 0;
+}
+
 static char	*find_command_in_path(char *command, char **envp)
 {
-	char	*path;
-	char	**directories;
-	char	*command_path;
-	int		i;
-	char	*tmp;
+	t_search_command	vars;
 
-	path = mini_getenv("PATH", envp);
-	if (!path)
+	vars.path = mini_getenv("PATH", envp);
+	if (!vars.path)
 		return (NULL);
-	directories = ft_split(path, ':');
-	if (!directories)
+	vars.directories = ft_split(vars.path, ':');
+	if (!vars.directories)
 		return (NULL);
-	command_path = NULL;
-	i = 0;
-	while (directories[i])
+	init_search_command_vars(&vars);
+	while (vars.directories[vars.i])
 	{
-		command_path = ft_strjoin(directories[i], "/");
-		if (!command_path)
-			return (clean_mtx(directories), NULL);
-		tmp = ft_strjoin(command_path, command);
-		free(command_path);
-		command_path = tmp;
-		if (access(command_path, X_OK) == 0)
-			return (clean_mtx(directories), command_path);
-		free(command_path);
-		command_path = NULL;
-		i++;
+		vars.command_path = ft_strjoin(vars.directories[vars.i], "/");
+		if (!vars.command_path)
+			return (clean_mtx(vars.directories), NULL);
+		vars.tmp = ft_strjoin(vars.command_path, command);
+		free(vars.command_path);
+		vars.command_path = vars.tmp;
+		if (access(vars.command_path, X_OK) == 0)
+			return (clean_mtx(vars.directories), vars.command_path);
+		free(vars.command_path);
+		vars.command_path = NULL;
+		vars.i++;
 	}
-	clean_mtx(directories);
+	clean_mtx(vars.directories);
 	return (NULL);
 }
 
@@ -75,7 +76,7 @@ static void	wait_exit(int i, int pid, t_command **command)
 		if (g_exit_code == 2 || g_exit_code == 3)
 			g_exit_code = g_exit_code + 128;
 		else if (g_exit_code != 0 && g_exit_code != 1 && g_exit_code != 127
-				&& g_exit_code != 13 && g_exit_code != 126)
+			&& g_exit_code != 13 && g_exit_code != 126)
 			perror(NULL);
 		i--;
 	}
@@ -83,41 +84,45 @@ static void	wait_exit(int i, int pid, t_command **command)
 	wait_signal(1);
 }
 
+void	manage_here_doc(t_data *data, char **line, char *limiter, int *fd)
+{
+	while (line[0])
+	{
+		if ((ft_strncmp(line[0], line[1], (ft_strlen(line[1]) + 1)) == 0) || !line[0])
+		{
+			if (line[0])
+				free(line[0]);
+			break ;
+		}
+		if (ft_strchr(line[0], '$') && ((limiter[1] != '\''
+					&& limiter[ft_strlen(limiter) - 1] != '\'')
+				&& (limiter[1] != '\"' && limiter[ft_strlen(limiter)
+					- 1] != '\"')))
+			line[0] = expand_variables(line[0], data->envp, data);
+		write(fd[1], line[0], ft_strlen(line[0]));
+		write(fd[1], "\n", 1);
+		free(line[0]);
+		line[0] = readline("heredoc> ");
+	}
+}
+
 static void	read_n_write(t_data *data, char *limiter, int *fd)
 {
-	char	*line;
-	char	*tmp;
+	char	*line[2];
 
-	line = readline("heredoc> ");
+	line[0] = readline("heredoc> ");
 	if ((limiter[1] != '\'' && limiter[ft_strlen(limiter) - 1] != '\'')
 		|| (limiter[1] != '\"' && limiter[ft_strlen(limiter) - 1] != '\"'))
 	{
 		if (limiter[0] == '\'')
-			tmp = ft_strtrim(limiter, "\'");
+			line[1] = ft_strtrim(limiter, "\'");
 		else
-			tmp = ft_strtrim(limiter, "\"");
+			line[1] = ft_strtrim(limiter, "\"");
 	}
 	else
-		tmp = ft_strdup(limiter);
-	while (line)
-	{
-		if ((ft_strncmp(line, tmp, (ft_strlen(tmp) + 1)) == 0) || !line)
-		{
-			if (line)
-				free(line);
-			break ;
-		}
-		if (ft_strchr(line, '$') && ((limiter[1] != '\''
-					&& limiter[ft_strlen(limiter) - 1] != '\'')
-				&& (limiter[1] != '\"' && limiter[ft_strlen(limiter)
-					- 1] != '\"')))
-			line = expand_variables(line, data->envp, data);
-		write(fd[1], line, ft_strlen(line));
-		write(fd[1], "\n", 1);
-		free(line);
-		line = readline("heredoc> ");
-	}
-	free(tmp);
+		line[1] = ft_strdup(limiter);
+	manage_here_doc(data, line, limiter, fd);
+	free(line[1]);
 }
 
 void	here_doc(t_data *data, char *limiter)
@@ -143,167 +148,152 @@ void	here_doc(t_data *data, char *limiter)
 	waitpid(reader, NULL, 0);
 }
 
-char	*manage_redirs(t_command *command, char **envp, int in_fd, int pipefd[2], t_data *data)
+void	redir(t_command *command, t_redir_vars *red)
 {
-    int		fd_in;
-    int		fd_out;
-    char	*command_path;
-    bool	input_redirection;
-    bool	output_redirection;
+	if (command->redir->type == INPUT)
+	{
+		red->input_redirection = true;
+		if (red->fd_in != STDIN_FILENO)
+			close(red->fd_in);
+		red->fd_in = open(command->redir->value, O_RDONLY);
+		if (red->fd_in < 0)
+			return (perror("open"), exit(EXIT_FAILURE)); // limpiar
+	}
+	else if (command->redir->type == OUTPUT)
+	{
+		red->output_redirection = true;
+		if (red->fd_out != STDOUT_FILENO)
+			close(red->fd_out);
+		if (command->append)
+			red->fd_out = open(command->redir->value,
+					O_WRONLY | O_CREAT | O_APPEND, 0644);
+		else
+			red->fd_out = open(command->redir->value,
+					O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (red->fd_out < 0)
+			return (perror("open"), exit(EXIT_FAILURE)); // limpiar
+	}
+	command->redir = command->redir->next;
+}
 
-    fd_in = STDIN_FILENO;
-    fd_out = STDOUT_FILENO;
-    input_redirection = false;
-    output_redirection = false;
+void	init_redir_vars(t_redir_vars *red)
+{
+	red->fd_in = STDIN_FILENO;
+	red->fd_out = STDOUT_FILENO;
+	red->input_redirection = false;
+	red->output_redirection = false;
+}
+
+void	manage_redirections(t_redir_vars *red)
+{
+	if (red->input_redirection)
+	{
+		dup2(red->fd_in, STDIN_FILENO);
+		close(red->fd_in);
+	}
+	if (red->output_redirection)
+	{
+		dup2(red->fd_out, STDOUT_FILENO);
+		close(red->fd_out);
+	}
+}
+
+char	*manage_redirs(t_command *command, char **envp, int in_fd,
+		int pipefd[2], t_data *data)
+{
+	t_redir_vars	red;
+
+	init_redir_vars(&red);
 	if (command->args && ft_strchr(command->args[0], '/') != 0)
-		ft_create_custom_path(&command_path, command);
+		ft_create_custom_path(&red.command_path, command);
 	else if (command->args)
-		command_path = find_command_in_path(command->args[0], envp);
+		red.command_path = find_command_in_path(command->args[0], envp);
 	if (in_fd != STDIN_FILENO)
 	{
-		dup2(in_fd, STDIN_FILENO); // Redirigir stdin
-		close(in_fd);              // Cerrar el descriptor de entrada
+		dup2(in_fd, STDIN_FILENO);
+		close(in_fd);
 	}
 	if (command->eof != NULL)
 		here_doc(data, command->eof);
-	while (command->redir) //DIV REDIR
-	{
-		if (command->redir->type == INPUT)
-		{
-			input_redirection = true;
-			if (fd_in != STDIN_FILENO)
-				close(fd_in);
-			fd_in = open(command->redir->value, O_RDONLY);
-			if (fd_in < 0)
-			{
-				perror("open");
-				exit(EXIT_FAILURE); // limpiar
-			}
-		}
-		else if (command->redir->type == OUTPUT)
-		{
-			output_redirection = true;
-			if (fd_out != STDOUT_FILENO)
-				close(fd_out);
-			if (command->append)
-				fd_out = open(command->redir->value,
-								O_WRONLY | O_CREAT | O_APPEND,
-								0644);
-			else
-				fd_out = open(command->redir->value,
-								O_WRONLY | O_CREAT | O_TRUNC,
-								0644);
-			if (fd_out < 0)
-			{
-				perror("open");
-				exit(EXIT_FAILURE); // limpiar
-			}
-		}
-		command->redir = command->redir->next;
-	} //END DIV REDIR
+	while (command->redir)
+		redir(command, &red); // command redir->next?
 	if (command->next)
 	{
 		dup2(pipefd[1], STDOUT_FILENO);
 		close(pipefd[0]);
 	}
-	if (input_redirection)
+	manage_redirections(&red);
+	return (red.command_path);
+}
+
+void	execve_error_exit(t_command *command, char *command_path)
+{
+	if (errno == EACCES)
 	{
-		dup2(fd_in, STDIN_FILENO);
-		close(fd_in);
+		if (access(command_path, X_OK) != 0)
+			write(STDERR_FILENO, " Permission denied\n", 19);
+		else
+			write(STDERR_FILENO, " Is a directory\n", 16);
+		exit(126);
 	}
-	if (output_redirection)
+	else if (errno == ENOEXEC)
+		return (write(STDERR_FILENO,
+				" Exec format error. Wrong Architecture.\n", 40), exit(126));
+	else if (errno == EISDIR)
+		return (write(STDERR_FILENO, " Is a directory\n", 16), exit(126));
+	else if (errno == ENOTDIR)
+		return (write(STDERR_FILENO, " Not a directory\n", 17), exit(126));
+	else if (errno == ENOENT)
+		return (write(STDERR_FILENO, " No such file or directory\n", 27),
+			exit(127));
+	else
+		return (write(STDERR_FILENO, command->args[0],
+				ft_strlen(command->args[0])), write(STDERR_FILENO,
+				": command not found\n", 20), exit(127));
+}
+
+void	init_pip(t_pip_vars *pip)
+{
+	pip->i = 0;
+	pip->in_fd = STDIN_FILENO;
+}
+
+void	father_process(t_pip_vars *pip, t_command *command)
+{
+	if (pip->in_fd != STDIN_FILENO)
+		close(pip->in_fd);
+	if (command->next)
 	{
-		dup2(fd_out, STDOUT_FILENO);
-		close(fd_out);
+		close(pip->pipefd[1]);
+		pip->in_fd = pip->pipefd[0];
 	}
-    return (command_path);
 }
 
 void	execute_pipeline(t_command *command, t_data *data, char **envp)
 {
-	int		i;
-	int		pipefd[2];
-	pid_t	pid;
-	int		in_fd;
-	char	*command_path;
+	t_pip_vars	pip;
 
-	in_fd = STDIN_FILENO;
-	i = 0;
+	init_pip(&pip);
 	while (command != NULL)
 	{
-		i++;
+		pip.i++;
 		if (command->next)
+			if (pipe(pip.pipefd) == -1)
+				return (perror("pipe"), exit(EXIT_FAILURE)); // limpiar
+		if ((pip.pid = fork()) == -1)
+			return (perror("fork"), exit(EXIT_FAILURE)); // limpiar
+		if (pip.pid == 0)
 		{
-			if (pipe(pipefd) == -1)
-			{
-				perror("pipe");
-				exit(EXIT_FAILURE); // limpiar
-			}
-		}
-		if ((pid = fork()) == -1)
-		{
-			perror("fork");
-			exit(EXIT_FAILURE); // limpiar
-		}
-		if (pid == 0)
-		{
-			command_path = manage_redirs(command, envp, in_fd, pipefd, data);
-			if (command->args && check_builtin(command, data) == false)
-			{ // Ejecutar el comando con execve
-				execve(command_path, command->args, envp);
-				if (errno == EACCES) // DIV ERROR_EXIT
-				{
-					if (access(command_path, X_OK) != 0)
-						write(STDERR_FILENO, " Permission denied\n", 19);
-					else
-						write(STDERR_FILENO, " Is a directory\n", 16);
-					exit(126);
-				}
-				else if (errno == ENOEXEC)
-				{
-					write(STDERR_FILENO,
-							" Exec format error. Wrong Architecture.\n",
-							40);
-					exit(126);
-				}
-				else if (errno == EISDIR)
-				{
-					write(STDERR_FILENO, " Is a directory\n", 16);
-					exit(126);
-				}
-				else if (errno == ENOTDIR)
-				{
-					write(STDERR_FILENO, " Not a directory\n", 17);
-					exit(126);
-				}
-				else if (errno == ENOENT)
-				{
-					write(STDERR_FILENO, " No such file or directory\n", 27);
-					exit(127);
-				}
-				else
-				{
-					write(STDERR_FILENO, command->args[0],
-							ft_strlen(command->args[0]));
-					write(STDERR_FILENO, ": command not found\n", 20);
-					exit(127);
-				} //END DIV ERROR_EXIT
-			}
+			pip.command_path = manage_redirs(command, envp, pip.in_fd,
+					pip.pipefd, data);
+			if ((command->args && check_builtin(command, data) == false)
+				&& execve(pip.command_path, command->args, envp))
+				execve_error_exit(command, pip.command_path);
 			exit(g_exit_code);
 		}
 		else
-		{ // Proceso padre
-			// Cerrar los descriptores de pipes después de ser usados
-			if (in_fd != STDIN_FILENO)
-				close(in_fd);
-			if (command->next)
-			{
-				close(pipefd[1]); // Cerrar el descriptor de escritura del pipe
-				in_fd = pipefd[0];
-				// Establecer la entrada para el siguiente comando
-			}
-		}
-		command = command->next; // Pasar al siguiente comando
+			father_process(&pip, command);
+		command = command->next;
 	}
-	wait_exit(i, pid, &command);
+	wait_exit(pip.i, pip.pid, &command);
 }
