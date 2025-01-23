@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/22 19:18:59 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/23 19:03:25 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,8 +177,9 @@ t_command				*parse_tokens(t_data *data, t_token *tokens);
 t_command				*parse_pipeline(t_data *data, t_token *tokens);
 
 // vars.c
-void					handle_variable_assignment(char *input,
-							t_vars **env_vars, t_data *data);
+void	handle_variable_assignment(char *input,
+								t_vars **env_vars,
+								t_data *data);
 int						set_variable(t_vars **env_vars, char *name,
 							char *value);
 char					*expand_variables(char *token_value, char *envp[],
@@ -217,6 +218,7 @@ void					execute_pipeline(t_command *command, t_data *data,
 void					free_tokens(t_token *tokens);
 void					clean_variables(t_vars *vars);
 void					clean_mtx(char **mtx);
+char					*clean_line(char *line, t_data *data);
 
 // utils.c
 char					**ft_realloc(char **envp, int size);

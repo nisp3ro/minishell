@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:40:12 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/22 19:30:23 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/23 06:59:45 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ static void	wait_exit(int i, int pid, t_command **command)
 		if (g_exit_code == 2 || g_exit_code == 3)
 			g_exit_code = g_exit_code + 128;
 		else if (g_exit_code != 0 && g_exit_code != 1 && g_exit_code != 127
-			&& g_exit_code != 13 && g_exit_code != 126)
+				&& g_exit_code != 13 && g_exit_code != 126)
 			perror(NULL);
 		i--;
 	}
@@ -88,7 +88,8 @@ void	manage_here_doc(t_data *data, char **line, char *limiter, int *fd)
 {
 	while (line[0])
 	{
-		if ((ft_strncmp(line[0], line[1], (ft_strlen(line[1]) + 1)) == 0) || !line[0])
+		if ((ft_strncmp(line[0], line[1], (ft_strlen(line[1]) + 1)) == 0)
+			|| !line[0])
 		{
 			if (line[0])
 				free(line[0]);
@@ -166,10 +167,12 @@ void	redir(t_command *command, t_redir_vars *red)
 			close(red->fd_out);
 		if (command->append)
 			red->fd_out = open(command->redir->value,
-					O_WRONLY | O_CREAT | O_APPEND, 0644);
+								O_WRONLY | O_CREAT | O_APPEND,
+								0644);
 		else
 			red->fd_out = open(command->redir->value,
-					O_WRONLY | O_CREAT | O_TRUNC, 0644);
+								O_WRONLY | O_CREAT | O_TRUNC,
+								0644);
 		if (red->fd_out < 0)
 			return (perror("open"), exit(EXIT_FAILURE)); // limpiar
 	}
@@ -238,14 +241,16 @@ void	execve_error_exit(t_command *command, char *command_path)
 	}
 	else if (errno == ENOEXEC)
 		return (write(STDERR_FILENO,
-				" Exec format error. Wrong Architecture.\n", 40), exit(126));
+						" Exec format error. Wrong Architecture.\n",
+						40),
+				exit(126));
 	else if (errno == EISDIR)
 		return (write(STDERR_FILENO, " Is a directory\n", 16), exit(126));
 	else if (errno == ENOTDIR)
 		return (write(STDERR_FILENO, " Not a directory\n", 17), exit(126));
 	else if (errno == ENOENT)
 		return (write(STDERR_FILENO, " No such file or directory\n", 27),
-			exit(127));
+				exit(127));
 	else
 		return (write(STDERR_FILENO, command->args[0],
 				ft_strlen(command->args[0])), write(STDERR_FILENO,
@@ -269,6 +274,14 @@ void	father_process(t_pip_vars *pip, t_command *command)
 	}
 }
 
+bool	check_cmd_args(t_command *command)
+{
+	if (command->args && command->args[0] != NULL
+		&& command->args[0][0] != '\0')
+		return (true);
+	return (false);
+}
+
 void	execute_pipeline(t_command *command, t_data *data, char **envp)
 {
 	t_pip_vars	pip;
@@ -286,7 +299,7 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 		{
 			pip.command_path = manage_redirs(command, envp, pip.in_fd,
 					pip.pipefd, data);
-			if ((command->args && check_builtin(command, data) == false)
+			if ((check_cmd_args(command) && !check_builtin(command, data))
 				&& execve(pip.command_path, command->args, envp))
 				execve_error_exit(command, pip.command_path);
 			exit(g_exit_code);
