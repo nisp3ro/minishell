@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/23 19:03:25 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/24 16:36:35 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,16 @@ typedef struct s_token
 	char				*value;
 	struct s_token		*next;
 }						t_token;
+
+typedef struct s_tokenizer
+{
+	int		i;
+	char	quote;
+	char	*full_cmd;
+	char	*token_value;
+	bool	in_here_doc;
+	t_token	*tokens;
+}			t_tokenizer;
 
 typedef struct s_redir
 {

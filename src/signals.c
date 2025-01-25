@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/17 17:10:01 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 20:06:50 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/24 13:06:19 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,7 @@ static void	signal_handler(int signal)
 static void	child_handler(int signal)
 {
 	if (signal == SIGINT)
-	{
-		write(1, "\n", 1);
 		g_exit_code = 130;
-	}
 	return ;
 }
 

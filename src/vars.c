@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:44:39 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 20:06:55 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/24 13:32:37 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,70 +57,13 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 		}
 		i++;
 	}
-	while (equal_sign[i] && (equal_sign[i] != ' ' || in_simple_quotes
-			|| in_double_quotes))
-	{
-		if (equal_sign[i] == '\'' && !in_simple_quotes && !in_double_quotes)
-		{
-			equal_sign++;
-			in_simple_quotes = true;
-		}
-		else if (equal_sign[i] == '\"' && !in_simple_quotes
-				&& !in_double_quotes)
-		{
-			equal_sign++;
-			in_double_quotes = true;
-		}
-		else if (equal_sign[i] == '\"' && in_double_quotes)
-		{
-			equal_sign++;
-			in_double_quotes = false;
-		}
-		else if (equal_sign[i] == '\'' && in_simple_quotes)
-		{
-			equal_sign++;
-			in_double_quotes = false;
-		}
-		else
-			i++;
-	}
-	value = (char *)ft_calloc(sizeof(char), (i + 1));
-	i = 0;
-	while (tmp[i] && (tmp[i] != ' ' || in_simple_quotes || in_double_quotes))
-	{
-		if (tmp[i] == '\'' && !in_simple_quotes && !in_double_quotes)
-		{
-			tmp++;
-			in_simple_quotes = true;
-		}
-		else if (tmp[i] == '\"' && !in_simple_quotes && !in_double_quotes)
-		{
-			tmp++;
-			in_double_quotes = true;
-		}
-		else if (tmp[i] == '\"' && in_double_quotes)
-		{
-			tmp++;
-			in_double_quotes = false;
-		}
-		else if (tmp[i] == '\'' && in_simple_quotes)
-		{
-			tmp++;
-			in_double_quotes = false;
-		}
-		else
-		{
-			value[i] = tmp[i];
-			i++;
-		}
-	}
 	existing_var = mini_getvars(data->exp_vars, name);
 	if (existing_var)
 	{
 		free(existing_var);
-		existing_var = ft_strdup(value);
+		existing_var = ft_strdup(equal_sign);
 		if (env == false)
-			if (set_exp(data, name, value) == ERROR)
+			if (set_exp(data, name, equal_sign) == ERROR)
 				return ; //limpiar y ver y tal
 	}
 	else if (env == false)
@@ -129,10 +72,10 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 		if (existing_var)
 		{
 			free(existing_var);
-			existing_var = ft_strdup(value);
+			existing_var = ft_strdup(equal_sign);
 		}
 		else
-			set_variable(env_vars, name, value);
+			set_variable(env_vars, name, equal_sign);
 	}
 }
 
