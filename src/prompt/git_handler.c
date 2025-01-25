@@ -6,11 +6,11 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:14:11 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 13:18:56 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/25 08:03:54 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 bool	has_git_directory(const char *dir_path)
 {
@@ -62,12 +62,36 @@ char	*is_a_daddy(char *parent_dir, t_data *data, bool *git_found,
 	return (name);
 }
 
-char	*get_branch(const char *dir_path) //limpiartodo
+char	*make_brach(char *branch)
 {
-	char *tmp;
-	char *branch;
-	char *for_clean;
-	int fd;
+	char	*tmp;
+
+	if (ft_strncmp(branch, "ref: refs/heads/", 16) == 0)
+	{
+		tmp = branch;
+		branch = ft_strdup(branch + 16);
+		free(tmp);
+		if (!branch)
+			return (NULL);
+		branch[ft_strlen(branch) - 1] = '\0';
+	}
+	else
+	{
+		tmp = branch;
+		branch = ft_strdup(branch + 33);
+		free(tmp);
+		if (!branch)
+			return (NULL);
+		branch[ft_strlen(branch) - 1] = '\0';
+	}
+	return (branch);
+}
+
+char	*get_branch(const char *dir_path)
+{
+	char	*tmp;
+	char	*branch;
+	int		fd;
 
 	tmp = ft_strjoin(dir_path, "/.git/HEAD");
 	if (!tmp)
@@ -78,27 +102,16 @@ char	*get_branch(const char *dir_path) //limpiartodo
 		return (NULL);
 	branch = NULL;
 	branch = get_next_line(fd);
-	for_clean = get_next_line(fd);
-	//miar si tiene perdidas pondria un whiule por si acaso
+	tmp = get_next_line(fd);
+	while (tmp)
+	{
+		free(branch);
+		tmp = get_next_line(fd);
+	}
 	close(fd);
 	if (!branch)
 		return (NULL);
-	if (ft_strncmp(branch, "ref: refs/heads/", 16) == 0)
-	{
-		tmp = branch;
-		branch = ft_strdup(branch + 16);   //prteger
-		branch = ft_strtrim(branch, "\n"); //tmbn
-		free(tmp);
-		if (!branch)
-			return (NULL);
-	}
-	else
-	{
-		tmp = branch;
-		branch = ft_strdup(branch + 33);   //proteger
-		branch = ft_strtrim(branch, "\n"); //tmbn
-		free(tmp);
-	}
+	branch = make_brach(branch);
 	return (branch);
 }
 

@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:29:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 20:06:21 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/25 14:08:59 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,5 +52,7 @@ void	ft_exit(t_data *data, t_command *command)
 			num = 256 + num;
 		g_exit_code = num;
 	}
+	clean_cmd(command);
+	clean_data(data);
 	exit(g_exit_code);
 }

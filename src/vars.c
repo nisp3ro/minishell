@@ -6,13 +6,13 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:44:39 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/24 13:32:37 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/25 15:52:17 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
+bool	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 {
 	char	*existing_var;
 	char	*equal_sign;
@@ -28,6 +28,11 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 
 	existing_var = NULL;
 	expanded = expand_variables(input, data->envp, data);
+	if (!expanded)
+	{
+		perror("Error");
+		return false;
+	}
 	i = 0;
 	in_simple_quotes = false;
 	in_double_quotes = false;
@@ -46,8 +51,8 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 			data->envp[i] = malloc(ft_strlen(name) + ft_strlen(equal_sign));
 			if (data->envp[i] == NULL)
 			{
-				perror("malloc");
-				return ;
+				perror("malloc"); //limpieza especial de env desde 0 a '\0' y de i++ a '\0' + fallo critico, limpiar y exit
+				exit (1);
 			}
 			ft_strcpy(data->envp[i], name);
 			ft_strcat(data->envp[i], "=");
@@ -62,9 +67,13 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 	{
 		free(existing_var);
 		existing_var = ft_strdup(equal_sign);
+		if (existing_var == NULL)
+		{
+			perror("malloc"); //limpieza especial de lista antes y despues del nulo, limpiar y exit
+			exit (1);
+		}
 		if (env == false)
-			if (set_exp(data, name, equal_sign) == ERROR)
-				return ; //limpiar y ver y tal
+			set_exp(data, name, equal_sign); // si falla hace exit dentro
 	}
 	else if (env == false)
 	{
@@ -73,10 +82,16 @@ void	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 		{
 			free(existing_var);
 			existing_var = ft_strdup(equal_sign);
+			if (existing_var == NULL)
+			{
+				perror("malloc"); //limpieza especial de lista antes y despues del nulo, limpiar y exit
+				exit (1);
+			}
 		}
 		else
-			set_variable(env_vars, name, equal_sign);
+			set_variable(env_vars, name, equal_sign); //si no se guarda no pasa nada
 	}
+	return (true);
 }
 
 int	set_variable(t_vars **env_vars, char *name, char *value)
@@ -115,9 +130,12 @@ char	*expand_variables(char *token_value, char *envp[], t_data *data)
 	int		j;
 	int		k;
 
+	// liberar token value antes de salir
 	i = 0;
 	j = 0;
 	k = 0;
+	if (!token_value)
+		return (NULL);
 	expanded = ft_calloc(sizeof(char), (ft_strlen(token_value) + 1));
 	if (!expanded)
 		return (NULL);

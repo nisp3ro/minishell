@@ -6,11 +6,11 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:10:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/23 19:03:06 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/25 11:55:22 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 void	parse_last_cmd_arg(t_command *commands, t_data *data)
 {
@@ -32,7 +32,8 @@ int	check_cmd_start(char *line, int i)
 {
 	if (line[i] == '|')
 	{
-		printf("minishell: syntax error near unexpected token `|'\n");
+		write(STDERR_FILENO,
+				"minishell: syntax error near unexpected token `|'\n", 52);
 		g_exit_code = 258;
 		free(line);
 		return (ERROR);

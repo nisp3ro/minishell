@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:40:12 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/24 13:06:51 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/25 14:19:36 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ static void	wait_exit(int i, int pid, t_command **command)
 	int	temp_pid;
 	int	temp;
 
-	// clear_lst(command);
+	clean_cmd(*command);
 	while (i)
 	{
 		temp_pid = waitpid(-1, &g_exit_code, 0);
@@ -201,8 +201,8 @@ void	manage_redirections(t_redir_vars *red)
 	}
 }
 
-char	*manage_redirs(t_command *command, char **envp, int in_fd,
-		int pipefd[2], t_data *data)
+char	*manage_redirs(t_command *command, char **envp, t_pip_vars *pip,
+		t_data *data)
 {
 	t_redir_vars	red;
 
@@ -211,10 +211,10 @@ char	*manage_redirs(t_command *command, char **envp, int in_fd,
 		ft_create_custom_path(&red.command_path, command);
 	else if (command->args)
 		red.command_path = find_command_in_path(command->args[0], envp);
-	if (in_fd != STDIN_FILENO)
+	if (pip->in_fd != STDIN_FILENO)
 	{
-		dup2(in_fd, STDIN_FILENO);
-		close(in_fd);
+		dup2(pip->in_fd, STDIN_FILENO);
+		close(pip->in_fd);
 	}
 	if (command->eof != NULL)
 		here_doc(data, command->eof);
@@ -222,8 +222,8 @@ char	*manage_redirs(t_command *command, char **envp, int in_fd,
 		redir(command, &red); // command redir->next?
 	if (command->next)
 	{
-		dup2(pipefd[1], STDOUT_FILENO);
-		close(pipefd[0]);
+		dup2(pip->pipefd[1], STDOUT_FILENO);
+		close(pip->pipefd[0]);
 	}
 	manage_redirections(&red);
 	return (red.command_path);
@@ -257,10 +257,11 @@ void	execve_error_exit(t_command *command, char *command_path)
 				": command not found\n", 20), exit(127));
 }
 
-void	init_pip(t_pip_vars *pip)
+void	init_pip(t_pip_vars *pip, t_command **command)
 {
 	pip->i = 0;
 	pip->in_fd = STDIN_FILENO;
+	pip->command_head = *command;
 	wait_signal(0);
 }
 
@@ -287,7 +288,7 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 {
 	t_pip_vars	pip;
 
-	init_pip(&pip);
+	init_pip(&pip, &command);
 	while (command != NULL)
 	{
 		pip.i++;
@@ -298,8 +299,7 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 			return (perror("fork"), exit(EXIT_FAILURE)); // limpiar
 		if (pip.pid == 0)
 		{
-			pip.command_path = manage_redirs(command, envp, pip.in_fd,
-					pip.pipefd, data);
+			pip.command_path = manage_redirs(command, envp, &pip, data);
 			if ((check_cmd_args(command) && !check_builtin(command, data))
 				&& execve(pip.command_path, command->args, envp))
 				execve_error_exit(command, pip.command_path);
@@ -309,5 +309,5 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 			father_process(&pip, command);
 		command = command->next;
 	}
-	wait_exit(pip.i, pip.pid, &command);
+	wait_exit(pip.i, pip.pid, &pip.command_head);
 }

@@ -1,9 +1,10 @@
 NAME		=		minishell
 SRCS		=		$(addprefix $(SRC_DIR)/, built_in.c cleaner.c env.c \
 					exec.c ft_cd.c ft_echo.c ft_env.c ft_exit.c ft_export.c \
-					ft_pwd.c ft_unset.c get_prompt.c git_handler.c history.c \
-					init_data.c loop.c main.c parsing.c signals.c tokenizer.c \
-					utils.c vars.c history_utils.c)
+					ft_pwd.c ft_unset.c prompt/get_prompt.c prompt/git_handler.c history.c \
+					init/init_data.c init/init_envp.c init/init_history.c core/loop.c main.c parser/parser_01.c \
+					signal/signals.c tokenizer/tokenizer_01.c tokenizer/tokenizer_02.c tokenizer/tokenizer_utils.c \
+					utils.c vars.c history_utils.c parser/parser_02.c)
 OBJS		=		$(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 SRC_DIR		=		./src
 INC_DIR		=		./include
@@ -37,7 +38,7 @@ $(NAME):	$(OBJS)
 	@printf "$(GREEN)%s$(NC)\n" " Compiled successfully."
 
 $(OBJ_DIR)/%.o:	$(SRC_DIR)/%.c $(HEADER_FILE)
-	@mkdir -p $(OBJ_DIR)  # Ensure the OBJ_DIR exists
+	@mkdir -p $(dir $@)
 	@printf "$(GREEN)|$(NC)"
 	@$(CC) $(CFLAGS) -c $< -o $@ -I $(INC_DIR)
 

@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/24 16:36:35 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/25 14:08:24 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,13 +66,14 @@ typedef struct s_token
 
 typedef struct s_tokenizer
 {
-	int		i;
-	char	quote;
-	char	*full_cmd;
-	char	*token_value;
-	bool	in_here_doc;
-	t_token	*tokens;
-}			t_tokenizer;
+	int					i;
+	char				quote;
+	char				*full_cmd;
+	char				*token_value;
+	bool				in_here_doc;
+	bool				stop;
+	t_token				*tokens;
+}						t_tokenizer;
 
 typedef struct s_redir
 {
@@ -127,6 +128,7 @@ typedef struct s_pipe_vars
 	pid_t				pid;
 	int					in_fd;
 	char				*command_path;
+	t_command			*command_head;
 }						t_pip_vars;
 
 typedef struct s_search_command
@@ -163,9 +165,13 @@ void					wait_signal(int i);
 
 // loop.c
 int						interactive_mode(t_data *data, char *envp[]);
+void					ft_recover_history(t_data *data);
+int						create_envp(t_data *data);
+char					**cpy_env(char *envp[]);
+int						update_envp(t_data *data);
 
 // get_prompt.c
-char					*get_host(char **envp, int *free_host);
+char					*get_host(char **envp, bool *free_host);
 int						get_prompt(char **p, t_data *data);
 
 // git_handler.c
@@ -176,18 +182,32 @@ char					*get_branch(const char *dir_path);
 int						is_a_git(t_data *data, bool *git_found, char **name);
 
 // tokenize.c
-t_token					*add_token(t_token **tokens, t_token_type type,
+t_token					*add_token(t_tokenizer **tok, t_token_type type,
 							char *value);
 t_token					*tokenize(char *line, t_data *data);
+t_token					*token_inner_loop(t_tokenizer **tok, t_data *data,
+							t_token **current);
+void					tokenizer_error(t_tokenizer **tok, bool syntax_error);
+bool					should_continue_parsing(t_tokenizer **tok);
 
 // parser.c
-t_redir					*add_redir(t_redir **redir, t_redir_type type,
+bool					add_redir(t_redir **redir, t_redir_type type,
 							char *value);
 t_command				*parse_tokens(t_data *data, t_token *tokens);
 t_command				*parse_pipeline(t_data *data, t_token *tokens);
+bool					handle_export_variable(t_token *current, t_data *data,
+							t_command *command, int *arg_count);
+bool					handle_heredoc(t_token **current, t_command *command);
+bool	handle_command_args(t_token *current,
+							t_command *command,
+							int *arg_count,
+							bool *export);
+bool	handle_redirection(t_token **current,
+						t_command *command,
+						bool is_output);
 
 // vars.c
-void	handle_variable_assignment(char *input,
+bool	handle_variable_assignment(char *input,
 								t_vars **env_vars,
 								t_data *data);
 int						set_variable(t_vars **env_vars, char *name,
@@ -225,10 +245,13 @@ void					execute_pipeline(t_command *command, t_data *data,
 							char **envp);
 
 // cleaner.c
+void					clean_redir_list(t_redir **redir);
 void					free_tokens(t_token *tokens);
 void					clean_variables(t_vars *vars);
 void					clean_mtx(char **mtx);
 char					*clean_line(char *line, t_data *data);
+void					clean_cmd(t_command *command);
+void					clean_data(t_data *data);
 
 // utils.c
 char					**ft_realloc(char **envp, int size);

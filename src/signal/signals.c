@@ -6,11 +6,11 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/17 17:10:01 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/24 13:06:19 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/25 14:03:40 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 static void	signal_handler(int signal)
 {
@@ -35,6 +35,7 @@ static void	child_handler(int signal)
 void	wait_signal(int i)
 {
 	struct sigaction	sa;
+	ft_memset(&sa, 0, sizeof(sa));
 
 	signal(SIGQUIT, SIG_IGN);
 	if (i)

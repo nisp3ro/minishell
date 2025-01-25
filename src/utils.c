@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:12:21 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/24 13:22:17 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/25 12:29:05 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,30 +20,23 @@ char	**ft_realloc(char **envp, int size)
 	i = 0;
 	new = ft_calloc(sizeof(char *), (size + 1));
 	if (new == NULL)
-	{
-		perror("malloc");
-		return (NULL);
-	}
+		return (clean_mtx(envp), perror("malloc"), NULL);
 	while (envp && envp[i] != NULL && envp[i][0] != '\0')
 	{
 		new[i] = ft_strdup(envp[i]);
+		if (new[i] == NULL)
+			return (clean_mtx(envp), clean_mtx(new), perror("malloc"), NULL);
 		i++;
 	}
 	new[i] = NULL;
 	i = 0;
-	while (envp && envp[i] != NULL)
-	{
-		free(envp[i]);
-		i++;
-	}
-	if (envp)
-		free(envp);
+	clean_mtx(envp);
 	return (new);
 }
 
 int	is_delimiter(char c)
 {
-	return (c == ' ' || c == '|' || c == '<' || c == '>');
+	return (c == '\t' || c == ' ' || c == '|' || c == '<' || c == '>');
 }
 
 bool	is_quote(char c)
