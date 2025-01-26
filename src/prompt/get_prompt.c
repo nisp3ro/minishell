@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:42:03 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/25 14:33:37 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/26 12:47:15 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ int	get_prompt(char **p, t_data *data)
 	if (host == NULL)
 		return (ERROR);
 	print_prompt(prompt, user, host, data);
-	*p = prompt;
+	*p = ft_strdup(prompt);
 	if (free_host == true)
 		free(host);
 	return (OK);

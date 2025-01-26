@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/25 14:08:24 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/26 19:52:30 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,8 @@ typedef struct s_redir
 typedef struct s_command
 {
 	char				**args;
-	char				*eof;
+	int					eof_count;
+	char				**eof;
 	int					append;
 	t_redir				*redir;
 	struct s_command	*next;
@@ -207,13 +208,19 @@ bool	handle_redirection(t_token **current,
 						bool is_output);
 
 // vars.c
-bool	handle_variable_assignment(char *input,
-								t_vars **env_vars,
-								t_data *data);
-int						set_variable(t_vars **env_vars, char *name,
-							char *value);
+bool					handle_variable_assignment(char *input,
+							t_vars **env_vars, t_data *data);
+void					process_user_variable(char *name, char *value,
+							t_vars **env_vars, t_data *data);
+bool					process_environment_variable(char *name, char *value,
+							t_data *data);
+void					replace_user_variable(char *existing_var, char *value,
+							t_data *data, char *name);
+char					*create_env_entry(char *name, char *value);
 char					*expand_variables(char *token_value, char *envp[],
 							t_data *data);
+int						set_variable(t_vars **env_vars, char *name,
+							char *value);
 
 // builtin.c
 bool					check_builtin(t_command *command, t_data *data);
@@ -240,7 +247,6 @@ void					unset_from_vars(t_command *command, t_vars **vars);
 void					ft_unset(t_command *command, t_data *data);
 
 // execute.c
-void					here_doc(t_data *data, char *limiter);
 void					execute_pipeline(t_command *command, t_data *data,
 							char **envp);
 

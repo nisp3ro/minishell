@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 12:37:57 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/25 13:01:53 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/26 19:37:40 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,12 +84,18 @@ bool	handle_command_args(t_token *current, t_command *command,
 
 bool	handle_heredoc(t_token **current, t_command *command)
 {
+
 	*current = (*current)->next;
 	if (*current && (*current)->type == TOKEN_WORD)
 	{
-		command->eof = ft_strdup((*current)->value);
+		command->eof = ft_realloc(command->eof, sizeof(char *) * (command->eof_count
+					+ 2));
 		if (!command->eof)
 			return (false);
+		command->eof[command->eof_count++] = ft_strdup((*current)->value);
+		if (!command->eof[command->eof_count - 1])
+			return (clean_mtx(command->eof), false);
+		command->eof[command->eof_count] = NULL;
 		return (true);
 	}
 	write(STDERR_FILENO, "syntax error near unexpected token `newline'\n", 45);

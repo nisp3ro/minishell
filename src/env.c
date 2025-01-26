@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 11:13:07 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/25 12:26:22 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/26 15:06:26 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	set_exp(t_data *data, char *name, char *value)
 	if (data->envp[i] == NULL)
 	{
 		perror("malloc");
-		return (ERROR); //limpieza especial de env desde 0 a '\0' y de i++ a '\0' + fallo critico, limpiar y exit
+		return (1);
 	}
 	ft_strcpy(data->envp[i], name);
 	ft_strcat(data->envp[i], "=");

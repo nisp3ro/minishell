@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:10:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/25 11:55:22 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/26 13:02:36 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	token_parsec_exec(char *full_cmd, t_data *data)
 		execute_pipeline(commands, data, data->envp);
 }
 
-char	*unfinished_pipe(char *line)
+char	*unfinished_pipe(char *line) //arreglar
 {
 	char	*tmp[2];
 	int		i;
@@ -103,6 +103,8 @@ int	interactive_mode(t_data *data, char *envp[])
 		if (get_prompt(&data->prompt, data) == ERROR)
 			return (ERROR);
 		line[0] = readline(data->prompt);
+		free(data->prompt);
+		data->prompt = NULL;
 		if (!line[0])
 			return (printf("exit\n"), g_exit_code);
 		while (isspace((unsigned char)line[0][i]))

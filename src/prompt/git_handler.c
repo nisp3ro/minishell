@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:14:11 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/25 08:03:54 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/26 14:18:42 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ char	*is_a_daddy(char *parent_dir, t_data *data, bool *git_found,
 {
 	char	*name;
 
+	name = NULL;
 	parent_dir = ft_strdup(data->pwd);
 	if (!parent_dir)
 		return (NULL);

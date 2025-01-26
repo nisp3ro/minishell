@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:40:12 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/25 14:19:36 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/26 20:04:44 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,7 @@ static void	read_n_write(t_data *data, char *limiter, int *fd)
 {
 	char	*line[2];
 
+	line[0] = NULL;
 	line[0] = readline("heredoc> ");
 	if ((limiter[1] != '\'' && limiter[ft_strlen(limiter) - 1] != '\'')
 		|| (limiter[1] != '\"' && limiter[ft_strlen(limiter) - 1] != '\"'))
@@ -126,10 +127,10 @@ static void	read_n_write(t_data *data, char *limiter, int *fd)
 	free(line[1]);
 }
 
-void	here_doc(t_data *data, char *limiter)
+void	here_doc(t_data *data, char *limiter, int *fd)
 {
 	pid_t	reader;
-	int		fd[2];
+	
 
 	if (pipe(fd) == -1)
 		exit(1); // limpiar
@@ -143,9 +144,6 @@ void	here_doc(t_data *data, char *limiter)
 		close(fd[1]);
 		exit(EXIT_SUCCESS);
 	}
-	close(fd[1]);
-	dup2(fd[0], STDIN_FILENO);
-	close(fd[0]);
 	waitpid(reader, NULL, 0);
 }
 
@@ -205,8 +203,18 @@ char	*manage_redirs(t_command *command, char **envp, t_pip_vars *pip,
 		t_data *data)
 {
 	t_redir_vars	red;
+	int				eof_i;
 
 	init_redir_vars(&red);
+	if (command->eof != NULL)
+	{
+		eof_i = -1;
+		while (command->eof[++eof_i])
+			here_doc(data, command->eof[eof_i], pip->pipefd);
+		close(pip->pipefd[1]);
+		dup2(pip->pipefd[0], STDIN_FILENO);
+		close(pip->pipefd[0]);
+	}
 	if (command->args && ft_strchr(command->args[0], '/') != 0)
 		ft_create_custom_path(&red.command_path, command);
 	else if (command->args)
@@ -216,8 +224,6 @@ char	*manage_redirs(t_command *command, char **envp, t_pip_vars *pip,
 		dup2(pip->in_fd, STDIN_FILENO);
 		close(pip->in_fd);
 	}
-	if (command->eof != NULL)
-		here_doc(data, command->eof);
 	while (command->redir)
 		redir(command, &red); // command redir->next?
 	if (command->next)

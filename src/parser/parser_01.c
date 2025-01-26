@@ -6,19 +6,21 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 12:38:07 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/25 12:45:51 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/26 19:24:47 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-static bool export_condition(t_token **current, bool *export) {
-    if (*export && (*current)->type == TOKEN_WORD
-        && ft_strchr((*current)->value, '=')
-        && is_valid_identifier((*current)->value) == OK) {
-        return true;
-    }
-    return false;
+static bool	export_condition(t_token **current, bool *export)
+{
+	if (*export && (*current)->type == TOKEN_WORD
+		&& ft_strchr((*current)->value, '=')
+		&& is_valid_identifier((*current)->value) == OK)
+	{
+		return (true);
+	}
+	return (false);
 }
 
 static bool	parse_token_conditions(t_token **current, t_data *data,
@@ -35,19 +37,27 @@ static bool	parse_token_conditions(t_token **current, t_data *data,
 		if (!handle_variable_assignment((*current)->value, &data->vars, data))
 			return (false);
 	}
-	else if ((*current)->type == TOKEN_HEREDOC && !handle_heredoc(current,
-				command))
-		return (false);
-	else if ((*current)->type == TOKEN_WORD && !handle_command_args(*current,
-				command, arg_count, export))
-		return (false);
-	else if ((*current)->type == TOKEN_REDIRECT_IN
-			&& !handle_redirection(current, command, false))
-		return (false);
+	else if ((*current)->type == TOKEN_HEREDOC)
+	{
+		if (!handle_heredoc(current, command))
+			return (false);
+	}
+	else if ((*current)->type == TOKEN_WORD)
+	{
+		if (!handle_command_args(*current, command, arg_count, export))
+			return (false);
+	}
+	else if ((*current)->type == TOKEN_REDIRECT_IN)
+	{
+		if (!handle_redirection(current, command, false))
+			return (false);
+	}
 	else if (((*current)->type == TOKEN_REDIRECT_OUT
-				|| (*current)->type == TOKEN_APPEND_OUT)
-			&& !handle_redirection(current, command, true))
-		return (false);
+				|| (*current)->type == TOKEN_APPEND_OUT))
+	{
+		if (!handle_redirection(current, command, true))
+			return (false);
+	}
 	return (true);
 }
 
@@ -59,6 +69,7 @@ t_command	*initialize_command(void)
 	if (!command)
 		return (NULL);
 	command->args = NULL;
+	command->eof_count = 0;
 	command->eof = NULL;
 	command->append = 0;
 	command->redir = NULL;
