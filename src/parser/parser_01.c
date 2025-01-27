@@ -93,7 +93,7 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 	if (current && current->type == TOKEN_PIPE && current->next
 		&& current->next->type == TOKEN_PIPE)
 	{
-		write(STDERR_FILENO, "syntax error near unexpected token `||'\n", 43);
+		write(STDERR_FILENO, "syntax error near unexpected token `||'\n", 41);
 		g_exit_code = 2;
 		return (NULL);
 	}

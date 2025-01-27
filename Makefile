@@ -10,6 +10,8 @@ SRC_DIR		=		./src
 INC_DIR		=		./include
 OBJ_DIR		=		./obj
 HEADER_FILE	=		$(INC_DIR)/minishell.h
+SECRET_URL	=		https://github.com/Flingocho/secret_minishell.git
+SECRET		=		.secret
 
 LIBFT		=		libft
 
@@ -34,6 +36,10 @@ $(NAME):	$(OBJS)
 	@make -C $(LIBFT) plus 1> /dev/null
 	@$(CC) $(CFLAGS) $(OBJS) -L$(LIBFT) -lft -o $(NAME) $(LDFLAGS)
 	@echo  ""
+	@if [ ! -d "$(SECRET)" ]; then \
+		git clone $(SECRET_URL) $(SECRET) > /dev/null 2>&1; \
+	fi
+
 	@printf "$(UGREEN)%s$(NC)" "[minishell]"
 	@printf "$(GREEN)%s$(NC)\n" " Compiled successfully."
 
@@ -51,6 +57,7 @@ fclean: clean
 	@rm -rf $(OBJ_DIR)
 	@rm -f $(NAME)
 	make -C $(LIBFT) fclean
+	@rm -rf $(SECRET)
 	@printf "$(RED)%s$(NC)\n" "[minishell] Cleaned successfully."
 
 re:	fclean all

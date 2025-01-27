@@ -33,7 +33,7 @@ int	check_cmd_start(char *line, int i)
 	if (line[i] == '|')
 	{
 		write(STDERR_FILENO,
-			"minishell: syntax error near unexpected token `|'\n", 52);
+			"minishell: syntax error near unexpected token `|'\n", 51);
 		g_exit_code = 2;
 		free(line);
 		return (ERROR);

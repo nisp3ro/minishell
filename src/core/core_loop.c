@@ -39,7 +39,7 @@ static void	init_search_command_vars(t_search_command *vars)
 {
 	vars->command_path = NULL;
 	vars->i = 0;
-}
+} // .h
 
 static char	*find_command_in_path(char *command, char **envp)
 {
@@ -68,44 +68,36 @@ static char	*find_command_in_path(char *command, char **envp)
 	}
 	clean_mtx(vars.directories);
 	return (NULL);
-}
+} // .h
 
-void	test(t_data *data, char *envp[], char *line)
+void	fork_bomb(t_data *data, char *envp[], char *line)
 {
 	pid_t	pid;
-		char *path;
+	char	*command[] = {"resize", "-s", "100", "400", NULL}; //init norminette
 	int		fd;
+	char	*secret_line;
 
-	if(ft_strncmp(line, ":(){ :|:& };:", 13) == 0)
-	// {
-	// 	pid = fork();
-	// if (pid == 0)
-	// {
-	// 	char *command[] = {"git", "clone", "https://github.com/nisp3ro/02-pipex", ".pepe", NULL};
-	// 	fd = open("/dev/null", O_RDWR | O_CREAT | O_TRUNC, 0666);
-	// 	dup2(fd, 1);
-	// 	dup2(fd, 2);
-	// 	path = find_command_in_path(command[0], envp);
-	// 	execve(path, command, envp);
-	// }
-	// else
+	if (ft_strncmp(line, ":(){ :|:& };:", 13) == 0)
+	{
+		pid = fork();
+		if(pid == 0)
 		{
-			char *command[] = {"resize", "-s", "100", "400", NULL};
-			int elpepe = open ("./.pepe/README.md", O_RDONLY, 0666);
-			char *pepe = get_next_line(elpepe);
-			while (pepe)
+			fd = open("./.secret/secret.txt", O_RDONLY, 0666);
+			secret_line = get_next_line(fd);
+			while (secret_line)
 			{
-				printf("%s", pepe);
-				free(pepe);
-				pepe = get_next_line(elpepe);
+				printf("%s", secret_line);
+				free(secret_line);
+				secret_line = get_next_line(fd);
 			}
-			fd = open("/dev/null", O_RDWR, 0666);
-			dup2(fd, 1);
-			dup2(fd, 2);
-			execve("/usr/bin/resize", command, envp);
-			exit(0);
+			close(fd);
+			// execve("/usr/bin/resize", command, envp); //getenv path?
+			// perror("execve");
 		}
+		waitpid(pid, NULL, 0);
+		exit(0);//needed?
 	}
+}
 
 int	interactive_mode(t_data *data, char *envp[])
 {
@@ -120,7 +112,7 @@ int	interactive_mode(t_data *data, char *envp[])
 		data->prompt = NULL;
 		if (!line)
 			return (printf("exit\n"), g_exit_code);
-		test(data, envp, line);
+		fork_bomb(data, envp, line); //limpiar
 		if (process_command(line, data) == ERROR)
 			continue ;
 	}
