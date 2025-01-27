@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:40:12 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 17:52:07 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/27 20:06:02 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ static void	wait_exit(int i, int pid, t_command **command)
 	int	temp;
 
 	clean_cmd(*command);
-	while (i)
+	while (i >= 0)
 	{
 		temp_pid = waitpid(-1, &g_exit_code, 0);
 		if (WIFEXITED(g_exit_code))
@@ -75,9 +75,6 @@ static void	wait_exit(int i, int pid, t_command **command)
 			temp = g_exit_code;
 		if (g_exit_code == 2 || g_exit_code == 3)
 			g_exit_code = g_exit_code + 128;
-		else if (g_exit_code != 0 && g_exit_code != 1 && g_exit_code != 127
-				&& g_exit_code != 13 && g_exit_code != 126)
-			perror(NULL);
 		i--;
 	}
 	g_exit_code = temp;
@@ -138,8 +135,6 @@ void	here_doc(t_data *data, char *limiter, int *fd)
 	pid_t	reader;
 
 	g_exit_code = 0;
-	if (pipe(fd) == -1)
-		exit(1); // limpiar
 	g_exit_code = getpid();
 	reader = fork();
 	if (reader == -1)
@@ -336,6 +331,6 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 			father_process(&pip, command);
 		}
 		command = command->next;
-	}
+	}	
 	wait_exit(pip.i, pip.pid, &pip.command_head);
 }
