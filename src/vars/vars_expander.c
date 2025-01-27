@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 15:41:14 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/26 15:41:22 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/27 09:30:58 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@ static char	*handle_variable_expansion(char *token_value, int *i,
 
 	j = *i + 1;
 	k = 0;
-	while ((token_value[j] != '\0' && ft_isalnum(token_value[j])) ||
-			(token_value[j] != '\0' && token_value[j] == '_'))
+	while ((token_value[j] != '\0' && ft_isalnum(token_value[j]))
+		|| (token_value[j] != '\0' && token_value[j] == '_'))
 		j++;
 	var_val[0] = malloc(sizeof(char) * (j - *i));
 	if (!var_val[0])
@@ -84,8 +84,8 @@ static char	*append_literal_char(char c, char **expanded)
 static int	process_token_character(char *token_value, int *i, char **expanded,
 		t_data *data)
 {
-	if ((token_value[*i] == '$' && ft_isalnum(token_value[*i + 1])) ||
-		(token_value[*i] == '$' && token_value[*i + 1] == '_'))
+	if ((token_value[*i] == '$' && ft_isalnum(token_value[*i + 1]))
+		|| (token_value[*i] == '$' && token_value[*i + 1] == '_'))
 	{
 		if (!handle_variable_expansion(token_value, i, expanded, data))
 			return (ERROR);
@@ -117,7 +117,9 @@ char	*expand_variables(char *token_value, char *envp[], t_data *data)
 	while (token_value[i] != '\0')
 	{
 		if (process_token_character(token_value, &i, &expanded, data) == ERROR)
-			return (NULL); // OJO check llib expan?
+			return (NULL);
 	}
 	return (expanded);
 }
+// OJO check llib expan? 
+// (puese este comentario en la linea 120 y no recuerdo que queria decir)

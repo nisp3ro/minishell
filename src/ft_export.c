@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:29:57 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 20:06:26 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/27 12:40:50 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,9 +82,6 @@ void	ft_export(t_command *command, t_data *data)
 				&& !mini_getvars(data->exp_vars, command->args[i]))
 		{
 			set_variable(&data->exp_vars, command->args[i], "");
-			if (ft_strchr(command->args[i], '='))
-				if (set_exp(data, command->args[i], "") == ERROR)
-					return ; //limpiar y ver y tal
 			sort_list(&data->exp_vars, data->exp_vars);
 		}
 		else if (mini_getvars(data->vars, command->args[i]))

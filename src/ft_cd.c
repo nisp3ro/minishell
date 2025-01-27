@@ -6,137 +6,103 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:25:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 20:06:04 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/27 17:52:10 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void	ft_cd(t_command *command, t_data *data)
+static void	update_env_var(char *key, char *value, char ***envp)
 {
-	int		i;
-	int		pwd_found;
-	int		oldpwd_found;
-	char	*tmp;
-	char	*tmp2;
+	int	i;
 
 	i = 0;
-	pwd_found = 0;
-	oldpwd_found = 0;
-	if (!command->args[1])
+	while ((*envp)[i])
 	{
-		tmp = mini_getenv("HOME", data->envp);
-		if (chdir(tmp) == -1)
+		if (ft_strncmp((*envp)[i], key, ft_strlen(key)) == 0)
 		{
-			perror("cd");
+			free((*envp)[i]);
+			(*envp)[i] = ft_strjoin(key, value);
+			if (!(*envp)[i])
+			{
+				perror("malloc");
+				return ;
+			}
 			return ;
 		}
+		i++;
 	}
-	else if (command->args[2])
-	{
-		write(STDERR_FILENO, " too many arguments\n", 20);
-		g_exit_code = 1;
-		return ;
-	}
-	else if (command->args[1][0] == '~')
-	{
-		tmp2 = mini_getenv("HOME", data->envp);
-		tmp = ft_strjoin(tmp2, command->args[1] + 1);
-		if (chdir(tmp) == -1)
-		{
-			perror("cd");
-			g_exit_code = 1;
-			return ;
-		}
-	}
-	else if (ft_strncmp(command->args[1], "-", 2) == 0)
-	{
-		if (chdir(data->oldpwd) == -1)
-		{
-			perror("cd");
-			g_exit_code = 1;
-			return ;
-		}
-	}
-	else if (chdir(command->args[1]) == -1)
+	(*envp)[i] = ft_strjoin(key, value);
+	(*envp)[i + 1] = NULL;
+}
+
+static bool	handle_cd_path(char *path, t_data *data)
+{
+	if (chdir(path) == -1)
 	{
 		perror("cd");
 		g_exit_code = 1;
-		return ;
+		return (false);
 	}
-	if (!data->oldpwd)
-		free(data->oldpwd);
-	data->oldpwd = data->pwd;
-	data->pwd = getcwd(NULL, 0);
-	if (data->pwd == NULL)
+	return (true);
+}
+
+static bool	handle_special_paths(t_command *command, t_data *data)
+{
+	char	*home;
+	char	*tmp;
+
+	if (!command->args[1])
+	{
+		home = mini_getenv("HOME", data->envp);
+		return (handle_cd_path(home, data));
+	}
+	else if (command->args[1][0] == '~')
+	{
+		home = mini_getenv("HOME", data->envp);
+		tmp = ft_strjoin(home, command->args[1] + 1);
+		if (!tmp || !handle_cd_path(tmp, data))
+		{
+			free(tmp);
+			return (false);
+		}
+		free(tmp);
+		return (true);
+	}
+	else if (ft_strncmp(command->args[1], "-", 2) == 0)
+		return (handle_cd_path(data->oldpwd, data));
+	return (handle_cd_path(command->args[1], data));
+}
+
+static void	update_pwd_and_oldpwd(t_data *data)
+{
+	char	*current_pwd;
+
+	current_pwd = getcwd(NULL, 0);
+	if (!current_pwd)
 	{
 		perror("getcwd");
 		g_exit_code = 1;
 		return ;
 	}
-	while (data->envp[i] != NULL)
+	if (data->oldpwd)
+		free(data->oldpwd);
+	data->oldpwd = data->pwd;
+	update_env_var("OLDPWD=", data->oldpwd, &data->envp);
+	data->pwd = current_pwd;
+	update_env_var("PWD=", data->pwd, &data->envp);
+}
+
+void	ft_cd(t_command *command, t_data *data)
+{
+	if (command->args[2])
 	{
-		if (ft_strncmp(data->envp[i], "PWD=", 4) == 0)
-		{
-			free(data->envp[i]);
-			data->envp[i] = malloc(ft_strlen("PWD=") + ft_strlen(data->pwd)
-					+ 1);
-			if (data->envp[i] == NULL)
-			{
-				perror("malloc");
-				return ;
-			}
-			ft_strcpy(data->envp[i], "PWD=");
-			ft_strcat(data->envp[i], data->pwd);
-			pwd_found = 1;
-			break ;
-		}
-		i++;
+		write(STDERR_FILENO, "cd: too many arguments\n", 23);
+		g_exit_code = 1;
+		return ;
 	}
-	if (!pwd_found)
-	{
-		data->envp[i] = malloc(ft_strlen("PWD=") + ft_strlen(data->pwd) + 1);
-		if (data->envp[i] == NULL)
-		{
-			perror("malloc");
-			return ;
-		}
-		ft_strcpy(data->envp[i], "PWD=");
-		ft_strcat(data->envp[i], data->pwd);
-		data->envp[i + 1] = NULL;
-	}
-	i = 0;
-	while (data->envp[i] != NULL)
-	{
-		if (ft_strncmp(data->envp[i], "OLDPWD=", 7) == 0)
-		{
-			free(data->envp[i]);
-			data->envp[i] = malloc(ft_strlen("OLDPWD=")
-					+ ft_strlen(data->oldpwd) + 1);
-			if (data->envp[i] == NULL)
-			{
-				perror("malloc");
-				return ;
-			}
-			ft_strcpy(data->envp[i], "OLDPWD=");
-			ft_strcat(data->envp[i], data->oldpwd);
-			oldpwd_found = 1;
-			break ;
-		}
-		i++;
-	}
-	if (!oldpwd_found)
-	{
-		data->envp[i] = malloc(ft_strlen("OLDPWD=") + ft_strlen(data->oldpwd)
-				+ 1);
-		if (data->envp[i] == NULL)
-		{
-			perror("malloc");
-			return ;
-		}
-		ft_strcpy(data->envp[i], "OLDPWD=");
-		ft_strcat(data->envp[i], data->oldpwd);
-		data->envp[i + 1] = NULL;
-	}
+	if (!handle_special_paths(command, data))
+		return ;
+	update_pwd_and_oldpwd(data);
 	g_exit_code = 0;
 }

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   var_assigment.c                                    :+:      :+:    :+:   */
+/*   vars_assigment.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 15:39:00 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/26 15:39:36 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/27 12:20:58 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,8 @@ bool	process_environment_variable(char *name, char *value, t_data *data)
 	i = 0;
 	while (data->envp[i] != NULL)
 	{
-		if (ft_strncmp(data->envp[i], name, ft_strlen(name)) == 0 &&
-			data->envp[i][ft_strlen(name)] == '=')
+		if (ft_strncmp(data->envp[i], name, ft_strlen(name)) == 0
+			&& data->envp[i][ft_strlen(name)] == '=')
 		{
 			free(data->envp[i]);
 			data->envp[i] = create_env_entry(name, value);

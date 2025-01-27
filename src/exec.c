@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:40:12 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/26 20:04:44 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/27 17:52:07 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ void	manage_here_doc(t_data *data, char **line, char *limiter, int *fd)
 		write(fd[1], line[0], ft_strlen(line[0]));
 		write(fd[1], "\n", 1);
 		free(line[0]);
-		line[0] = readline("heredoc> ");
+		line[0] = readline("> ");
 	}
 }
 
@@ -112,7 +112,7 @@ static void	read_n_write(t_data *data, char *limiter, int *fd)
 	char	*line[2];
 
 	line[0] = NULL;
-	line[0] = readline("heredoc> ");
+	line[0] = readline("> ");
 	if ((limiter[1] != '\'' && limiter[ft_strlen(limiter) - 1] != '\'')
 		|| (limiter[1] != '\"' && limiter[ft_strlen(limiter) - 1] != '\"'))
 	{
@@ -127,24 +127,32 @@ static void	read_n_write(t_data *data, char *limiter, int *fd)
 	free(line[1]);
 }
 
+static void	here_doc_handler(int signal)
+{
+	g_exit_code = 130;
+	exit(g_exit_code);
+}
+
 void	here_doc(t_data *data, char *limiter, int *fd)
 {
 	pid_t	reader;
-	
 
+	g_exit_code = 0;
 	if (pipe(fd) == -1)
 		exit(1); // limpiar
+	g_exit_code = getpid();
 	reader = fork();
 	if (reader == -1)
 		exit(1); // limpiar
 	if (reader == 0)
 	{
+		wait_signal(2);
 		close(fd[0]);
 		read_n_write(data, limiter, fd);
 		close(fd[1]);
 		exit(EXIT_SUCCESS);
 	}
-	waitpid(reader, NULL, 0);
+	waitpid(reader, &g_exit_code, 0);
 }
 
 void	redir(t_command *command, t_redir_vars *red)
@@ -204,17 +212,9 @@ char	*manage_redirs(t_command *command, char **envp, t_pip_vars *pip,
 {
 	t_redir_vars	red;
 	int				eof_i;
+	int				here_doc_pipe[2];
 
 	init_redir_vars(&red);
-	if (command->eof != NULL)
-	{
-		eof_i = -1;
-		while (command->eof[++eof_i])
-			here_doc(data, command->eof[eof_i], pip->pipefd);
-		close(pip->pipefd[1]);
-		dup2(pip->pipefd[0], STDIN_FILENO);
-		close(pip->pipefd[0]);
-	}
 	if (command->args && ft_strchr(command->args[0], '/') != 0)
 		ft_create_custom_path(&red.command_path, command);
 	else if (command->args)
@@ -225,7 +225,7 @@ char	*manage_redirs(t_command *command, char **envp, t_pip_vars *pip,
 		close(pip->in_fd);
 	}
 	while (command->redir)
-		redir(command, &red); // command redir->next?
+		redir(command, &red);
 	if (command->next)
 	{
 		dup2(pip->pipefd[1], STDOUT_FILENO);
@@ -293,6 +293,8 @@ bool	check_cmd_args(t_command *command)
 void	execute_pipeline(t_command *command, t_data *data, char **envp)
 {
 	t_pip_vars	pip;
+	int			eof_i;
+	int			here_doc_pipe[2];
 
 	init_pip(&pip, &command);
 	while (command != NULL)
@@ -301,6 +303,22 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 		if (command->next)
 			if (pipe(pip.pipefd) == -1)
 				return (perror("pipe"), exit(EXIT_FAILURE)); // limpiar
+		if (command->eof != NULL)
+		{
+			if (pipe(here_doc_pipe) == -1)
+				exit(1); // limpiar
+			eof_i = -1;
+			while (command->eof[++eof_i])
+				here_doc(data, command->eof[eof_i], here_doc_pipe);
+			if (g_exit_code == SIGKILL)
+			{
+				g_exit_code = 130;
+				return ;
+			}
+			close(here_doc_pipe[1]);
+			pip.in_fd = here_doc_pipe[0];
+		}
+		g_exit_code = 0;
 		if ((pip.pid = fork()) == -1)
 			return (perror("fork"), exit(EXIT_FAILURE)); // limpiar
 		if (pip.pid == 0)
@@ -312,7 +330,11 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 			exit(g_exit_code);
 		}
 		else
+		{
+			if (command->eof != NULL)
+				waitpid(pip.pid, &g_exit_code, 0);
 			father_process(&pip, command);
+		}
 		command = command->next;
 	}
 	wait_exit(pip.i, pip.pid, &pip.command_head);

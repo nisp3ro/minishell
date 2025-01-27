@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 08:04:07 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/25 14:00:22 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/27 12:53:53 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,9 +75,10 @@ t_token	*handle_delimiter(t_tokenizer **tok)
 }
 
 void	init_tokenizer(t_tokenizer **tokenizer,
-		t_token **current, char *full_cmd)
+					t_token **current,
+					char *full_cmd)
 {
-	t_token		*tokens;
+	t_token	*tokens;
 
 	tokens = NULL;
 	(*tokenizer)->i = 0;
@@ -92,14 +93,13 @@ void	init_tokenizer(t_tokenizer **tokenizer,
 
 t_token	*tokenize(char *full_cmd, t_data *data)
 {
-
 	t_token		*current;
 	t_tokenizer	*tok;
-	t_token	*tokens;
+	t_token		*tokens;
 
 	tok = malloc(sizeof(t_tokenizer));
-    if (!tok)
-        return (NULL);
+	if (!tok)
+		return (NULL);
 	init_tokenizer(&tok, &current, full_cmd);
 	while (full_cmd[tok->i])
 	{
@@ -107,8 +107,8 @@ t_token	*tokenize(char *full_cmd, t_data *data)
 			current = handle_delimiter(&tok);
 		else
 			current = token_inner_loop(&tok, data, &current);
-        if (tok->stop == true)
-            return (free_tokens(tok->tokens), NULL);
+		if (tok->stop == true)
+			return (free_tokens(tok->tokens), NULL);
 	}
 	tokens = tok->tokens;
 	free(tok);

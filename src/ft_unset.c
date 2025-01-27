@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:26:34 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/21 19:10:04 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/27 12:49:12 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,32 +41,26 @@ void	unset_from_envp(t_command *command, t_data *data)
 	g_exit_code = 0;
 }
 
-void	unset_from_vars(t_command *command, t_vars **vars)
+void	unset_from_vars(char *arg, t_vars **vars)
 {
 	t_vars	*tmp;
 	t_vars	*prev;
-	int		i;
 
 	tmp = *vars;
 	prev = NULL;
-	i = 0;
-	while (command->args[++i])
+	while (tmp)
 	{
-		while (tmp)
+		if (ft_strncmp(tmp->name, arg, ft_strlen(arg)) == 0
+			&& tmp->name[ft_strlen(arg)] == '\0')
 		{
-			if (ft_strncmp(tmp->name, command->args[i],
-					ft_strlen(command->args[i])) == 0
-				&& tmp->name[ft_strlen(command->args[i])] == '\0')
-			{
-				if (prev)
-					prev->next = tmp->next;
-				else
-					*vars = tmp->next;
-				return (free(tmp->name), free(tmp->value), free(tmp));
-			}
-			prev = tmp;
-			tmp = tmp->next;
+			if (prev)
+				prev->next = tmp->next;
+			else
+				*vars = tmp->next;
+			return (free(tmp->name), free(tmp->value), free(tmp));
 		}
+		prev = tmp;
+		tmp = tmp->next;
 	}
 }
 
@@ -91,10 +85,16 @@ static int	is_valid_identifier_unset(const char *str)
 // 	return ;
 void	ft_unset(t_command *command, t_data *data)
 {
+	int	i;
+
+	i = 0;
 	if (!command->args[1])
 		return ;
 	unset_from_envp(command, data);
-	unset_from_vars(command, &data->vars);
-	unset_from_vars(command, &data->exp_vars);
+	while (command->args[++i])
+	{
+		unset_from_vars(command->args[i], &data->vars);
+		unset_from_vars(command->args[i], &data->exp_vars);
+	}
 	g_exit_code = 0;
 }

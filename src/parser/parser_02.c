@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 12:37:57 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/26 19:37:40 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/27 13:05:37 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,15 +47,15 @@ bool	handle_redirection(t_token **current, t_command *command,
 	if (*current && (*current)->type == TOKEN_WORD)
 	{
 		if (is_output)
-        {
+		{
 			if (!add_redir(&command->redir, OUTPUT, (*current)->value))
 				return (clean_redir_list(&command->redir), false);
-        }
-        else
-        {
+		}
+		else
+		{
 			if (!add_redir(&command->redir, INPUT, (*current)->value))
 				return (clean_redir_list(&command->redir), false);
-        }
+		}
 		if (type == TOKEN_APPEND_OUT)
 			command->append = true;
 		else
@@ -63,33 +63,32 @@ bool	handle_redirection(t_token **current, t_command *command,
 		return (true);
 	}
 	write(STDERR_FILENO, "syntax error near unexpected token `newline'\n", 45);
+	g_exit_code = 2;
 	return (false);
 }
 
-bool	handle_command_args(t_token *current, t_command *command,
-		int *arg_count, bool *export)
+bool	handle_command_args(t_token *current, t_command *command)
 {
-	command->args = ft_realloc(command->args, sizeof(char *) * (*arg_count
-				+ 2));
+	command->args = ft_realloc(command->args, sizeof(char *)
+			* (command->arg_count + 2));
 	if (!command->args)
 		return (false);
-	command->args[(*arg_count)++] = ft_strdup(current->value);
-	if (!command->args[*arg_count - 1])
+	command->args[(command->arg_count)++] = ft_strdup(current->value);
+	if (!command->args[command->arg_count - 1])
 		return (clean_mtx(command->args), false);
-	command->args[*arg_count] = NULL;
+	command->args[command->arg_count] = NULL;
 	if (!ft_strncmp(current->value, "export", 7))
-		*export = true;
+		command->export = true;
 	return (true);
 }
 
 bool	handle_heredoc(t_token **current, t_command *command)
 {
-
 	*current = (*current)->next;
 	if (*current && (*current)->type == TOKEN_WORD)
 	{
-		command->eof = ft_realloc(command->eof, sizeof(char *) * (command->eof_count
-					+ 2));
+		command->eof = ft_realloc(command->eof, sizeof(char *)
+				* (command->eof_count + 2));
 		if (!command->eof)
 			return (false);
 		command->eof[command->eof_count++] = ft_strdup((*current)->value);
@@ -99,6 +98,7 @@ bool	handle_heredoc(t_token **current, t_command *command)
 		return (true);
 	}
 	write(STDERR_FILENO, "syntax error near unexpected token `newline'\n", 45);
+	g_exit_code = 2;
 	return (false);
 }
 
@@ -108,10 +108,11 @@ bool	handle_export_variable(t_token *current, t_data *data,
 	char	*tmp;
 
 	tmp = ft_strchr(current->value, '=');
-	if (tmp && *(tmp + 1) && *(tmp + 1) != ' ' && *(tmp + 1) != '='
-		&& current->next == NULL)
+	if (tmp && *(tmp + 1) != ' ' && *(tmp + 1) != '=')
+	{
 		handle_variable_assignment(current->value, &data->vars, data);
-	*tmp = '\0';
+		*tmp = '\0';
+	}
 	command->args = ft_realloc(command->args, sizeof(char *) * (*arg_count
 				+ 2));
 	if (!command->args)

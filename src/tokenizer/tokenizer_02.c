@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 08:08:51 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/26 15:29:20 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/27 09:28:09 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,6 @@ t_token	*token_inner_loop(t_tokenizer **tok, t_data *data, t_token **current)
 			{
 				*current = process_token_value(tok, (*tok)->token_value);
 				(*tok)->token_value = NULL;
-				free((*tok)->token_value); //bien?
 				break ;
 			}
 		}
@@ -115,9 +114,9 @@ t_token	*token_inner_loop(t_tokenizer **tok, t_data *data, t_token **current)
 			(*tok)->in_here_doc = false;
 			*current = process_token_value(tok, (*tok)->token_value);
 			(*tok)->token_value = NULL;
-			free((*tok)->token_value); //bien?
 			break ;
 		}
 	}
 	return (*current);
 }
+// OJO Comprobar free de linea 109 y 118 ¿?¿¿? nose si siempre hay que liberar

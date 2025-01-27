@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 12:38:07 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/26 19:24:47 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/27 17:49:28 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,16 +23,38 @@ static bool	export_condition(t_token **current, bool *export)
 	return (false);
 }
 
-static bool	parse_token_conditions(t_token **current, t_data *data,
-		t_command *command, int *arg_count, bool *export, bool *first)
+static bool	parse_redirection_or_command(t_token **current, t_command *command)
 {
-	if (export_condition(current, export))
+	if ((*current)->type == TOKEN_WORD)
 	{
-		if (!handle_export_variable(*current, data, command, arg_count))
+		if (!handle_command_args(*current, command))
+			return (false);
+	}
+	else if ((*current)->type == TOKEN_REDIRECT_IN)
+	{
+		if (!handle_redirection(current, command, false))
+			return (false);
+	}
+	else if ((*current)->type == TOKEN_REDIRECT_OUT
+		|| (*current)->type == TOKEN_APPEND_OUT)
+	{
+		if (!handle_redirection(current, command, true))
+			return (false);
+	}
+	return (true);
+}
+
+static bool	parse_token_conditions(t_token **current, t_data *data,
+		t_command *command)
+{
+	if (export_condition(current, &command->export))
+	{
+		if (!handle_export_variable(*current, data, command,
+				&command->arg_count))
 			return (false);
 	}
 	else if ((*current)->type == TOKEN_WORD && ft_strchr((*current)->value, '=')
-			&& is_valid_identifier((*current)->value) == OK && *first)
+		&& is_valid_identifier((*current)->value) == OK && command->first)
 	{
 		if (!handle_variable_assignment((*current)->value, &data->vars, data))
 			return (false);
@@ -42,39 +64,11 @@ static bool	parse_token_conditions(t_token **current, t_data *data,
 		if (!handle_heredoc(current, command))
 			return (false);
 	}
-	else if ((*current)->type == TOKEN_WORD)
+	else if (!parse_redirection_or_command(current, command))
 	{
-		if (!handle_command_args(*current, command, arg_count, export))
-			return (false);
-	}
-	else if ((*current)->type == TOKEN_REDIRECT_IN)
-	{
-		if (!handle_redirection(current, command, false))
-			return (false);
-	}
-	else if (((*current)->type == TOKEN_REDIRECT_OUT
-				|| (*current)->type == TOKEN_APPEND_OUT))
-	{
-		if (!handle_redirection(current, command, true))
-			return (false);
+		return (false);
 	}
 	return (true);
-}
-
-t_command	*initialize_command(void)
-{
-	t_command	*command;
-
-	command = malloc(sizeof(t_command));
-	if (!command)
-		return (NULL);
-	command->args = NULL;
-	command->eof_count = 0;
-	command->eof = NULL;
-	command->append = 0;
-	command->redir = NULL;
-	command->next = NULL;
-	return (command);
 }
 
 t_command	*parse_tokens(t_data *data, t_token *tokens)
@@ -86,19 +80,22 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 	bool		first;
 
 	current = tokens;
-	arg_count = 0;
-	export = false;
-	first = true;
 	command = initialize_command();
 	if (!command)
 		return (NULL);
 	while (current && current->type != TOKEN_PIPE)
 	{
-		if (!parse_token_conditions(&current, data, command, &arg_count,
-				&export, &first))
+		if (!parse_token_conditions(&current, data, command))
 			return (free(command), NULL);
 		first = false;
 		current = current->next;
+	}
+	if (current && current->type == TOKEN_PIPE && current->next
+		&& current->next->type == TOKEN_PIPE)
+	{
+		write(STDERR_FILENO, "syntax error near unexpected token `||'\n", 43);
+		g_exit_code = 2;
+		return (NULL);
 	}
 	return (command);
 }

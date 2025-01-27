@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 11:13:07 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/26 15:06:26 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/27 12:16:30 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ int	set_exp(t_data *data, char *name, char *value)
 	int	i;
 
 	i = 0;
+	if (mini_getenv(name, data->envp) != NULL)
+		return (OK);
 	while (data->envp[i])
 		i++;
 	data->envp = ft_realloc(data->envp, sizeof(char *) * (i + 2));

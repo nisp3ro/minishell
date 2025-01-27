@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:42:03 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/26 12:47:15 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/27 09:22:33 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,8 +87,9 @@ static int	print_prompt(char *prompt, char *user, char *host, t_data *data)
 	}
 	ft_strcat(prompt, YELLOW " ✗ ");
 	ft_strcat(prompt, RESET_COLOR);
-	return (free(name), OK); //OJO COMPROBAR name siempre es algo o NULL
+	return (free(name), OK);
 }
+//OJO COMPROBAR name siempre es algo o NULL antes de liberar en linea 90 ¿?
 
 int	get_prompt(char **p, t_data *data)
 {

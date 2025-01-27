@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   loop.c                                             :+:      :+:    :+:   */
+/*   core_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/20 13:10:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/26 13:02:36 by mrubal-c         ###   ########.fr       */
+/*   Created: 2025/01/27 09:06:04 by mrubal-c          #+#    #+#             */
+/*   Updated: 2025/01/27 12:51:07 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ int	check_cmd_start(char *line, int i)
 	if (line[i] == '|')
 	{
 		write(STDERR_FILENO,
-				"minishell: syntax error near unexpected token `|'\n", 52);
-		g_exit_code = 258;
+			"minishell: syntax error near unexpected token `|'\n", 52);
+		g_exit_code = 2;
 		free(line);
 		return (ERROR);
 	}
@@ -63,7 +63,7 @@ void	token_parsec_exec(char *full_cmd, t_data *data)
 		execute_pipeline(commands, data, data->envp);
 }
 
-char	*unfinished_pipe(char *line) //arreglar
+char	*unfinished_pipe(char *line)
 {
 	char	*tmp[2];
 	int		i;
@@ -90,35 +90,4 @@ char	*unfinished_pipe(char *line) //arreglar
 			break ;
 	}
 	return (line);
-}
-
-int	interactive_mode(t_data *data, char *envp[])
-{
-	char	*line[2];
-	int		i;
-
-	while (1)
-	{
-		i = 0;
-		if (get_prompt(&data->prompt, data) == ERROR)
-			return (ERROR);
-		line[0] = readline(data->prompt);
-		free(data->prompt);
-		data->prompt = NULL;
-		if (!line[0])
-			return (printf("exit\n"), g_exit_code);
-		while (isspace((unsigned char)line[0][i]))
-			i++;
-		if (check_cmd_start(line[0], i) == ERROR)
-			continue ;
-		line[0] = unfinished_pipe(line[0]);
-		if (line[0] == NULL)
-			continue ;
-		line[1] = clean_line(line[0], data);
-		if (line[1] == NULL)
-			continue ;
-		else if (line[1][0] != '\0')
-			token_parsec_exec(line[1], data);
-	}
-	return (g_exit_code);
 }

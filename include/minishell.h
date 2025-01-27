@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/26 19:52:30 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/27 18:35:51 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@
 # include <sys/stat.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# include <sys/ioctl.h>
 # include <unistd.h>
 
 # define ERROR -1
@@ -88,6 +89,9 @@ typedef struct s_command
 	int					eof_count;
 	char				**eof;
 	int					append;
+	int					arg_count;
+	bool				export;
+	bool				first;
 	t_redir				*redir;
 	struct s_command	*next;
 }						t_command;
@@ -166,6 +170,10 @@ void					wait_signal(int i);
 
 // loop.c
 int						interactive_mode(t_data *data, char *envp[]);
+char					*unfinished_pipe(char *line);
+void					token_parsec_exec(char *full_cmd, t_data *data);
+int						check_cmd_start(char *line, int i);
+void					parse_last_cmd_arg(t_command *commands, t_data *data);
 void					ft_recover_history(t_data *data);
 int						create_envp(t_data *data);
 char					**cpy_env(char *envp[]);
@@ -200,16 +208,16 @@ bool					handle_export_variable(t_token *current, t_data *data,
 							t_command *command, int *arg_count);
 bool					handle_heredoc(t_token **current, t_command *command);
 bool	handle_command_args(t_token *current,
-							t_command *command,
-							int *arg_count,
-							bool *export);
+							t_command *command);
 bool	handle_redirection(t_token **current,
 						t_command *command,
 						bool is_output);
+t_command				*initialize_command(void);
 
 // vars.c
-bool					handle_variable_assignment(char *input,
-							t_vars **env_vars, t_data *data);
+bool	handle_variable_assignment(char *input,
+								t_vars **env_vars,
+								t_data *data);
 void					process_user_variable(char *name, char *value,
 							t_vars **env_vars, t_data *data);
 bool					process_environment_variable(char *name, char *value,
@@ -243,7 +251,7 @@ void					ft_export(t_command *command, t_data *data);
 void					ft_pwd(t_data *data);
 // ft_unset.c
 void					unset_from_envp(t_command *command, t_data *data);
-void					unset_from_vars(t_command *command, t_vars **vars);
+void					unset_from_vars(char *arg, t_vars **vars);
 void					ft_unset(t_command *command, t_data *data);
 
 // execute.c
