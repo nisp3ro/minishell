@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 09:06:04 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 18:08:21 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/28 20:44:08 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	token_parsec_exec(char *full_cmd, t_data *data, bool interactive)
 		parse_last_cmd_arg(commands, data);
 	if (!commands || !commands->next && check_builtin_prepipe(commands,
 			data) == true)
-		return ;
+		return (clean_cmd(commands));
 	else
 		execute_pipeline(commands, data, data->envp);
 }

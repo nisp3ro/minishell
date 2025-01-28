@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:29:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 16:04:09 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/28 20:44:28 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ void	ft_exit(t_data *data, t_command *command)
 		check_numeric_limits(command);
 		set_exit_code(command);
 	}
+	rl_clear_history();
 	clean_cmd(command);
 	clean_data(data);
 	exit(g_exit_code);
