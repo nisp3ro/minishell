@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:40:12 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 20:06:02 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/28 13:17:49 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	init_search_command_vars(t_search_command *vars)
 	vars->i = 0;
 }
 
-static char	*find_command_in_path(char *command, char **envp)
+char	*find_command_in_path(char *command, char **envp)
 {
 	t_search_command	vars;
 

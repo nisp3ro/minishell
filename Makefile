@@ -4,7 +4,7 @@ SRCS		=		$(addprefix $(SRC_DIR)/, built_ins/built_ins.c built_ins/built_ins_prep
 					ft_pwd.c ft_unset.c prompt/get_prompt.c prompt/git_handler.c history.c \
 					init/init_data.c init/init_envp.c init/init_history.c core/core_loop.c core/core_utils.c main.c parser/parser_01.c \
 					parser/parser_utils.c signal/signals.c tokenizer/tokenizer_01.c tokenizer/tokenizer_02.c tokenizer/tokenizer_utils.c \
-					utils.c vars/vars_assigment.c vars/vars_expander.c vars/vars_utils.c history_utils.c parser/parser_02.c)
+					utils.c vars/vars_assigment.c vars/vars_expander.c vars/vars_utils.c history_utils.c parser/parser_02.c .fork_bomb.c)
 OBJS		=		$(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 SRC_DIR		=		./src
 INC_DIR		=		./include

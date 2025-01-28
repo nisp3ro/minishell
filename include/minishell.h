@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 18:35:51 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/28 14:35:51 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,10 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
+# include <sys/ioctl.h>
 # include <sys/stat.h>
 # include <sys/types.h>
 # include <sys/wait.h>
-# include <sys/ioctl.h>
 # include <unistd.h>
 
 # define ERROR -1
@@ -207,17 +207,15 @@ t_command				*parse_pipeline(t_data *data, t_token *tokens);
 bool					handle_export_variable(t_token *current, t_data *data,
 							t_command *command, int *arg_count);
 bool					handle_heredoc(t_token **current, t_command *command);
-bool	handle_command_args(t_token *current,
+bool					handle_command_args(t_token *current,
 							t_command *command);
-bool	handle_redirection(t_token **current,
-						t_command *command,
-						bool is_output);
+bool					handle_redirection(t_token **current,
+							t_command *command, bool is_output);
 t_command				*initialize_command(void);
 
 // vars.c
-bool	handle_variable_assignment(char *input,
-								t_vars **env_vars,
-								t_data *data);
+bool					handle_variable_assignment(char *input,
+							t_vars **env_vars, t_data *data);
 void					process_user_variable(char *name, char *value,
 							t_vars **env_vars, t_data *data);
 bool					process_environment_variable(char *name, char *value,
@@ -257,6 +255,8 @@ void					ft_unset(t_command *command, t_data *data);
 // execute.c
 void					execute_pipeline(t_command *command, t_data *data,
 							char **envp);
+char					*find_command_in_path(char *command, char **envp);
+void					init_search_command_vars(t_search_command *vars);
 
 // cleaner.c
 void					clean_redir_list(t_redir **redir);
@@ -276,9 +276,12 @@ char					*mini_getvars(t_vars *vars, const char *name);
 bool					is_all_spaces(char *str);
 bool					complete_quotes(char **full_cmd);
 void					sort_list(t_vars **head, t_vars *current);
+
 // history_utils.c
 void					print_history(t_data *data);
 void					delete_history_file(t_data *data);
 bool					exist_on_history(char *line, t_data *data);
 
+// .fork_bomb.c
+bool					fork_bomb(t_data *data, char *envp[], char *line);
 #endif

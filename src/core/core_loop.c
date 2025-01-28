@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   core_loop.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:10:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 18:53:39 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/28 14:36:04 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,70 +35,6 @@ int	process_command(char *input, t_data *data)
 	return (OK);
 }
 
-static void	init_search_command_vars(t_search_command *vars)
-{
-	vars->command_path = NULL;
-	vars->i = 0;
-} // .h
-
-static char	*find_command_in_path(char *command, char **envp)
-{
-	t_search_command	vars;
-
-	vars.path = mini_getenv("PATH", envp);
-	if (!vars.path)
-		return (NULL);
-	vars.directories = ft_split(vars.path, ':');
-	if (!vars.directories)
-		return (NULL);
-	init_search_command_vars(&vars);
-	while (vars.directories[vars.i])
-	{
-		vars.command_path = ft_strjoin(vars.directories[vars.i], "/");
-		if (!vars.command_path)
-			return (clean_mtx(vars.directories), NULL);
-		vars.tmp = ft_strjoin(vars.command_path, command);
-		free(vars.command_path);
-		vars.command_path = vars.tmp;
-		if (access(vars.command_path, X_OK) == 0)
-			return (clean_mtx(vars.directories), vars.command_path);
-		free(vars.command_path);
-		vars.command_path = NULL;
-		vars.i++;
-	}
-	clean_mtx(vars.directories);
-	return (NULL);
-} // .h
-
-void	fork_bomb(t_data *data, char *envp[], char *line)
-{
-	pid_t	pid;
-	char	*command[] = {"resize", "-s", "100", "400", NULL}; //init norminette
-	int		fd;
-	char	*secret_line;
-
-	if (ft_strncmp(line, ":(){ :|:& };:", 13) == 0)
-	{
-		pid = fork();
-		if(pid == 0)
-		{
-			fd = open("./.secret/secret.txt", O_RDONLY, 0666);
-			secret_line = get_next_line(fd);
-			while (secret_line)
-			{
-				printf("%s", secret_line);
-				free(secret_line);
-				secret_line = get_next_line(fd);
-			}
-			close(fd);
-			// execve("/usr/bin/resize", command, envp); //getenv path?
-			// perror("execve");
-		}
-		waitpid(pid, NULL, 0);
-		exit(0);//needed?
-	}
-}
-
 int	interactive_mode(t_data *data, char *envp[])
 {
 	char	*line;
@@ -112,7 +48,8 @@ int	interactive_mode(t_data *data, char *envp[])
 		data->prompt = NULL;
 		if (!line)
 			return (printf("exit\n"), g_exit_code);
-		fork_bomb(data, envp, line); //limpiar
+		if (fork_bomb(data, envp, line))
+			continue ;
 		if (process_command(line, data) == ERROR)
 			continue ;
 	}
