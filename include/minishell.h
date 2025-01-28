@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 14:35:51 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/28 18:12:45 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,7 @@ typedef struct s_data
 	int					fd;
 	char				history[HISTORY_ROWS][HISTORY_COLUMNS];
 	int					hist_size;
+	bool				unset_pwd;
 	t_vars				*vars;
 	t_vars				*exp_vars;
 }						t_data;
@@ -171,7 +172,8 @@ void					wait_signal(int i);
 // loop.c
 int						interactive_mode(t_data *data, char *envp[]);
 char					*unfinished_pipe(char *line);
-void					token_parsec_exec(char *full_cmd, t_data *data);
+void					token_parsec_exec(char *full_cmd, t_data *data,
+							bool interactive);
 int						check_cmd_start(char *line, int i);
 void					parse_last_cmd_arg(t_command *commands, t_data *data);
 void					ft_recover_history(t_data *data);
@@ -227,7 +229,7 @@ char					*expand_variables(char *token_value, char *envp[],
 							t_data *data);
 int						set_variable(t_vars **env_vars, char *name,
 							char *value);
-
+int						special_set_exp(t_data *data, char *name, char *value);
 // builtin.c
 bool					check_builtin(t_command *command, t_data *data);
 bool					check_redirs(t_command *command);
@@ -236,6 +238,8 @@ bool					check_builtin_prepipe(t_command *command, t_data *data);
 // BULTINS
 // ft_cd.c
 void					ft_cd(t_command *command, t_data *data);
+void					update_env_var(t_data *data, char *key, char *value,
+							char ***envp);
 // ft_echo.c
 void					ft_echo(t_command *command);
 // ft_env.c
@@ -245,6 +249,8 @@ void					ft_exit(t_data *data, t_command *command);
 // ft_export.c
 int						is_valid_identifier(const char *str);
 void					ft_export(t_command *command, t_data *data);
+void					print_exported_vars(t_data *data);
+void					handle_invalid_identifier(t_command *command, int *i);
 // ft_pwd.c
 void					ft_pwd(t_data *data);
 // ft_unset.c
@@ -253,10 +259,24 @@ void					unset_from_vars(char *arg, t_vars **vars);
 void					ft_unset(t_command *command, t_data *data);
 
 // execute.c
+void					handle_here_doc(t_command *command, t_data *data,
+							int *here_doc_pipe);
+void					here_doc(t_data *data, char *limiter, int *fd);
+void					manage_here_doc(t_data *data, char **line,
+							char *limiter, int *fd);
+void					execve_error_exit(t_command *command,
+							char *command_path);
+void					father_process(t_pip_vars *pip, t_command *command);
 void					execute_pipeline(t_command *command, t_data *data,
 							char **envp);
+char					*manage_redirs(t_command *command, char **envp,
+							t_pip_vars *pip, t_data *data);
+void					init_pip(t_pip_vars *pip, t_command **command);
+bool					check_cmd_args(t_command *command);
+void					ft_create_custom_path(char **path, t_command *command);
 char					*find_command_in_path(char *command, char **envp);
 void					init_search_command_vars(t_search_command *vars);
+void					wait_exit(int i, int pid, t_command **command);
 
 // cleaner.c
 void					clean_redir_list(t_redir **redir);
@@ -274,7 +294,7 @@ bool					is_quote(char c);
 char					*mini_getenv(char *var, char *envp[]);
 char					*mini_getvars(t_vars *vars, const char *name);
 bool					is_all_spaces(char *str);
-bool					complete_quotes(char **full_cmd);
+// bool					complete_quotes(char **full_cmd);
 void					sort_list(t_vars **head, t_vars *current);
 
 // history_utils.c

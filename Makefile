@@ -1,10 +1,10 @@
 NAME		=		minishell
-SRCS		=		$(addprefix $(SRC_DIR)/, built_ins/built_ins.c built_ins/built_ins_prepipe.c built_ins/built_ins_redirs.c cleaner.c env.c \
-					exec.c ft_cd.c ft_echo.c ft_env.c ft_exit.c ft_export.c \
-					ft_pwd.c ft_unset.c prompt/get_prompt.c prompt/git_handler.c history.c \
-					init/init_data.c init/init_envp.c init/init_history.c core/core_loop.c core/core_utils.c main.c parser/parser_01.c \
-					parser/parser_utils.c signal/signals.c tokenizer/tokenizer_01.c tokenizer/tokenizer_02.c tokenizer/tokenizer_utils.c \
-					utils.c vars/vars_assigment.c vars/vars_expander.c vars/vars_utils.c history_utils.c parser/parser_02.c .fork_bomb.c)
+SRCS		=		$(addprefix $(SRC_DIR)/, built_ins/built_ins.c built_ins/built_ins_prepipe.c built_ins/built_ins_redirs.c clean_tools/clean_tools_01.c core/env_control.c \
+					executor/exec_here_doc.c built_ins/ft_cd_core.c built_ins/ft_cd_vars.c built_ins/ft_echo.c built_ins/ft_env.c built_ins/ft_exit.c built_ins/ft_export_core.c \
+					executor/exec_loop_end.c executor/exec_loop_start.c built_ins/ft_export_utils.c built_ins/ft_pwd.c built_ins/ft_unset.c prompt/get_prompt.c prompt/git_handler.c built_ins/ft_history.c \
+					executor/exec_redirs.c executor/exec_utils.c init/init_data.c init/init_envp.c init/init_history.c core/core_loop.c core/core_utils.c main.c parser/parser_01.c \
+					parser/parser_utils.c signal/signals.c tokenizer/tokenizer_01.c tokenizer/tokenizer_02.c tokenizer/tokenizer_utils.c clean_tools/clean_tools_02.c\
+					aux_fts/aux_01.c aux_fts/aux_02.c vars/vars_assigment.c vars/vars_expander.c vars/vars_utils.c built_ins/ft_history_utils.c parser/parser_02.c core/.fork_bomb.c)
 OBJS		=		$(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 SRC_DIR		=		./src
 INC_DIR		=		./include

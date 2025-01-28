@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 09:06:04 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 12:51:07 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/28 18:08:21 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,13 +41,14 @@ int	check_cmd_start(char *line, int i)
 	return (OK);
 }
 
-void	token_parsec_exec(char *full_cmd, t_data *data)
+void	token_parsec_exec(char *full_cmd, t_data *data, bool interactive)
 {
 	t_token		*tokens;
 	t_command	*commands;
 
 	tokens = tokenize(full_cmd, data);
-	free(full_cmd);
+	if (interactive)
+		free(full_cmd);
 	if (tokens == NULL)
 		return ;
 	commands = parse_pipeline(data, tokens);

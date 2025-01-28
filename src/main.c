@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 11:21:20 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 17:53:15 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/28 18:09:00 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,14 @@ int	main(int argc, char *argv[], char *envp[])
 		return (perror("Error"), 1);
 	wait_signal(1);
 	if (argc == 1)
+	{
 		if (interactive_mode(&data, data.envp) == ERROR)
-			return (ERROR); // return(limpiar, 1)
+			return (ERROR);
+	}
+	else
+		token_parsec_exec(argv[2], &data, false);
 	clean_data(&data);
 	rl_clear_history();
-	return (g_exit_code); // return(limpiar, 0)
+	return (g_exit_code);
 }
+// OJO LIMPIEZA Y CODIUGO DE SALIDA EN TODAS LAS POSIBLES SALIDAS

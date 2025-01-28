@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:26:34 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 12:49:12 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/28 16:00:27 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,15 @@ void	ft_unset(t_command *command, t_data *data)
 	{
 		unset_from_vars(command->args[i], &data->vars);
 		unset_from_vars(command->args[i], &data->exp_vars);
+	}
+	i = 0;
+	while (command->args[++i])
+	{
+		if (ft_strncmp(command->args[i], "PWD", 3) == 0)
+		{
+			data->unset_pwd = true;
+			break ;
+		}
 	}
 	g_exit_code = 0;
 }

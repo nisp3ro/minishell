@@ -6,11 +6,11 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:25:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 20:06:16 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/28 15:59:18 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 void	ft_echo(t_command *command)
 {

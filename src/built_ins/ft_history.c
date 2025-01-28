@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   history.c                                          :+:      :+:    :+:   */
+/*   ft_history.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 11:20:00 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/20 19:22:25 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/28 17:55:23 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 void	ft_save_history(t_data *data)
 {
@@ -29,38 +29,36 @@ void	ft_save_history(t_data *data)
 	{
 		write(data->fd, data->history[i], ft_strlen(data->history[i]));
 		if (data->history[i][0] != '\0')
-			// para no poner salto de linea  despues de truncar
 			write(data->fd, "\n", 1);
 		i++;
 	}
 	close(data->fd);
 }
 
-void ft_write_history(t_data *data, char *line)
+void	ft_write_history(t_data *data, char *line)
 {
-    int i;
+	int	i;
 
-    i = 0;
-
-    if (exist_on_history(line, data) == false)
-    {
-        add_history(line);
-        if (data->hist_size >= HISTORY_ROWS)
-        {
-            while (i < HISTORY_ROWS - 1)
-            {
-                ft_strcpy(data->history[i], data->history[i + 1]);
-                i++;
-            }
-            ft_strcpy(data->history[HISTORY_ROWS - 1], line);
-        }
-        else
-        {
-            ft_strcpy(data->history[data->hist_size], line);
-            data->hist_size++;
-        }
-        ft_save_history(data);
-    }
+	i = 0;
+	if (exist_on_history(line, data) == false)
+	{
+		add_history(line);
+		if (data->hist_size >= HISTORY_ROWS)
+		{
+			while (i < HISTORY_ROWS - 1)
+			{
+				ft_strcpy(data->history[i], data->history[i + 1]);
+				i++;
+			}
+			ft_strcpy(data->history[HISTORY_ROWS - 1], line);
+		}
+		else
+		{
+			ft_strcpy(data->history[data->hist_size], line);
+			data->hist_size++;
+		}
+		ft_save_history(data);
+	}
 }
 
 char	*make_path(char *name)
@@ -83,26 +81,27 @@ char	*ft_get_user_home(t_data *data)
 {
 	DIR				*dir;
 	struct dirent	*entry;
-	char			*h_path;
-	char			*username;
+	char			*user_home[2];
 
-	username = mini_getenv("HOME", data->envp);
-	if (username != NULL)
-		return (ft_strjoin(username, "/.minishell_history"));
+	user_home[0] = mini_getenv("HOME", data->envp);
+	if (user_home[0] != NULL)
+		return (ft_strjoin(user_home[0], "/.minishell_history"));
 	dir = opendir("/home");
 	if (dir == NULL)
 		return (NULL);
-	while ((entry = readdir(dir)) != NULL)
+	entry = readdir(dir);
+	while (entry != NULL)
 	{
 		if (ft_strncmp(entry->d_name, "Desktop", 8) != 0)
 		{
-			h_path = make_path(entry->d_name);
-			if (h_path == NULL)
+			user_home[1] = make_path(entry->d_name);
+			if (user_home[1] == NULL)
 				return (closedir(dir), NULL);
-			if (access(h_path, F_OK) == 0)
-				return (closedir(dir), h_path);
-			free(h_path);
+			if (access(user_home[1], F_OK) == 0)
+				return (closedir(dir), user_home[1]);
+			free(user_home[1]);
 		}
+		entry = readdir(dir);
 	}
 	return (closedir(dir), NULL);
 }

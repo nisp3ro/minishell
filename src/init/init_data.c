@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:21:39 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/25 07:21:45 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/28 15:29:33 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,21 @@ int	handle_no_env(t_data *data)
 	return (OK);
 }
 
-int	init_data(t_data *data, char *envp[])
+static void	init_nulls(t_data *data)
 {
 	data->exp_vars = NULL;
+	data->envp = NULL;
+	data->vars = NULL;
+	data->home = NULL;
+	data->prompt = NULL;
+	data->unset_pwd = false;
+	data->fd = 0;
+	data->hist_size = 0;
+}
+
+int	init_data(t_data *data, char *envp[])
+{
+	init_nulls(data);
 	if (envp == NULL || envp[0] == NULL || envp[0][0] == '\0')
 		handle_no_env(data);
 	else
@@ -64,7 +76,6 @@ int	init_data(t_data *data, char *envp[])
 			return (clean_mtx(data->envp), ERROR);
 	}
 	sort_list(&data->exp_vars, data->exp_vars);
-	data->home = NULL;
 	data->pwd = getcwd(NULL, 0);
 	if (!data->pwd)
 		return (clean_mtx(data->envp), clean_variables(data->exp_vars), ERROR);
@@ -72,7 +83,5 @@ int	init_data(t_data *data, char *envp[])
 	if (!data->oldpwd)
 		return (clean_mtx(data->envp), clean_variables(data->exp_vars),
 			free(data->pwd), ERROR);
-	data->prompt = NULL;
-	data->vars = NULL;
 	return (ft_recover_history(data), OK);
 }

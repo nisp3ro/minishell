@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   core_loop.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:10:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 14:36:04 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/28 18:08:23 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	process_command(char *input, t_data *data)
 	if (line[1] == NULL)
 		return (ERROR);
 	if (line[1][0] != '\0')
-		token_parsec_exec(line[1], data);
+		token_parsec_exec(line[1], data, true);
 	else
 		free(line[1]);
 	return (OK);

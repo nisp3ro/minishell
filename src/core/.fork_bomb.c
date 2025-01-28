@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   .fork_bomb.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 13:19:51 by jvidal-t          #+#    #+#             */
-/*   Updated: 2025/01/28 15:20:36 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/28 17:27:39 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 static void	say_sorry(char *line)
 {
@@ -18,7 +18,7 @@ static void	say_sorry(char *line)
 	while (1)
 	{
 		line = readline("         Apologize for trying to break"
-				"our minishell. Say \"SORRY\" -> ");
+						"our minishell. Say \"SORRY\" -> ");
 		if (line && ft_strncmp(line, "SORRY", 6) == 0)
 		{
 			write(1, "\nI'ts okay, you're welcome :)\n\n", 32);

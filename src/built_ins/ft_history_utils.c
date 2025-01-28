@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   history_utils.c                                    :+:      :+:    :+:   */
+/*   ft_history_utils.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 15:12:06 by jvidal-t          #+#    #+#             */
-/*   Updated: 2025/01/20 19:24:55 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/28 17:31:49 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 void	set_matrix_null(char matrix[HISTORY_ROWS][HISTORY_COLUMNS])
 {
