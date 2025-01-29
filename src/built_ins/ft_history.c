@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_history.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 11:20:00 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 17:55:23 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/29 17:55:11 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	ft_write_history(t_data *data, char *line)
 	int	i;
 
 	i = 0;
-	if (exist_on_history(line, data) == false)
+	if (exist_on_history(line, data) == false || line[0] == '\0' )
 	{
 		add_history(line);
 		if (data->hist_size >= HISTORY_ROWS)
