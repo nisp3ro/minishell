@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   .fork_bomb.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 13:19:51 by jvidal-t          #+#    #+#             */
-/*   Updated: 2025/01/28 17:27:39 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/29 13:07:21 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,32 +31,27 @@ static void	say_sorry(char *line)
 	}
 }
 
-// OJO si no se maximiza no hace falta open dev_null
-static void	init_secret_vars(char *command[], int *fd, int *dev_null)
+static void	init_secret_vars(char *command[], int *fd)
 {
 	command[0] = "resize";
 	command[1] = "-s";
 	command[2] = "100";
 	command[3] = "400";
 	command[4] = NULL;
-	*dev_null = open("/dev/null", O_RDWR);
-	if (!*dev_null)
-		return (perror("open"), exit(ERROR));
+
 	*fd = open("./.secret/secret.txt", O_RDONLY, 0666);
 	if (!*fd)
-		return (perror("open"), close(*dev_null), exit(ERROR));
+		return (perror("open"), exit(ERROR));
 }
 
-// OJO si no se maximiza no hace falta dup2
 static void	child_secret(char *secret_line, char *envp[])
 {
-	int		dev_null;
 	int		fd;
 	char	*command[5];
 	char	*path;
 	char	*resize_path;
 
-	init_secret_vars(command, &fd, &dev_null);
+	init_secret_vars(command, &fd);
 	path = mini_getenv("PATH", envp);
 	resize_path = find_command_in_path(command[0], envp);
 	secret_line = get_next_line(fd);
@@ -66,10 +61,7 @@ static void	child_secret(char *secret_line, char *envp[])
 		free(secret_line);
 		secret_line = get_next_line(fd);
 	}
-	dup2(dev_null, STDOUT_FILENO);
-	dup2(dev_null, STDERR_FILENO);
 	close(fd);
-	close(dev_null);
 	exit(OK);
 }
 
