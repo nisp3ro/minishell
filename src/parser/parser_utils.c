@@ -1,36 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strcat.c                                        :+:      :+:    :+:   */
+/*   parser_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/05 13:38:32 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/25 13:06:37 by mrubal-c         ###   ########.fr       */
+/*   Created: 2025/01/27 09:18:33 by mrubal-c          #+#    #+#             */
+/*   Updated: 2025/01/27 09:18:40 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../../include/minishell.h"
 
-char	*ft_strcat(char *dest, char *src)
+t_command	*initialize_command(void)
 {
-	int	i;
-	int	j;
+	t_command	*command;
 
-	i = 0;
-	j = 0;
-	if (!dest)
+	command = malloc(sizeof(t_command));
+	if (!command)
 		return (NULL);
-	while (dest[i] != '\0')
-		i++;
-	if (src)
-	{
-		while (src[j] != '\0')
-		{
-			dest[i + j] = src[j];
-			j++;
-		}
-	}
-	dest[i + j] = '\0';
-	return (dest);
+	command->args = NULL;
+	command->eof_count = 0;
+	command->eof = NULL;
+	command->append = 0;
+	command->arg_count = 0;
+	command->export = false;
+	command->first = true;
+	command->redir = NULL;
+	command->next = NULL;
+	return (command);
 }

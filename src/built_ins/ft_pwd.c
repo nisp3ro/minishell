@@ -1,36 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strcat.c                                        :+:      :+:    :+:   */
+/*   ft_pwd.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/05 13:38:32 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/25 13:06:37 by mrubal-c         ###   ########.fr       */
+/*   Created: 2025/01/20 13:26:58 by mrubal-c          #+#    #+#             */
+/*   Updated: 2025/01/28 15:59:16 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../../include/minishell.h"
 
-char	*ft_strcat(char *dest, char *src)
+void	ft_pwd(t_data *data)
 {
-	int	i;
-	int	j;
-
-	i = 0;
-	j = 0;
-	if (!dest)
-		return (NULL);
-	while (dest[i] != '\0')
-		i++;
-	if (src)
+	if (data->pwd == NULL)
 	{
-		while (src[j] != '\0')
-		{
-			dest[i + j] = src[j];
-			j++;
-		}
+		write(STDERR_FILENO, "pwd: cannot get the current directory", 37);
+		g_exit_code = 1;
+		return ;
 	}
-	dest[i + j] = '\0';
-	return (dest);
+	write(STDOUT_FILENO, data->pwd, ft_strlen(data->pwd));
+	write(STDOUT_FILENO, "\n", 1);
+	g_exit_code = 0;
 }

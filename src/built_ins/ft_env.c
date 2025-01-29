@@ -1,36 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strcat.c                                        :+:      :+:    :+:   */
+/*   ft_env.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/05 13:38:32 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/25 13:06:37 by mrubal-c         ###   ########.fr       */
+/*   Created: 2025/01/20 13:26:02 by mrubal-c          #+#    #+#             */
+/*   Updated: 2025/01/28 16:10:09 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../include/minishell.h"
 
-char	*ft_strcat(char *dest, char *src)
+void	ft_env(t_data *data)
 {
 	int	i;
-	int	j;
 
 	i = 0;
-	j = 0;
-	if (!dest)
-		return (NULL);
-	while (dest[i] != '\0')
-		i++;
-	if (src)
+	while (data->envp[i])
 	{
-		while (src[j] != '\0')
+		if (ft_strchr(data->envp[i], '='))
 		{
-			dest[i + j] = src[j];
-			j++;
+			write(STDOUT_FILENO, data->envp[i], ft_strlen(data->envp[i]));
+			write(STDOUT_FILENO, "\n", 1);
 		}
+		i++;
 	}
-	dest[i + j] = '\0';
-	return (dest);
+	g_exit_code = 0;
 }

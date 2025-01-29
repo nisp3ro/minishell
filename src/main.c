@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 11:21:20 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/24 11:57:07 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/28 18:09:00 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,16 +29,12 @@ int	main(int argc, char *argv[], char *envp[])
 	if (argc == 1)
 	{
 		if (interactive_mode(&data, data.envp) == ERROR)
-			return (ERROR); // return(limpiar, 1)
+			return (ERROR);
 	}
 	else
-	{
-		tokens = tokenize(argv[2], &data);
-		commands = parse_pipeline(&data, tokens);
-		if (!commands->next && check_builtin(commands, &data) == true)
-			return (OK); // return(limpiar, 0)
-		execute_pipeline(commands, &data, data.envp);
-	}
+		token_parsec_exec(argv[2], &data, false);
+	clean_data(&data);
 	rl_clear_history();
-	return (g_exit_code); // return(limpiar, 0)
+	return (g_exit_code);
 }
+// OJO LIMPIEZA Y CODIUGO DE SALIDA EN TODAS LAS POSIBLES SALIDAS
