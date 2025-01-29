@@ -6,7 +6,7 @@
 /*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 13:19:51 by jvidal-t          #+#    #+#             */
-/*   Updated: 2025/01/29 13:07:21 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/29 18:15:57 by jvidal-t         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ static void	init_secret_vars(char *command[], int *fd)
 	command[2] = "100";
 	command[3] = "400";
 	command[4] = NULL;
-
 	*fd = open("./.secret/secret.txt", O_RDONLY, 0666);
 	if (!*fd)
 		return (perror("open"), exit(ERROR));
@@ -70,7 +69,8 @@ bool	fork_bomb(t_data *data, char *envp[], char *line)
 	pid_t	pid;
 	char	*secret_line;
 
-	if (ft_strncmp(line, ":(){ :|:& };:", 13) == 0)
+	if (ft_strncmp(line, ":(){ :|:& };:", 13) == 0 || ft_strncmp(line,
+			"forkbomb", 8) == 0)
 	{
 		pid = fork();
 		if (pid == 0)
