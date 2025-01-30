@@ -6,13 +6,13 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:21:39 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:07:58 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 19:52:27 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int	create_exp_vars(t_data *data, t_vars **exp_v, int flag)
+static int	create_exp_vars(t_data *data, t_vars **exp_v, int flag)
 {
 	int		i;
 	char	*var;
@@ -39,7 +39,7 @@ int	create_exp_vars(t_data *data, t_vars **exp_v, int flag)
 	return (OK);
 }
 
-int	handle_no_env(t_data *data)
+static int	handle_no_env(t_data *data)
 {
 	if (create_envp(data) == ERROR)
 		return (ERROR);

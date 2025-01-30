@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 12:13:03 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 20:01:48 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,160 +146,185 @@ typedef struct s_search_command
 	char				*tmp;
 }						t_search_command;
 
-// init_data.c
-int						ft_init_history(char history[1001][1024], t_data *data);
-void					ft_recover_history(t_data *data);
-int						create_exp_vars(t_data *data, t_vars **exp_v, int flag);
-int						handle_no_env(t_data *data);
-int						init_data(t_data *data, char *envp[]);
+// aux_fts
+// aux_fts/aux_01.c
+int		is_delimiter(char c);
+bool	is_quote(char c);
+bool	is_all_spaces(char *str);
+// aux_fts/aux_02.c
+char	**ft_realloc(char **envp, int size);
+char	*mini_getenv(char *var, char *envp[]);
+char	*mini_getvars(t_vars *vars, const char *name);
+void	sort_list(t_vars **head, t_vars *current);
 
-// env.c
-int						set_exp(t_data *data, char *name, char *value);
-void					set_last_cmd_arg(t_data *data, char *name, char *value);
-int						update_envp(t_data *data);
-char					**cpy_env(char *envp[]);
-int						create_envp(t_data *data);
+// built_ins
+// built_ins_prepipe.c
+bool	check_builtin_prepipe(t_command *command, t_data *data);
+// built_ins/redirs.c
+bool	check_redirs(t_command *command);
+// built_ins/built_ins.c
+bool	check_builtin(t_command *command, t_data *data);
+// built_ins/built_ins_core.c
+void	ft_cd(t_command *command, t_data *data);
+// built_ins/ft_cd_vars.c
+void	update_env_var(t_data *data, char *key, char *value);
+// built_ins/ft_echo.c
+void	ft_echo(t_data *data, t_command *command);
+// built_ins/ft_env.c
+void	ft_env(t_data *data);
+// built_ins/ft_exit.c
+void	ft_exit(t_data *data, t_command *command);
+// built_ins/ft_export_core.c
+void	ft_export(t_command *command, t_data *data);
+// built_ins/ft_export_utils.c
+int		is_valid_identifier(const char *str);
+void	print_exported_vars(t_data *data);
+void	handle_invalid_identifier(t_data *data, int *i);
+// built_ins/ft_history_utils.c
+void	set_matrix_null(char matrix[HISTORY_ROWS][HISTORY_COLUMNS]);
+void	delete_history_file(t_data *data);
+void	print_history(t_data *data);
+bool	exist_on_history(char *line, t_data *data);
+// built_ins/ft_history.c
+void	ft_save_history(t_data *data);
+void	ft_write_history(t_data *data, char *line);
+char	*make_path(char *name);
+char	*ft_get_user_home(t_data *data);
+// built_ins/ft_pwd.c
+void	ft_pwd(t_data *data);
+// built_ins/ft_unset.c
+void	unset_from_envp(t_command *command, t_data *data);
+void	unset_from_vars(char *arg, t_vars **vars);
+void	ft_unset(t_command *command, t_data *data);
 
-// history.c
-void					ft_save_history(t_data *data);
-void					ft_write_history(t_data *data, char *line);
-char					*make_path(char *name);
-char					*ft_get_user_home(t_data *data);
+// clean_tools
+// clean_tools/clean_tools_01.c
+void	free_tokens(t_token *tokens);
+void	clean_variables(t_vars *vars);
+void	clean_mtx(char **mtx);
+char	*clean_line(char *line, t_data *data);
+// clean_tools/clean_tools_02.c
+void	clean_data(t_data *data);
+void	clean_redir_list(t_redir **redir);
+void	clean_cmd(t_command *command);
 
-// signals.c
-void					wait_signal(int i);
+// core
+// core/.fork_bomb.c
+bool	fork_bomb(t_data *data, char *envp[], char *line);
+// core/core_loop.c
+int		process_command(char *input, t_data *data);
+int		interactive_mode(t_data *data, char *envp[]);
+// core/core_utils.c
+void	parse_last_cmd_arg(t_command *commands, t_data *data);
+int		check_cmd_start(t_data *data, char *line, int i);
+void	token_parsec_exec(char *full_cmd, t_data *data, bool interactive);
+char	*unfinished_pipe(char *line);
+// core/env_control.c
+int		special_set_exp(t_data *data, char *name);
+int		set_exp(t_data *data, char *name, char *value);
+void	set_last_cmd_arg(t_data *data, char *name, char *value);
 
-// loop.c
-int						interactive_mode(t_data *data, char *envp[]);
-char					*unfinished_pipe(char *line);
-void					token_parsec_exec(char *full_cmd, t_data *data,
-							bool interactive);
-int						check_cmd_start(t_data *data, char *line, int i);
-void					parse_last_cmd_arg(t_command *commands, t_data *data);
-void					ft_recover_history(t_data *data);
-int						create_envp(t_data *data);
-char					**cpy_env(char *envp[]);
-int						update_envp(t_data *data);
+// executor
+// executor/exec_here_doc.c
+void	manage_here_doc(t_data *data, char **line, char *limiter, int *fd);
+void	here_doc(t_data *data, char *limiter, int *fd);
+void	handle_here_doc(t_command *command, t_data *data, int *here_doc_pipe);
+// executor/exec_loop_end.c
+void	wait_exit(t_data *data, int i, int pid, t_command **command);
+void	father_process(t_pip_vars *pip, t_command *command);
+void	execve_error_exit(t_command *command, char *command_path);
+// executor/exec_start.c
+void	create_pipe_if_needed(t_pip_vars *pip, t_command *command);
+void	execute_child_process(t_command *command, t_data *data, char **envp,
+		t_pip_vars *pip);
+void	handle_parent_process(t_data *data, t_pip_vars *pip, t_command *command);
+void	execute_pipeline(t_command *command, t_data *data, char **envp);
+// executor/exec_redirs.c
+void	redir(t_command *command, t_redir_vars *red);
+void	init_redir_vars(t_redir_vars *red);
+void	manage_redirections(t_redir_vars *red);
+char	*manage_redirs(t_command *command, char **envp, t_pip_vars *pip);
+// executor/exec_utils.c
+void	init_search_command_vars(t_search_command *vars);
+char	*find_command_in_path(char *command, char **envp);
+void	ft_create_custom_path(char **path, t_command *command);
+bool	check_cmd_args(t_command *command);
+void	init_pip(t_pip_vars *pip, t_command **command);
 
-// get_prompt.c
-char					*get_host(char **envp, bool *free_host);
-int						get_prompt(char **p, t_data *data);
+// init
+// init/init_data.c
+int	init_data(t_data *data, char *envp[]);
+// init/init_envp.c
+int	update_envp(t_data *data);
+char	**cpy_env(char *envp[]);
+int	create_envp(t_data *data);
+// init/init_history.c
+int	ft_init_history(char history[1001][1024], t_data *data);
+void	ft_recover_history(t_data *data);
 
-// git_handler.c
-bool					has_git_directory(const char *dir_path);
-char					*is_a_daddy(char *parent_dir, t_data *data,
-							bool *git_found, char *last_slash);
-char					*get_branch(const char *dir_path);
-int						is_a_git(t_data *data, bool *git_found, char **name);
+// parser
+// parser/parser_01.c
+t_command	*parse_tokens(t_data *data, t_token *tokens);
+t_command	*parse_pipeline(t_data *data, t_token *tokens);
+// parser/parser_02.c
+bool	add_redir(t_redir **redir, t_redir_type type, char *value);
+bool	handle_redirection(t_data *data, t_token **current, t_command *command,
+	bool is_output);
+bool	handle_command_args(t_token *current, t_command *command);
+bool	handle_heredoc(t_data *data, t_token **current, t_command *command);
+bool	handle_export_variable(t_token *current, t_data *data,
+		t_command *command, int *arg_count);
+// parser/parser_utils.c
+t_command	*initialize_command(void);
 
-// tokenize.c
-t_token					*add_token(t_data *data, t_tokenizer **tok, t_token_type type,
-							char *value);
-t_token					*tokenize(char *line, t_data *data);
-t_token					*token_inner_loop(t_tokenizer **tok, t_data *data,
-							t_token **current);
-void					tokenizer_error(t_data *data, t_tokenizer **tok, bool syntax_error);
-bool					should_continue_parsing(t_tokenizer **tok);
+// prompt
+// prompt/get_prompt.c
+char	*get_host(char **envp, bool *free_host);
+int	get_prompt(char **p, t_data *data);
+// prompt/git_handler.c
+bool	has_git_directory(const char *dir_path);
+char	*is_a_daddy(char *parent_dir, t_data *data, bool *git_found,
+	char *last_slash);
+char	*make_brach(char *branch);
+char	*get_branch(const char *dir_path);
+int		is_a_git(t_data *data, bool *git_found, char **name);
 
-// parser.c
-bool					add_redir(t_redir **redir, t_redir_type type,
-							char *value);
-t_command				*parse_tokens(t_data *data, t_token *tokens);
-t_command				*parse_pipeline(t_data *data, t_token *tokens);
-bool					handle_export_variable(t_token *current, t_data *data,
-							t_command *command, int *arg_count);
-bool					handle_heredoc(t_data *data, t_token **current, t_command *command);
-bool					handle_command_args(t_token *current,
-							t_command *command);
-bool					handle_redirection(t_data *data, t_token **current,
-							t_command *command, bool is_output);
-t_command				*initialize_command(void);
+// signals
+// signals/signals.c
+void	wait_signal(int i);
 
-// vars.c
-bool					handle_variable_assignment(char *input,
-							t_vars **env_vars, t_data *data);
-void					process_user_variable(char *name, char *value,
-							t_vars **env_vars, t_data *data);
-bool					process_environment_variable(char *name, char *value,
-							t_data *data);
-void					replace_user_variable(char *existing_var, char *value,
-							t_data *data, char *name);
-char					*create_env_entry(char *name, char *value);
-char					*expand_variables(char *token_value,
-							t_data *data);
-int						set_variable(t_vars **env_vars, char *name, char *value);
-int						special_set_exp(t_data *data, char *name);
-// builtin.c
-bool					check_builtin(t_command *command, t_data *data);
-bool					check_redirs(t_command *command);
-bool					check_builtin_prepipe(t_command *command, t_data *data);
+// tokenizer
+// tokenizer/tokenizer_01.c
+t_token	*add_token(t_data *data, t_tokenizer **tok, t_token_type type,
+	char *value);
+t_token	*check_hd_and_create_tok(t_data *data, t_tokenizer **tok,
+	enum e_token_type type, bool hd_val);
+t_token	*handle_delimiter(t_data *data, t_tokenizer **tok);
+void	init_tokenizer(t_tokenizer **tokenizer,
+	t_token **current, char *full_cmd);
+t_token	*tokenize(char *full_cmd, t_data *data);
+// tokenizer/tokenizer_02.c
+t_token	*process_token_value(t_data *data, t_tokenizer **tok, char *token_value);
+char	*handle_word(t_tokenizer **tok, t_data *data);
+char	*handle_quotes(t_tokenizer **tok, t_data *data, int start, char **tmp);
+bool	manage_quotes(t_tokenizer **tok, char *full_cmd, t_data *data);
+t_token	*token_inner_loop(t_tokenizer **tok, t_data *data, t_token **current);
+// tokenizer/tokenizer_utils.c
+bool	should_continue_parsing(t_tokenizer **tok);
+void	tokenizer_error(t_data *data, t_tokenizer **tok, bool syntax_error);
 
-// BULTINS
-// ft_cd.c
-void					ft_cd(t_command *command, t_data *data);
-void					update_env_var(t_data *data, char *key, char *value);
-// ft_echo.c
-void					ft_echo(t_data *data, t_command *command);
-// ft_env.c
-void					ft_env(t_data *data);
-// ft_exit.c
-void					ft_exit(t_data *data, t_command *command);
-// ft_export.c
-int						is_valid_identifier(const char *str);
-void					ft_export(t_command *command, t_data *data);
-void					print_exported_vars(t_data *data);
-void					handle_invalid_identifier(t_data *data, int *i);
-// ft_pwd.c
-void					ft_pwd(t_data *data);
-// ft_unset.c
-void					unset_from_envp(t_command *command, t_data *data);
-void					unset_from_vars(char *arg, t_vars **vars);
-void					ft_unset(t_command *command, t_data *data);
+// vars
+// vars/vars_assigment.c
+char	*create_env_entry(char *name, char *value);
+void	replace_user_variable(char *existing_var, char *value, t_data *data,
+	char *name);
+bool	process_environment_variable(char *name, char *value, t_data *data);
+void	process_user_variable(char *name, char *value, t_vars **env_vars,
+	t_data *data);
+bool	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data);
+// vars/vars_expander.c
+char	*expand_variables(char *token_value, t_data *data);
+// vars/vars_utils.c
+int	set_variable(t_vars **env_vars, char *name, char *value);
 
-// execute.c
-void					handle_here_doc(t_command *command, t_data *data,
-							int *here_doc_pipe);
-void					here_doc(t_data *data, char *limiter, int *fd);
-void					manage_here_doc(t_data *data, char **line,
-							char *limiter, int *fd);
-void					execve_error_exit(t_command *command,
-							char *command_path);
-void					father_process(t_pip_vars *pip, t_command *command);
-void					execute_pipeline(t_command *command, t_data *data,
-							char **envp);
-char					*manage_redirs(t_command *command, char **envp,
-							t_pip_vars *pip);
-void					init_pip(t_pip_vars *pip, t_command **command);
-bool					check_cmd_args(t_command *command);
-void					ft_create_custom_path(char **path, t_command *command);
-char					*find_command_in_path(char *command, char **envp);
-void					init_search_command_vars(t_search_command *vars);
-void					wait_exit(t_data *data, int i, int pid, t_command **command);
-
-// cleaner.c
-void					clean_redir_list(t_redir **redir);
-void					free_tokens(t_token *tokens);
-void					clean_variables(t_vars *vars);
-void					clean_mtx(char **mtx);
-char					*clean_line(char *line, t_data *data);
-void					clean_cmd(t_command *command);
-void					clean_data(t_data *data);
-
-// utils.c
-char					**ft_realloc(char **envp, int size);
-int						is_delimiter(char c);
-bool					is_quote(char c);
-char					*mini_getenv(char *var, char *envp[]);
-char					*mini_getvars(t_vars *vars, const char *name);
-bool					is_all_spaces(char *str);
-// bool					complete_quotes(char **full_cmd);
-void					sort_list(t_vars **head, t_vars *current);
-
-// history_utils.c
-void					print_history(t_data *data);
-void					delete_history_file(t_data *data);
-bool					exist_on_history(char *line, t_data *data);
-
-// .fork_bomb.c
-bool					fork_bomb(t_data *data, char *envp[], char *line);
 #endif
