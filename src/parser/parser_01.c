@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 12:38:07 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 17:49:28 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:23:27 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ static bool	export_condition(t_token **current, bool *export)
 	return (false);
 }
 
-static bool	parse_redirection_or_command(t_token **current, t_command *command)
+static bool	parse_redirection_or_command(t_data *data, t_token **current,
+		t_command *command)
 {
 	if ((*current)->type == TOKEN_WORD)
 	{
@@ -32,13 +33,13 @@ static bool	parse_redirection_or_command(t_token **current, t_command *command)
 	}
 	else if ((*current)->type == TOKEN_REDIRECT_IN)
 	{
-		if (!handle_redirection(current, command, false))
+		if (!handle_redirection(data, current, command, false))
 			return (false);
 	}
 	else if ((*current)->type == TOKEN_REDIRECT_OUT
 		|| (*current)->type == TOKEN_APPEND_OUT)
 	{
-		if (!handle_redirection(current, command, true))
+		if (!handle_redirection(data, current, command, true))
 			return (false);
 	}
 	return (true);
@@ -61,10 +62,10 @@ static bool	parse_token_conditions(t_token **current, t_data *data,
 	}
 	else if ((*current)->type == TOKEN_HEREDOC)
 	{
-		if (!handle_heredoc(current, command))
+		if (!handle_heredoc(data, current, command))
 			return (false);
 	}
-	else if (!parse_redirection_or_command(current, command))
+	else if (!parse_redirection_or_command(data, current, command))
 	{
 		return (false);
 	}
@@ -75,8 +76,6 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 {
 	t_command	*command;
 	t_token		*current;
-	int			arg_count;
-	bool		export;
 	bool		first;
 
 	current = tokens;
@@ -94,7 +93,7 @@ t_command	*parse_tokens(t_data *data, t_token *tokens)
 		&& current->next->type == TOKEN_PIPE)
 	{
 		write(STDERR_FILENO, "syntax error near unexpected token `||'\n", 41);
-		g_exit_code = 2;
+		data->g_exit_code = 2;
 		return (NULL);
 	}
 	return (command);

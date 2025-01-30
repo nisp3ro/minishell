@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 15:41:14 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 09:30:58 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:10:12 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,12 @@ static char	*handle_variable_expansion(char *token_value, int *i,
 	return (free(var_val[0]), *expanded);
 }
 
-static char	*handle_exit_code_expansion(int *i, char **expanded)
+static char	*handle_exit_code_expansion(t_data *data, int *i, char **expanded)
 {
 	char	*tmp;
 	char	*tmp2;
 
-	tmp = ft_itoa(g_exit_code);
+	tmp = ft_itoa(data->g_exit_code);
 	if (!tmp)
 	{
 		perror("Error");
@@ -92,7 +92,7 @@ static int	process_token_character(char *token_value, int *i, char **expanded,
 	}
 	else if (token_value[*i] == '$' && token_value[*i + 1] == '?')
 	{
-		if (!handle_exit_code_expansion(i, expanded))
+		if (!handle_exit_code_expansion(data, i, expanded))
 			return (ERROR);
 	}
 	else
@@ -103,7 +103,7 @@ static int	process_token_character(char *token_value, int *i, char **expanded,
 	return (OK);
 }
 
-char	*expand_variables(char *token_value, char *envp[], t_data *data)
+char	*expand_variables(char *token_value, t_data *data)
 {
 	char	*expanded;
 	int		i;

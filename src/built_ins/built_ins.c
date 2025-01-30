@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   built_in.c                                         :+:      :+:    :+:   */
+/*   built_ins.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:24:46 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 10:01:06 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:03:40 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ bool	check_builtin(t_command *command, t_data *data)
 	if (ft_strncmp(command->args[0], "exit", 5) == 0)
 		return (ft_exit(data, command), true);
 	if (ft_strncmp(command->args[0], "echo", 5) == 0)
-		return (ft_echo(command), true);
+		return (ft_echo(data, command), true);
 	if (ft_strncmp(command->args[0], "cd", 3) == 0)
 		return (ft_cd(command, data), true);
 	if (ft_strncmp(command->args[0], "pwd", 4) == 0)

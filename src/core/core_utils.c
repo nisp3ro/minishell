@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 09:06:04 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 20:44:08 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:06:57 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,13 @@ void	parse_last_cmd_arg(t_command *commands, t_data *data)
 	}
 }
 
-int	check_cmd_start(char *line, int i)
+int	check_cmd_start(t_data *data, char *line, int i)
 {
 	if (line[i] == '|')
 	{
 		write(STDERR_FILENO,
 			"minishell: syntax error near unexpected token `|'\n", 51);
-		g_exit_code = 2;
+		data->g_exit_code = 2;
 		free(line);
 		return (ERROR);
 	}
@@ -57,7 +57,7 @@ void	token_parsec_exec(char *full_cmd, t_data *data, bool interactive)
 		return ;
 	if (commands->args && !commands->next)
 		parse_last_cmd_arg(commands, data);
-	if (!commands || !commands->next && check_builtin_prepipe(commands,
+	if ((!commands || !commands->next) && check_builtin_prepipe(commands,
 			data) == true)
 		return (clean_cmd(commands));
 	else

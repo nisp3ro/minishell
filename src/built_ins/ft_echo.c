@@ -6,13 +6,13 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:25:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 15:59:18 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:04:31 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	ft_echo(t_command *command)
+void	ft_echo(t_data *data, t_command *command)
 {
 	int	i;
 
@@ -28,5 +28,5 @@ void	ft_echo(t_command *command)
 	}
 	if (command->args[1] != NULL && ft_strncmp("-n", command->args[1], 3))
 		write(STDOUT_FILENO, "\n", 1);
-	g_exit_code = 0;
+	data->g_exit_code = 0;
 }

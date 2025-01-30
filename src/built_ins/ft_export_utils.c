@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 16:44:45 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 16:45:16 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:05:31 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,9 @@ void	print_exported_vars(t_data *data)
 	}
 }
 
-void	handle_invalid_identifier(t_command *command, int *i)
+void	handle_invalid_identifier(t_data *data, int *i)
 {
 	write(STDERR_FILENO, " not a valid identifier\n", 24);
-	g_exit_code = 1;
+	data->g_exit_code = 1;
 	(*i)++;
 }

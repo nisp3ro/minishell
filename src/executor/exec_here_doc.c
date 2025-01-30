@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 17:02:16 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 17:57:49 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:07:17 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	manage_here_doc(t_data *data, char **line, char *limiter, int *fd)
 					&& limiter[ft_strlen(limiter) - 1] != '\'')
 				&& (limiter[1] != '\"' && limiter[ft_strlen(limiter)
 						- 1] != '\"')))
-			line[0] = expand_variables(line[0], data->envp, data);
+			line[0] = expand_variables(line[0], data);
 		write(fd[1], line[0], ft_strlen(line[0]));
 		write(fd[1], "\n", 1);
 		free(line[0]);
@@ -55,18 +55,12 @@ static void	read_n_write(t_data *data, char *limiter, int *fd)
 	free(line[1]);
 }
 
-static void	here_doc_handler(int signal)
-{
-	g_exit_code = 130;
-	exit(g_exit_code);
-}
-
 void	here_doc(t_data *data, char *limiter, int *fd)
 {
 	pid_t	reader;
 
-	g_exit_code = 0;
-	g_exit_code = getpid();
+	data->g_exit_code = 0;
+	data->g_exit_code = getpid();
 	reader = fork();
 	if (reader == -1)
 		exit(1);
@@ -78,7 +72,7 @@ void	here_doc(t_data *data, char *limiter, int *fd)
 		close(fd[1]);
 		exit(EXIT_SUCCESS);
 	}
-	waitpid(reader, &g_exit_code, 0);
+	waitpid(reader, &data->g_exit_code, 0);
 }
 // OJO LIMPIAR A LA SALIDA¿?
 
@@ -91,10 +85,7 @@ void	handle_here_doc(t_command *command, t_data *data, int *here_doc_pipe)
 	eof_i = -1;
 	while (command->eof[++eof_i])
 		here_doc(data, command->eof[eof_i], here_doc_pipe);
-	if (g_exit_code == SIGKILL)
-	{
-		g_exit_code = 130;
-		return ;
-	}
+	if (data->g_exit_code == SIGKILL)
+		data->g_exit_code = 130;
 	close(here_doc_pipe[1]);
 }

@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 15:39:00 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 12:20:58 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:10:02 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ bool	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 	char	*name;
 	char	*value;
 
-	expanded = expand_variables(input, data->envp, data);
+	expanded = expand_variables(input, data);
 	if (!expanded)
 		return (perror("Error"), false);
 	equal_sign = ft_strchr(expanded, '=');

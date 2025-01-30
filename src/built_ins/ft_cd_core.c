@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:25:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 15:59:06 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:12:28 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static bool	handle_cd_path(char *path, t_data *data)
 	if (chdir(path) == -1)
 	{
 		perror("cd");
-		g_exit_code = 1;
+		data->g_exit_code = 1;
 		return (false);
 	}
 	return (true);
@@ -59,15 +59,15 @@ static void	update_pwd_and_oldpwd(t_data *data)
 	if (!current_pwd)
 	{
 		perror("getcwd");
-		g_exit_code = 1;
+		data->g_exit_code = 1;
 		return ;
 	}
 	if (data->oldpwd)
 		free(data->oldpwd);
 	data->oldpwd = data->pwd;
-	update_env_var(data, "OLDPWD", data->oldpwd, &data->envp);
+	update_env_var(data, "OLDPWD", data->oldpwd);
 	data->pwd = current_pwd;
-	update_env_var(data, "PWD", data->pwd, &data->envp);
+	update_env_var(data, "PWD", data->pwd);
 }
 
 void	ft_cd(t_command *command, t_data *data)
@@ -75,11 +75,11 @@ void	ft_cd(t_command *command, t_data *data)
 	if (command->args[2])
 	{
 		write(STDERR_FILENO, "cd: too many arguments\n", 23);
-		g_exit_code = 1;
+		data->g_exit_code = 1;
 		return ;
 	}
 	if (!handle_special_paths(command, data))
 		return ;
 	update_pwd_and_oldpwd(data);
-	g_exit_code = 0;
+	data->g_exit_code = 0;
 }

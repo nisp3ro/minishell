@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:21:39 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 15:29:33 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:07:58 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ static void	init_nulls(t_data *data)
 	data->unset_pwd = false;
 	data->fd = 0;
 	data->hist_size = 0;
+	data->g_exit_code = 0;
 }
 
 int	init_data(t_data *data, char *envp[])

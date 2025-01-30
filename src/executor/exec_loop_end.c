@@ -6,30 +6,31 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:40:12 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 17:59:50 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:07:26 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	wait_exit(int i, int pid, t_command **command)
+void	wait_exit(t_data *data, int i, int pid, t_command **command)
 {
 	int	temp_pid;
 	int	temp;
 
 	clean_cmd(*command);
-	while (i >= 0)
+	temp = data->g_exit_code;
+	while (i > 0)
 	{
-		temp_pid = waitpid(-1, &g_exit_code, 0);
-		if (WIFEXITED(g_exit_code))
-			g_exit_code = WEXITSTATUS(g_exit_code);
+		temp_pid = waitpid(-1, &data->g_exit_code, 0);
+		if (WIFEXITED(data->g_exit_code))
+			data->g_exit_code = WEXITSTATUS(data->g_exit_code);
 		if (temp_pid == pid)
-			temp = g_exit_code;
-		if (g_exit_code == 2 || g_exit_code == 3)
-			g_exit_code = g_exit_code + 128;
+			temp = data->g_exit_code;
+		if (data->g_exit_code == 2 || data->g_exit_code == 3)
+			data->g_exit_code = data->g_exit_code + 128;
 		i--;
 	}
-	g_exit_code = temp;
+	data->g_exit_code = temp;
 	wait_signal(1);
 }
 

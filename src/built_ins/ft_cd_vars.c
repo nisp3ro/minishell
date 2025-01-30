@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 15:31:40 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 15:41:18 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:04:16 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ static void	find_and_update_envp(t_data *data, char *key,
 	}
 }
 
-void	update_env_var(t_data *data, char *key, char *value, char ***envp)
+void	update_env_var(t_data *data, char *key, char *value)
 {
 	find_and_update_exp_var(data, key, value);
 	find_and_update_envp(data, key, value);

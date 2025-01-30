@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:26:34 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 16:00:27 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:06:05 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	unset_from_envp(t_command *command, t_data *data)
 			}
 		}
 	}
-	g_exit_code = 0;
+	data->g_exit_code = 0;
 }
 
 void	unset_from_vars(char *arg, t_vars **vars)
@@ -62,22 +62,6 @@ void	unset_from_vars(char *arg, t_vars **vars)
 		prev = tmp;
 		tmp = tmp->next;
 	}
-}
-
-static int	is_valid_identifier_unset(const char *str)
-{
-	int	i;
-
-	i = 0;
-	if (ft_strchr(str, '=') != NULL && ft_isdigit(str[0]))
-		return (ERROR);
-	while (str[i] != '\0')
-	{
-		if (!ft_isalnum(str[i]) && str[i] != '_')
-			return (ERROR);
-		i++;
-	}
-	return (OK);
 }
 
 // For minishell tester
@@ -105,5 +89,5 @@ void	ft_unset(t_command *command, t_data *data)
 			break ;
 		}
 	}
-	g_exit_code = 0;
+	data->g_exit_code = 0;
 }

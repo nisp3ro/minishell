@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:42:03 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 09:22:33 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:09:05 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,6 @@ int	get_prompt(char **p, t_data *data)
 {
 	char	*user;
 	char	*host;
-	char	**tmp;
 	bool	free_host;
 	char	prompt[PATH_MAX];
 

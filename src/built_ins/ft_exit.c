@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:29:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 20:44:28 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:05:02 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ static void	check_invalid_arguments(t_command *command)
 	}
 }
 
-static void	validate_numeric_argument(t_command *command, int i)
+static void	validate_numeric_argument(t_data *data, t_command *command, int i)
 {
 	while (command->args[1][i])
 	{
@@ -29,14 +29,14 @@ static void	validate_numeric_argument(t_command *command, int i)
 			&& command->args[1][i] != '+')
 		{
 			write(STDERR_FILENO, " numeric argument required\n", 27);
-			g_exit_code = 2;
-			exit(g_exit_code);
+			data->g_exit_code = 2;
+			exit(data->g_exit_code);
 		}
 		i++;
 	}
 }
 
-static void	check_numeric_limits(t_command *command)
+static void	check_numeric_limits(t_data *data, t_command *command)
 {
 	if ((ft_strlen(command->args[1]) == 19 && ft_strncmp(command->args[1],
 				"9223372036854775807", 19) > 0)
@@ -45,19 +45,19 @@ static void	check_numeric_limits(t_command *command)
 		|| ft_strlen(command->args[1]) > 21)
 	{
 		write(STDERR_FILENO, " numeric argument required\n", 27);
-		g_exit_code = 2;
-		exit(g_exit_code);
+		data->g_exit_code = 2;
+		exit(data->g_exit_code);
 	}
 }
 
-static void	set_exit_code(t_command *command)
+static void	set_exit_code(t_data *data, t_command *command)
 {
 	int	num;
 
 	num = ft_atoi(command->args[1]);
 	if (num < 0)
 		num = 256 + num;
-	g_exit_code = num;
+	data->g_exit_code = num;
 }
 
 void	ft_exit(t_data *data, t_command *command)
@@ -69,12 +69,12 @@ void	ft_exit(t_data *data, t_command *command)
 	check_invalid_arguments(command);
 	if (command->args[1])
 	{
-		validate_numeric_argument(command, i);
-		check_numeric_limits(command);
-		set_exit_code(command);
+		validate_numeric_argument(data, command, i);
+		check_numeric_limits(data, command);
+		set_exit_code(data, command);
 	}
 	rl_clear_history();
 	clean_cmd(command);
 	clean_data(data);
-	exit(g_exit_code);
+	exit(data->g_exit_code);
 }

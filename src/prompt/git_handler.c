@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:14:11 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/26 14:18:42 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:09:14 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,8 @@ int	is_a_git(t_data *data, bool *git_found, char **name)
 	char	*parent_dir;
 	char	*last_slash;
 
+	parent_dir = NULL;
+	last_slash = NULL;
 	*git_found = false;
 	tmp = ft_strjoin(data->pwd, "/.git");
 	if (!tmp)

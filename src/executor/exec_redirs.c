@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 17:18:36 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 17:20:17 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:07:45 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,9 @@ void	manage_redirections(t_redir_vars *red)
 	}
 }
 
-char	*manage_redirs(t_command *command, char **envp, t_pip_vars *pip,
-		t_data *data)
+char	*manage_redirs(t_command *command, char **envp, t_pip_vars *pip)
 {
 	t_redir_vars	red;
-	int				eof_i;
-	int				here_doc_pipe[2];
 
 	init_redir_vars(&red);
 	if (command->args && ft_strchr(command->args[0], '/') != 0)

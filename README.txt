@@ -1,5 +1,4 @@
- gestionar redirecciones si no hay comando
- dentro de parsing
-    crea output
-    syntax error input
-
+COMPROBAR CODIGOS DE SALIDA DE BUILT_INS
+REVISAR TODOS LOS OJOS
+MAKEFILE
+.h

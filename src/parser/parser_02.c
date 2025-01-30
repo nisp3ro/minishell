@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 12:37:57 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 13:05:37 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:23:45 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,8 @@ bool	add_redir(t_redir **redir, t_redir_type type, char *value)
 	return (true);
 }
 
-bool	handle_redirection(t_token **current, t_command *command,
-		bool is_output)
+bool	handle_redirection(t_data *data, t_token **current, t_command *command,
+	bool is_output)
 {
 	t_token_type	type;
 
@@ -63,7 +63,7 @@ bool	handle_redirection(t_token **current, t_command *command,
 		return (true);
 	}
 	write(STDERR_FILENO, "syntax error near unexpected token `newline'\n", 45);
-	g_exit_code = 2;
+	data->g_exit_code = 2;
 	return (false);
 }
 
@@ -82,7 +82,7 @@ bool	handle_command_args(t_token *current, t_command *command)
 	return (true);
 }
 
-bool	handle_heredoc(t_token **current, t_command *command)
+bool	handle_heredoc(t_data *data, t_token **current, t_command *command)
 {
 	*current = (*current)->next;
 	if (*current && (*current)->type == TOKEN_WORD)
@@ -98,7 +98,7 @@ bool	handle_heredoc(t_token **current, t_command *command)
 		return (true);
 	}
 	write(STDERR_FILENO, "syntax error near unexpected token `newline'\n", 45);
-	g_exit_code = 2;
+	data->g_exit_code = 2;
 	return (false);
 }
 

@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:29:57 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 16:47:55 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:05:14 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ static void	export_new_variable(t_command *command, t_data *data, int i)
 
 static void	export_empty_variable(t_command *command, t_data *data, int i)
 {
-	special_set_exp(data, command->args[i], "");
+	special_set_exp(data, command->args[i]);
 	set_variable(&data->exp_vars, command->args[i], "");
 	sort_list(&data->exp_vars, data->exp_vars);
 }
@@ -74,12 +74,12 @@ void	ft_export(t_command *command, t_data *data)
 	int	i;
 
 	i = 1;
-	g_exit_code = 0;
+	data->g_exit_code = 0;
 	while (command->args[i])
 	{
 		if (is_valid_identifier(command->args[i]) == ERROR)
 		{
-			handle_invalid_identifier(command, &i);
+			handle_invalid_identifier(data, &i);
 			continue ;
 		}
 		if (!mini_getvars(data->vars, command->args[i])

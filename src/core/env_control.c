@@ -6,13 +6,13 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 11:13:07 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 15:59:32 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:07:05 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int	special_set_exp(t_data *data, char *name, char *value)
+int	special_set_exp(t_data *data, char *name)
 {
 	int	i;
 

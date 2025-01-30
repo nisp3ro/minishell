@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/17 17:10:01 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 17:30:43 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:09:25 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ static void	signal_handler(int signal)
 		write(1, "\n", 1);
 		rl_on_new_line();
 		rl_redisplay();
-		g_exit_code = 1;
 	}
 	return ;
 }
@@ -33,7 +32,6 @@ static void	here_doc_handler(int signal)
 		if (kill(getpid(), SIGKILL) == -1)
 		{
 			perror("kill");
-			g_exit_code = 130;
 		}
 	}
 	return ;
@@ -42,7 +40,7 @@ static void	here_doc_handler(int signal)
 static void	child_handler(int signal)
 {
 	if (signal == SIGINT)
-		g_exit_code = 130;
+		write(1, "\n", 1);
 	return ;
 }
 

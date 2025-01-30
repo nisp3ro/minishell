@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:10:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 18:08:23 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:06:45 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int	process_command(char *input, t_data *data)
 	i = 0;
 	while (isspace((unsigned char)input[i]))
 		i++;
-	if (check_cmd_start(input, i) == ERROR)
+	if (check_cmd_start(data, input, i) == ERROR)
 		return (ERROR);
 	line[0] = unfinished_pipe(input);
 	if (line[0] == NULL)
@@ -47,11 +47,11 @@ int	interactive_mode(t_data *data, char *envp[])
 		free(data->prompt);
 		data->prompt = NULL;
 		if (!line)
-			return (printf("exit\n"), g_exit_code);
+			return (printf("exit\n"), data->g_exit_code);
 		if (fork_bomb(data, envp, line))
 			continue ;
 		if (process_command(line, data) == ERROR)
 			continue ;
 	}
-	return (g_exit_code);
+	return (data->g_exit_code);
 }

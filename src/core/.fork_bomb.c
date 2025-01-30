@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   .fork_bomb.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 13:19:51 by jvidal-t          #+#    #+#             */
-/*   Updated: 2025/01/29 18:15:57 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/01/30 13:06:36 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ bool	fork_bomb(t_data *data, char *envp[], char *line)
 	pid_t	pid;
 	char	*secret_line;
 
+	secret_line = NULL;
 	if (ft_strncmp(line, ":(){ :|:& };:", 13) == 0 || ft_strncmp(line,
 			"forkbomb", 8) == 0)
 	{
@@ -78,6 +79,7 @@ bool	fork_bomb(t_data *data, char *envp[], char *line)
 		waitpid(pid, NULL, 0);
 		free(line);
 		say_sorry(line);
+		data->g_exit_code = 0; // OJO arreglame
 		return (true);
 	}
 	return (false);
