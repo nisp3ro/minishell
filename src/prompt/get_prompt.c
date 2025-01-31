@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:42:03 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:09:05 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/01/31 12:57:23 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,14 @@ static char	*host_trim(char *host)
 	k = 0;
 	while (host[i] != '\0' && host[i] != '/')
 		i++;
+	i++;
 	j = i;
 	while (host[j] != '\0' && host[j] != '.')
 		j++;
 	trimmed = malloc(sizeof(char) * (j - i + 1));
 	if (!trimmed)
 		return (NULL);
-	while (i < j)
+	while (host[i] && i < j)
 		trimmed[k++] = host[i++];
 	trimmed[k] = '\0';
 	return (trimmed);
