@@ -28,10 +28,14 @@ int	process_command(char *input, t_data *data)
 	line[1] = clean_line(line[0], data);
 	if (line[1] == NULL)
 		return (ERROR);
+	line[0] = expand_variables_pretoken(line[1], data);
+	free(line[1]);
+	if (line[0] == NULL)
+		return (ERROR);
 	if (line[1][0] != '\0')
-		token_parsec_exec(line[1], data, true);
+		token_parsec_exec(line[0], data, true);
 	else
-		free(line[1]);
+		free(line[0]);
 	return (OK);
 }
 

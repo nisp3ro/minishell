@@ -322,7 +322,11 @@ bool	process_environment_variable(char *name, char *value, t_data *data);
 void	process_user_variable(char *name, char *value, t_vars **env_vars,
 	t_data *data);
 bool	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data);
-// vars/vars_expander.c
+// vars/vars_expander_01.c
+char	*expand_variables_pretoken(char *token_value, t_data *data);
+// vars/vars_expander_02.c
+char	*append_literal_char(char c, char **expanded);
+char	*handle_exit_code_expansion(t_data *data, int *i, char **expanded);
 char	*expand_variables(char *token_value, t_data *data);
 // vars/vars_utils.c
 int	set_variable(t_vars **env_vars, char *name, char *value);

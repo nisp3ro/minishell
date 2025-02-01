@@ -63,6 +63,17 @@ char	*get_host(char **envp, bool *free_host)
 	return (host);
 }
 
+static void	make_pwd(t_data *data, char *prompt)
+{
+	if (data->home && ft_strncmp(data->pwd, data->home, ft_strlen(data->home)) == 0)
+	{
+		ft_strcat(prompt, "~");
+		ft_strcat(prompt, data->pwd + ft_strlen(data->home));
+	}
+	else
+		ft_strcat(prompt, data->pwd);
+}
+
 static int	print_prompt(char *prompt, char *user, char *host, t_data *data)
 {
 	bool	git_found;
@@ -72,11 +83,8 @@ static int	print_prompt(char *prompt, char *user, char *host, t_data *data)
 	ft_strcpy(prompt, user);
 	ft_strcat(prompt, "@");
 	ft_strcat(prompt, host);
-	ft_strcat(prompt, ":" BRIGHT_CYAN "~");
-	if (ft_strncmp(data->pwd, data->home, ft_strlen(data->home)) == 0)
-		ft_strcat(prompt, data->pwd + ft_strlen(data->home));
-	else
-		ft_strcat(prompt, data->pwd);
+	ft_strcat(prompt, ":" BRIGHT_CYAN);
+	make_pwd(data, prompt);
 	if (is_a_git(data, &git_found, &name) == OK && git_found)
 	{
 		ft_strcat(prompt, BRIGHT_BLUE);
@@ -90,7 +98,7 @@ static int	print_prompt(char *prompt, char *user, char *host, t_data *data)
 	ft_strcat(prompt, RESET_COLOR);
 	return (free(name), OK);
 }
-//OJO COMPROBAR name siempre es algo o NULL antes de liberar en linea 90 ¿?
+//OJO COMPROBAR name siempre es algo o NULL antes de liberar en return ¿?
 
 int	get_prompt(char **p, t_data *data)
 {

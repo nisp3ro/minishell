@@ -25,7 +25,7 @@ SRCS		=		$(addprefix $(SRC_DIR)/, \
 					prompt/get_prompt.c prompt/git_handler.c  \
 					signal/signals.c \
 					tokenizer/tokenizer_01.c tokenizer/tokenizer_02.c tokenizer/tokenizer_utils.c \
-					vars/vars_assigment.c vars/vars_expander.c vars/vars_utils.c \
+					vars/vars_assigment.c vars/vars_expander_01.c vars/vars_expander_02.c vars/vars_utils.c \
 					main.c )
 
 # Objects
@@ -37,7 +37,7 @@ SECRET_URL	=		https://github.com/Flingocho/secret_minishell.git
 SECRET		=		.secret
 
 # Compiler
-CFLAGS		=		-Wall -Wextra -Werror
+CFLAGS		=		#-Wall -Wextra -Werror
 LDFLAGS		=		-lreadline -lhistory
 CC			=		cc
 
@@ -52,13 +52,13 @@ NC			=		\033[0m # No color
 ############################################################################################################
 # Minishell Rules
 
-all:	$(NAME)
+all: ascii_art
 
 lib:
 	make -C $(LIBFT)
 
 ascii_art:
-	@if [ ! -f $(OBJ_DIR) ] || [ $(shell find $(SRCS) -newer $(OBJS)/$(NAME) > /dev/null 2>&1) ]; then \
+	@if ! $(MAKE) -q $(NAME); then \
 		printf " \033[0;35m                                                                   \n"; \
 		printf "     ███╗   ███╗██╗███╗   ██╗██╗███████╗██╗  ██╗███████╗██╗     ██╗\n"; \
 		printf "     ████╗ ████║██║████╗  ██║██║██╔════╝██║  ██║██╔════╝██║     ██║\n"; \
@@ -68,12 +68,13 @@ ascii_art:
 		printf "     ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝\n"; \
 		printf "						BY JVIDAL-T && MRUBAL-C\033[0m\n"; \
 		echo "$(YELLOW)\nCreating program...$(GREEN)"; \
+		$(MAKE) -s $(NAME); \
 	else \
-		echo "No changes detected, skipping recompilation..."; \
+		echo "$(GREEN)[$(NAME)] is already up to date.$(NC)"; \
 	fi
 
 
-$(NAME): ascii_art $(OBJS)
+$(NAME): $(OBJS)
 	@printf "$(NC)"
 	@make -C $(LIBFT) plus > /dev/null
 	@$(CC) $(CFLAGS) $(OBJS) -L$(LIBFT) -lft -o $(NAME) $(LDFLAGS) && \
@@ -97,7 +98,7 @@ clean:
 fclean: clean
 	@rm -rf $(OBJ_DIR)
 	@rm -f $(NAME)
-	make -C $(LIBFT) fclean
+	@make -s -C $(LIBFT) fclean
 	@rm -rf $(SECRET)
 	@printf "$(RED)%s$(NC)\n" "[minishell] Cleaned successfully."
 

@@ -66,11 +66,15 @@ static void	child_secret(char *secret_line, char *envp[])
 
 bool	fork_bomb(t_data *data, char *envp[], char *line)
 {
+	int		i;
 	pid_t	pid;
 	char	*secret_line;
 
+	i = 0;
 	secret_line = NULL;
-	if (ft_strncmp(line, ":(){ :|:& };:", 13) == 0 || ft_strncmp(line,
+	while (isspace((unsigned char)line[i]))
+		i++;
+	if (ft_strncmp((line + i), ":(){ :|:& };:", 13) == 0 || ft_strncmp((line + i),
 			"forkbomb", 8) == 0)
 	{
 		pid = fork();

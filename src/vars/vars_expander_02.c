@@ -42,7 +42,7 @@ static char	*handle_variable_expansion(char *token_value, int *i,
 	return (free(var_val[0]), *expanded);
 }
 
-static char	*handle_exit_code_expansion(t_data *data, int *i, char **expanded)
+char	*handle_exit_code_expansion(t_data *data, int *i, char **expanded)
 {
 	char	*tmp;
 	char	*tmp2;
@@ -61,7 +61,7 @@ static char	*handle_exit_code_expansion(t_data *data, int *i, char **expanded)
 	return (*expanded);
 }
 
-static char	*append_literal_char(char c, char **expanded)
+char	*append_literal_char(char c, char **expanded)
 {
 	char	*tmp;
 	char	*tmp2;
@@ -121,5 +121,4 @@ char	*expand_variables(char *token_value, t_data *data)
 	}
 	return (expanded);
 }
-// OJO check llib expan? 
-// (puese este comentario en la linea 120 y no recuerdo que queria decir)
+// OJO check liberaciones expan si error
