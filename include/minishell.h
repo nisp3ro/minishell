@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 16:44:38 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/02/03 09:04:35 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/02/03 14:21:23 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -339,8 +339,8 @@ void					tokenizer_error(t_data *data, t_tokenizer **tok,
 // vars
 // vars/vars_assigment.c
 char					*create_env_entry(char *name, char *value);
-void					replace_user_variable(char *existing_var, char *value,
-							t_data *data, char *name);
+void					replace_user_variable(t_vars **env_vars,
+							char *name, char *value, t_data *data);
 bool					process_environment_variable(char *name, char *value,
 							t_data *data);
 void					process_user_variable(char *name, char *value,

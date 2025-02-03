@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 15:39:00 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:10:02 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/02/03 14:31:01 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,17 +27,30 @@ char	*create_env_entry(char *name, char *value)
 	return (entry);
 }
 
-void	replace_user_variable(char *existing_var, char *value, t_data *data,
-		char *name)
+void	replace_user_variable(t_vars **env_vars, char *name, char *value,
+		t_data *data)
 {
-	free(existing_var);
-	existing_var = ft_strdup(value);
-	if (!existing_var)
-		return (perror("malloc"));
-	if (!mini_getvars(data->exp_vars, name))
+	t_vars	*current;
+
+	current = *env_vars;
+	while (current != NULL)
 	{
-		set_exp(data, name, value);
+		if (current->name && ft_strncmp(current->name, name, (ft_strlen(name)
+					+ 1)) == 0)
+		{
+			free(current->value);
+			current->value = ft_strdup(value);
+			if (!current->value)
+			{
+				perror("malloc");
+				exit(1);
+				break ;
+			}
+		}
+		current = current->next;
 	}
+	if (!mini_getvars(data->exp_vars, name))
+		set_exp(data, name, value);
 }
 
 bool	process_environment_variable(char *name, char *value, t_data *data)
@@ -67,21 +80,18 @@ bool	process_environment_variable(char *name, char *value, t_data *data)
 void	process_user_variable(char *name, char *value, t_vars **env_vars,
 		t_data *data)
 {
-	char	*existing_var;
-
-	existing_var = mini_getvars(data->exp_vars, name);
-	if (existing_var)
+	if (mini_getvars(data->exp_vars, name))
 	{
-		replace_user_variable(existing_var, value, data, name);
+		replace_user_variable(&data->exp_vars, name, value, data);
 		set_exp(data, name, value);
+	}
+	else if (mini_getvars(data->vars, name))
+	{
+		replace_user_variable(&data->vars, name, value, data);
 	}
 	else
 	{
-		existing_var = mini_getvars(data->vars, name);
-		if (existing_var)
-			replace_user_variable(existing_var, value, data, name);
-		else
-			set_variable(env_vars, name, value);
+		set_variable(env_vars, name, value);
 	}
 }
 
