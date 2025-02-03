@@ -19,7 +19,7 @@ SRCS		=		$(addprefix $(SRC_DIR)/, \
 					clean_tools/clean_tools_01.c clean_tools/clean_tools_02.c \
 					core/.fork_bomb.c core/core_loop.c core/core_utils.c core/env_control.c \
 					executor/exec_here_doc.c executor/exec_loop_end.c executor/exec_loop_start.c \
-					executor/exec_redirs.c executor/exec_utils.c \
+					executor/exec_path_utils.c executor/exec_redirs.c executor/exec_utils.c \
 					init/init_data.c init/init_envp.c init/init_history.c \
 					parser/parser_01.c parser/parser_02.c parser/parser_utils.c \
 					prompt/get_prompt.c prompt/git_handler.c  \
@@ -86,7 +86,7 @@ $(NAME): $(OBJS)
 
 $(OBJ_DIR)/%.o:	$(SRC_DIR)/%.c $(HEADER_FILE)
 	@mkdir -p $(dir $@)
-	@echo -n "░"
+	@echo -n "█"
 	@$(CC) $(CFLAGS) -c $< -o $@ -I $(INC_DIR)
 
 

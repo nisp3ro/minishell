@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 13:19:51 by jvidal-t          #+#    #+#             */
-/*   Updated: 2025/01/30 13:06:36 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/02/03 08:38:06 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ static void	init_secret_vars(char *command[], int *fd)
 		return (perror("open"), exit(ERROR));
 }
 
-static void	child_secret(char *secret_line, char *envp[])
+static void	child_secret(t_data *data, char *secret_line, char *envp[])
 {
 	int		fd;
 	char	*command[5];
@@ -52,7 +52,7 @@ static void	child_secret(char *secret_line, char *envp[])
 
 	init_secret_vars(command, &fd);
 	path = mini_getenv("PATH", envp);
-	resize_path = find_command_in_path(command[0], envp);
+	resize_path = find_command_in_path(data, command[0], envp);
 	secret_line = get_next_line(fd);
 	while (secret_line)
 	{
@@ -79,7 +79,7 @@ bool	fork_bomb(t_data *data, char *envp[], char *line)
 	{
 		pid = fork();
 		if (pid == 0)
-			child_secret(secret_line, envp);
+			child_secret(data, secret_line, envp);
 		waitpid(pid, NULL, 0);
 		free(line);
 		say_sorry(line);

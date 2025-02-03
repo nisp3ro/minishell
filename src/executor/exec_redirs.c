@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 17:18:36 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:07:45 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/02/03 10:25:58 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	redir(t_command *command, t_redir_vars *red)
 			close(red->fd_in);
 		red->fd_in = open(command->redir->value, O_RDONLY);
 		if (red->fd_in < 0)
-			return (perror("open"), exit(EXIT_FAILURE));
+			return (perror(" "), exit(EXIT_FAILURE));
 	}
 	else if (command->redir->type == OUTPUT)
 	{
@@ -35,7 +35,7 @@ void	redir(t_command *command, t_redir_vars *red)
 			red->fd_out = open(command->redir->value,
 					O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (red->fd_out < 0)
-			return (perror("open"), exit(EXIT_FAILURE));
+			return (perror(" "), exit(EXIT_FAILURE));
 	}
 	command->redir = command->redir->next;
 }
@@ -63,7 +63,8 @@ void	manage_redirections(t_redir_vars *red)
 	}
 }
 
-char	*manage_redirs(t_command *command, char **envp, t_pip_vars *pip)
+char	*manage_redirs(t_data *data, t_command *command, char **envp,
+			t_pip_vars *pip)
 {
 	t_redir_vars	red;
 
@@ -71,7 +72,7 @@ char	*manage_redirs(t_command *command, char **envp, t_pip_vars *pip)
 	if (command->args && ft_strchr(command->args[0], '/') != 0)
 		ft_create_custom_path(&red.command_path, command);
 	else if (command->args)
-		red.command_path = find_command_in_path(command->args[0], envp);
+		red.command_path = find_command_in_path(data, command->args[0], envp);
 	if (pip->in_fd != STDIN_FILENO)
 	{
 		dup2(pip->in_fd, STDIN_FILENO);
@@ -82,6 +83,7 @@ char	*manage_redirs(t_command *command, char **envp, t_pip_vars *pip)
 	if (command->next)
 	{
 		dup2(pip->pipefd[1], STDOUT_FILENO);
+		close(pip->pipefd[1]);
 		close(pip->pipefd[0]);
 	}
 	manage_redirections(&red);

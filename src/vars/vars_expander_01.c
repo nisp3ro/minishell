@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   vars_expander.c                                    :+:      :+:    :+:   */
+/*   vars_expander_01.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 15:41:14 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:10:12 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/02/03 09:12:20 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,12 +89,11 @@ char	*expand_variables_pretoken(char *token_value, t_data *data)
 {
 	char	*expanded;
 	int		i;
-	bool	s_quote;
-	bool	d_quote;
+	bool	s_d_quote[2];
 
 	i = 0;
-	s_quote = false;
-	d_quote = false;
+	s_d_quote[0] = false;
+	s_d_quote[1] = false;
 	if (!token_value)
 		return (NULL);
 	expanded = ft_calloc(sizeof(char), (ft_strlen(token_value) + 1));
@@ -102,16 +101,16 @@ char	*expand_variables_pretoken(char *token_value, t_data *data)
 		return (NULL);
 	while (token_value[i] != '\0')
 	{
-		check_quotes(token_value, i, &s_quote, &d_quote);
-		if (s_quote || d_quote)
+		check_quotes(token_value, i, &s_d_quote[0], &s_d_quote[1]);
+		if (s_d_quote[0] || s_d_quote[1])
 		{
 			if (!append_literal_char(token_value[i++], &expanded))
 				return (NULL);
 		}
-		else if (process_token_character(token_value, &i, &expanded, data) == ERROR)
+		else if (process_token_character(token_value, &i, &expanded,
+				data) == ERROR)
 			return (NULL);
 	}
 	return (expanded);
 }
 // OJO check liberaciones expan si error
-

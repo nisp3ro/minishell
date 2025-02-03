@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:10:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:06:45 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/02/03 10:07:28 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	process_command(char *input, t_data *data)
 	free(line[1]);
 	if (line[0] == NULL)
 		return (ERROR);
-	if (line[1][0] != '\0')
+	if (line[0][0] != '\0')
 		token_parsec_exec(line[0], data, true);
 	else
 		free(line[0]);

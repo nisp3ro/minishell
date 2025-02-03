@@ -22,11 +22,6 @@ las tabulaciones. Valorar dividirlo en varios .h por claridad de código.
 - Valorar la gestión de la variable global PATH en ejecución sin env.
 (gnl en /etc/env... y asignar a variable)
 
-- (Comprobar testers.. creo que es cosa de mi PC; ahora sin tocar el código, todo OK.)
-Ⱦɍⱥꞩ łꝋꞩ ᵾłⱦīᵯꝋꞩ ȼⱥᵯƀīꝋꞩ ēł ⱦēꞩⱦ đⱥ ēɍɍꝋɍ ēꞥ ēł ȼꝋđīꞡꝋ đē đēꝟꝋłᵾȼīꝋꞥ đē "ēӿꝑꝋɍⱦ Ⱥ-" ⱥᵾꞥꝗᵾē ⱦɍⱥꞩ
-ȼꝋᵯꝑɍꝋƀⱥɍłꝋ ēꞥ ⱦēɍᵯīꞥⱥł đēꝟᵾēłꝟē łꝋ ꝗᵾē đēƀē. Ꞧēꝟīꞩⱥɍ ɏⱥ ꝗᵾē ꞥꝋ ꞩē ħⱥ ⱦꝋȼⱥđꝋ ēł ȼꝋᵯⱥꞥđꝋ ēӿꝑꝋɍⱦ. 
-Ⱥ ꝟēȼēꞩ đⱥ ꝋⱦɍꝋꞩ ēɍɍꝋɍēꞩ ꝑēɍꝋ ȼꝋᵯꝑɍꝋƀⱥꞥđꝋ ȼꝋđīꞡꝋ ⱦꝋđꝋ ӻᵾꞥȼīꝋꞥⱥ ȼꝋᵯꝋ đēƀē.
-
 - Revisar codigos de ejecución correcta y de error de los builts in.
 
 - Revisar todas las anotaciones marcadas con "OJO" en el código.

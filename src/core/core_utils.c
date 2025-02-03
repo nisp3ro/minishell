@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 09:06:04 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:06:57 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/02/03 10:22:03 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,9 +72,9 @@ char	*unfinished_pipe(char *line)
 	while (1)
 	{
 		i = ft_strlen(line) - 1;
-		while (isspace((unsigned char)line[i]))
+		while (i > 0 && isspace((unsigned char)line[i]))
 			i--;
-		if (line[i] == '|')
+		if (i >= 0 && line[i] == '|')
 		{
 			tmp[0] = readline(">");
 			tmp[1] = ft_strjoin(line, " ");

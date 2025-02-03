@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 16:57:57 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 17:57:09 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/02/03 08:56:45 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,35 +16,6 @@ void	init_search_command_vars(t_search_command *vars)
 {
 	vars->command_path = NULL;
 	vars->i = 0;
-}
-
-char	*find_command_in_path(char *command, char **envp)
-{
-	t_search_command	vars;
-
-	vars.path = mini_getenv("PATH", envp);
-	if (!vars.path)
-		return (NULL);
-	vars.directories = ft_split(vars.path, ':');
-	if (!vars.directories)
-		return (NULL);
-	init_search_command_vars(&vars);
-	while (vars.directories[vars.i])
-	{
-		vars.command_path = ft_strjoin(vars.directories[vars.i], "/");
-		if (!vars.command_path)
-			return (clean_mtx(vars.directories), NULL);
-		vars.tmp = ft_strjoin(vars.command_path, command);
-		free(vars.command_path);
-		vars.command_path = vars.tmp;
-		if (access(vars.command_path, X_OK) == 0)
-			return (clean_mtx(vars.directories), vars.command_path);
-		free(vars.command_path);
-		vars.command_path = NULL;
-		vars.i++;
-	}
-	clean_mtx(vars.directories);
-	return (NULL);
 }
 
 void	ft_create_custom_path(char **path, t_command *command)

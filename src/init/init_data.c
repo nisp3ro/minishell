@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:21:39 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 19:52:27 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/02/03 09:00:07 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,11 @@ static int	handle_no_env(t_data *data)
 {
 	if (create_envp(data) == ERROR)
 		return (ERROR);
-	if (create_exp_vars(data, &data->exp_vars, 0))
+	if (create_exp_vars(data, &data->exp_vars, 1))
 		return (clean_mtx(data->envp), ERROR);
+	if (create_path_no_env(data) == ERROR)
+		return (clean_mtx(data->envp), clean_variables(data->exp_vars), ERROR);
+	sort_list(&data->exp_vars, data->exp_vars);
 	return (OK);
 }
 

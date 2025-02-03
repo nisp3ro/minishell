@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:42:03 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/31 12:57:23 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/02/03 09:05:34 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,8 @@ char	*get_host(char **envp, bool *free_host)
 
 static void	make_pwd(t_data *data, char *prompt)
 {
-	if (data->home && ft_strncmp(data->pwd, data->home, ft_strlen(data->home)) == 0)
+	if (data->home && ft_strncmp(data->pwd, data->home,
+			ft_strlen(data->home)) == 0)
 	{
 		ft_strcat(prompt, "~");
 		ft_strcat(prompt, data->pwd + ft_strlen(data->home));

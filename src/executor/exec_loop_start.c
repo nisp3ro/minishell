@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 16:51:20 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:21:12 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/02/03 11:24:19 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	create_pipe_if_needed(t_pip_vars *pip, t_command *command)
 void	execute_child_process(t_command *command, t_data *data, char **envp,
 		t_pip_vars *pip)
 {
-	pip->command_path = manage_redirs(command, envp, pip);
+	pip->command_path = manage_redirs(data, command, envp, pip);
 	if ((check_cmd_args(command) && !check_builtin(command, data))
 		&& execve(pip->command_path, command->args, envp))
 		execve_error_exit(command, pip->command_path);
@@ -57,7 +57,6 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 	init_pip(&pip, &command);
 	while (command != NULL)
 	{
-		create_pipe_if_needed(&pip, command);
 		if (command->eof != NULL)
 		{
 			handle_here_doc(command, data, here_doc_pipe);
@@ -65,6 +64,7 @@ void	execute_pipeline(t_command *command, t_data *data, char **envp)
 			if (data->g_exit_code == 130)
 				break ;
 		}
+		create_pipe_if_needed(&pip, command);
 		if (command->args && command->args[0])
 			handle_child_creation(&pip, command, data, envp);
 		command = command->next;

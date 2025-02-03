@@ -6,7 +6,7 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 17:28:54 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 17:29:30 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/02/03 11:03:10 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void	clean_cmd(t_command *command)
 		if (tmp->args)
 			clean_mtx(tmp->args);
 		if (tmp->eof)
-			free(tmp->eof);
+			clean_mtx(tmp->eof);
 		while (tmp->redir)
 		{
 			redir_tmp = tmp->redir;

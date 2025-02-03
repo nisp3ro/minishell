@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_history_utils.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 15:12:06 by jvidal-t          #+#    #+#             */
-/*   Updated: 2025/01/29 17:40:16 by jvidal-t         ###   ########.fr       */
+/*   Updated: 2025/02/03 09:51:14 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,15 +42,18 @@ void	delete_history_file(t_data *data)
 
 void	print_history(t_data *data)
 {
+	int		i;
 	char	*line;
 	char	*path;
 
+	i = 0;
 	path = ft_get_user_home(data);
 	data->fd = open(path, O_RDONLY);
 	line = get_next_line(data->fd);
 	while (line)
 	{
-		write(1, line, ft_strlen(line));
+		i++;
+		printf("%d %s", i, line);
 		free(line);
 		line = get_next_line(data->fd);
 	}

@@ -6,11 +6,60 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 07:21:54 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/25 14:33:23 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/02/03 09:05:10 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+
+static char	*get_path_line(void)
+{
+	int		fd;
+	char	*line;
+	char	*tmp;
+
+	fd = open("/etc/environment", O_RDONLY);
+	if (fd < 0)
+		return (NULL);
+	line = get_next_line(fd);
+	tmp = get_next_line(fd);
+	while (tmp)
+	{
+		free(tmp);
+		tmp = get_next_line(fd);
+	}
+	close(fd);
+	return (line);
+}
+
+int	create_path_no_env(t_data *data)
+{
+	char	*tmp;
+	char	*line;
+
+	if (access("/etc/environment", F_OK) == 0)
+	{
+		line = get_path_line();
+		if (line)
+		{
+			tmp = NULL;
+			tmp = ft_strchr(line, '\n');
+			if (tmp)
+				*tmp = '\0';
+			tmp = NULL;
+			tmp = ft_strchr(line, '=');
+			if (tmp)
+				*tmp = '\0';
+			tmp = ft_strtrim(tmp + 1, "\"");
+			if (tmp == NULL)
+				return (free(line), ERROR);
+			if (set_variable(&data->vars, line, tmp) == ERROR)
+				return (free(line), free(tmp), ERROR);
+			return (free(line), free(tmp), OK);
+		}
+	}
+	return (OK);
+}
 
 int	update_envp(t_data *data)
 {
