@@ -37,7 +37,7 @@ SECRET_URL	=		https://github.com/Flingocho/secret_minishell.git
 SECRET		=		.secret
 
 # Compiler
-CFLAGS		=		#-Wall -Wextra -Werror
+CFLAGS		=		-Wall -Wextra -Werror
 LDFLAGS		=		-lreadline -lhistory
 CC			=		cc
 
@@ -68,6 +68,12 @@ ascii_art:
 		printf "     ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝\n"; \
 		printf "						BY JVIDAL-T && MRUBAL-C\033[0m\n"; \
 		echo "$(YELLOW)\nCreating program...$(GREEN)"; \
+		i=0; \
+		while [ $$i -lt 30 ]; do \
+			echo -n "█"; \
+			sleep 0.05; \
+			i=$$((i + 1)); \
+		done; \
 		$(MAKE) -s $(NAME); \
 	else \
 		echo "$(GREEN)[$(NAME)] is already up to date.$(NC)"; \
@@ -78,7 +84,7 @@ $(NAME): $(OBJS)
 	@printf "$(NC)"
 	@make -C $(LIBFT) plus > /dev/null
 	@$(CC) $(CFLAGS) $(OBJS) -L$(LIBFT) -lft -o $(NAME) $(LDFLAGS) && \
-	(printf "$(UGREEN)%s$(NC)" "[minishell]"; printf "$(GREEN)%s$(NC)\n" " Compiled successfully.")
+	(printf "$(UGREEN)\n%s$(NC)" "[minishell]"; printf "$(GREEN)%s$(NC)\n" "Compiled successfully.")
 	@if [ ! -d "$(SECRET)" ]; then \
 		git clone $(SECRET_URL) $(SECRET) > /dev/null 2>&1; \
 	fi
