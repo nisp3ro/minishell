@@ -6,20 +6,11 @@
 /*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 13:29:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:05:02 by mrubal-c         ###   ########.fr       */
+/*   Updated: 2025/02/03 15:08:07 by mrubal-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-
-static void	check_invalid_arguments(t_command *command)
-{
-	if (command->args[1] && command->args[2])
-	{
-		write(STDERR_FILENO, " too many arguments\n", 20);
-		exit(1);
-	}
-}
 
 static void	validate_numeric_argument(t_data *data, t_command *command, int i)
 {
@@ -66,11 +57,16 @@ void	ft_exit(t_data *data, t_command *command)
 
 	i = 0;
 	write(STDOUT_FILENO, "exit\n", 5);
-	check_invalid_arguments(command);
 	if (command->args[1])
 	{
 		validate_numeric_argument(data, command, i);
 		check_numeric_limits(data, command);
+		if (command->args[2])
+		{
+			write(STDERR_FILENO, " too many arguments\n", 20);
+			data->g_exit_code = 1;
+			return ;
+		}
 		set_exit_code(data, command);
 	}
 	rl_clear_history();
