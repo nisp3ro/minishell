@@ -1,6 +1,6 @@
 # 📚 Minishell  100/100
 
-The aim of this project is to build a minimal shell that replicates some basic functionalities of a Unix shell.  
+The aim of this project is to build a minimal shell that replicates some basic functionalities of a bash.  
 This project not only implements standard shell operations but also includes a fun hidden Easter Egg that activates under certain conditions.
 
 ## Installation & Compilation
@@ -27,7 +27,7 @@ To run Minishell, simply execute the generated binary:
 ./minishell
 ```
 
-Once running, you can interact with your shell much like any standard Unix shell.
+Once running, you can interact with your shell much like bash.
 
 ## Built-ins
 
