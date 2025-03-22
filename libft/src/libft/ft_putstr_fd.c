@@ -1,24 +1,21 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_putstr_fd.c                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42madrid>       +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/20 19:52:34 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/20 20:21:35 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Writes a string to a file descriptor.
+ *
+ * This function outputs the given null-terminated string `s` to the file descriptor `fd`.
+ * If the string is NULL, the function does nothing.
+ *
+ * @param s The string to be written.
+ * @param fd The file descriptor on which to write the string.
+ */
 void	ft_putstr_fd(char *s, int fd)
 {
 	int	i;
 
-	i = 0;
 	if (!s)
-		return ;
+		return;
+	i = 0;
 	while (s[i])
 	{
 		ft_putchar_fd(s[i], fd);

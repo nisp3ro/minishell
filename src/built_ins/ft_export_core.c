@@ -1,17 +1,14 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_export_core.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/20 13:29:57 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:05:14 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Removes a variable from the export list.
+ *
+ * Searches through the linked list of exported variables and removes the variable
+ * whose name exactly matches the provided command string.
+ *
+ * @param command The name of the variable to remove.
+ * @param vars Pointer to the head of the linked list of exported variables.
+ */
 static void	unset_from_vars_export(char *command, t_vars **vars)
 {
 	t_vars	*tmp;
@@ -38,6 +35,16 @@ static void	unset_from_vars_export(char *command, t_vars **vars)
 	}
 }
 
+/**
+ * @brief Exports a new variable that already exists in the environment.
+ *
+ * Retrieves the value of the variable from the environment and, if it is not already
+ * present in the exported variables list, adds it. Afterwards, it sorts the export list.
+ *
+ * @param command The command structure containing the arguments.
+ * @param data Pointer to the minishell data structure.
+ * @param i The index of the variable in the command arguments.
+ */
 static void	export_new_variable(t_command *command, t_data *data, int i)
 {
 	char	*to_export;
@@ -50,6 +57,17 @@ static void	export_new_variable(t_command *command, t_data *data, int i)
 	}
 }
 
+/**
+ * @brief Exports an empty variable.
+ *
+ * Handles the case when the variable does not exist in either the variables list
+ * or the exported variables list. It sets the exported variable with an empty value,
+ * then sorts the export list.
+ *
+ * @param command The command structure containing the arguments.
+ * @param data Pointer to the minishell data structure.
+ * @param i The index of the variable in the command arguments.
+ */
 static void	export_empty_variable(t_command *command, t_data *data, int i)
 {
 	special_set_exp(data, command->args[i]);
@@ -57,6 +75,17 @@ static void	export_empty_variable(t_command *command, t_data *data, int i)
 	sort_list(&data->exp_vars, data->exp_vars);
 }
 
+/**
+ * @brief Exports an existing variable.
+ *
+ * If the variable exists in the variables list, this function updates its export
+ * status, moves it to the exported variables list, and sorts the export list. It also
+ * removes the variable from the original variables list.
+ *
+ * @param command The command structure containing the arguments.
+ * @param data Pointer to the minishell data structure.
+ * @param i The index of the variable in the command arguments.
+ */
 static void	export_existing_variable(t_command *command, t_data *data, int i)
 {
 	char	*to_export;
@@ -69,6 +98,17 @@ static void	export_existing_variable(t_command *command, t_data *data, int i)
 	sort_list(&data->exp_vars, data->exp_vars);
 }
 
+/**
+ * @brief Implements the export built-in command.
+ *
+ * Processes each argument provided to the export command. Depending on whether
+ * the variable already exists in the variables list, the exported variables list,
+ * or neither, it calls the appropriate function to handle the export. If no arguments
+ * are provided, it prints the list of exported variables.
+ *
+ * @param command The command structure containing the export command arguments.
+ * @param data Pointer to the minishell data structure.
+ */
 void	ft_export(t_command *command, t_data *data)
 {
 	int	i;

@@ -1,17 +1,24 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/20 11:21:20 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/02/03 09:39:36 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../include/minishell.h"
 
+/**
+ * @brief Entry point for the minishell program.
+ *
+ * This main function initializes the minishell data structure, processes command line
+ * arguments, sets up signal handling, and runs either the interactive shell or a single
+ * command execution based on the provided arguments.
+ *
+ * - If the program is invoked with arguments other than "-c", it writes an error message
+ *   to standard error and exits with code 127.
+ * - If no arguments or the proper "-c" argument is provided, it initializes the shell's data
+ *   with the provided environment. In interactive mode (argc == 1), it enters the interactive shell;
+ *   otherwise, it tokenizes and executes the command provided as argv[2].
+ * - Finally, it cleans up allocated resources and clears the readline history.
+ *
+ * @param argc The number of command-line arguments.
+ * @param argv The array of command-line argument strings.
+ * @param envp The array of environment variable strings.
+ * @return int The exit code of the minishell, based on the global exit code in the data structure.
+ */
 int	main(int argc, char *argv[], char *envp[])
 {
 	t_data	data;
@@ -33,4 +40,3 @@ int	main(int argc, char *argv[], char *envp[])
 	rl_clear_history();
 	return (data.g_exit_code);
 }
-// OJO LIMPIEZA Y CODIUGO DE SALIDA EN TODAS LAS POSIBLES SALIDAS

@@ -1,17 +1,15 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   vars_assigment.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/26 15:39:00 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/02/03 14:31:01 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Creates an environment entry string.
+ *
+ * Constructs a string in the format "name=value" by allocating sufficient memory,
+ * copying the name, appending an equal sign, and then the value.
+ *
+ * @param name The name of the environment variable.
+ * @param value The value of the environment variable.
+ * @return char* A pointer to the newly created environment entry string, or NULL on failure.
+ */
 char	*create_env_entry(char *name, char *value)
 {
 	size_t	size;
@@ -27,6 +25,18 @@ char	*create_env_entry(char *name, char *value)
 	return (entry);
 }
 
+/**
+ * @brief Replaces the value of a user-defined variable.
+ *
+ * Iterates through the linked list of environment variables and, when a variable with the
+ * matching name is found, frees its current value and replaces it with a duplicate of the new value.
+ * If the variable is not found in the exported variables list, it adds it using set_exp().
+ *
+ * @param env_vars Double pointer to the head of the environment variables linked list.
+ * @param name The name of the variable to replace.
+ * @param value The new value to assign to the variable.
+ * @param data Pointer to the minishell data structure.
+ */
 void	replace_user_variable(t_vars **env_vars, char *name, char *value,
 		t_data *data)
 {
@@ -53,6 +63,17 @@ void	replace_user_variable(t_vars **env_vars, char *name, char *value,
 		set_exp(data, name, value);
 }
 
+/**
+ * @brief Processes an environment variable assignment.
+ *
+ * Searches the environment array (data->envp) for an entry that matches the given name.
+ * If found, it replaces the existing entry with a new one created from the name and value.
+ *
+ * @param name The name of the variable.
+ * @param value The value of the variable.
+ * @param data Pointer to the minishell data structure.
+ * @return bool Returns true if the variable was processed (found and replaced), false otherwise.
+ */
 bool	process_environment_variable(char *name, char *value, t_data *data)
 {
 	int	i;
@@ -77,6 +98,18 @@ bool	process_environment_variable(char *name, char *value, t_data *data)
 	return (false);
 }
 
+/**
+ * @brief Processes a user variable assignment.
+ *
+ * Depending on whether the variable exists in the exported variables list or in the
+ * regular variables list, this function replaces the variable's value using replace_user_variable()
+ * or adds a new variable using set_variable().
+ *
+ * @param name The name of the variable.
+ * @param value The value of the variable.
+ * @param env_vars Double pointer to the head of the variables linked list.
+ * @param data Pointer to the minishell data structure.
+ */
 void	process_user_variable(char *name, char *value, t_vars **env_vars,
 		t_data *data)
 {
@@ -95,6 +128,18 @@ void	process_user_variable(char *name, char *value, t_vars **env_vars,
 	}
 }
 
+/**
+ * @brief Handles a variable assignment from the input.
+ *
+ * Expands any variables in the input assignment string, splits the string at the first '='
+ * into a name and a value, and then processes the assignment by updating both the environment
+ * and user-defined variables.
+ *
+ * @param input The input string containing the variable assignment.
+ * @param env_vars Double pointer to the head of the variables linked list.
+ * @param data Pointer to the minishell data structure.
+ * @return bool Returns true on success, or false on failure.
+ */
 bool	handle_variable_assignment(char *input, t_vars **env_vars, t_data *data)
 {
 	char	*expanded;

@@ -1,17 +1,15 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_tolower.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/17 12:05:22 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/18 17:56:59 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Converts an uppercase letter to lowercase.
+ *
+ * This function checks if the given character is an uppercase letter ('A' to 'Z')
+ * and, if so, converts it to its lowercase equivalent by adding 32 to its ASCII value.
+ * If the character is not an uppercase letter, it is returned unchanged.
+ *
+ * @param ch The character to convert.
+ * @return int The lowercase equivalent of ch if ch is uppercase; otherwise, ch.
+ */
 int	ft_tolower(int ch)
 {
 	if (ch >= 'A' && ch <= 'Z')

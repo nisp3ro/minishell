@@ -1,17 +1,16 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   env_control.c                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/20 11:13:07 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:07:05 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Specially sets an export variable in the environment.
+ *
+ * This function adds a new variable to the environment (data->envp) only if it 
+ * does not already exist. The new variable is added as a standalone string (without an '=' sign).
+ * The environment array is reallocated to accommodate the new variable.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param name The name of the variable to add.
+ * @return int Returns OK if the variable was successfully added or already exists.
+ */
 int	special_set_exp(t_data *data, char *name)
 {
 	int	i;
@@ -31,8 +30,18 @@ int	special_set_exp(t_data *data, char *name)
 	data->envp[i + 1] = NULL;
 	return (OK);
 }
-// OJO EXIT PORQUE SALIDA CRITICA
 
+/**
+ * @brief Sets an export variable in the environment with a value.
+ *
+ * This function adds a new variable to the environment (data->envp) in the format "name=value"
+ * if it does not already exist. The environment array is reallocated to accommodate the new variable.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param name The name of the variable.
+ * @param value The value of the variable.
+ * @return int Returns OK if the variable was successfully added or already exists.
+ */
 int	set_exp(t_data *data, char *name, char *value)
 {
 	int	i;
@@ -55,8 +64,18 @@ int	set_exp(t_data *data, char *name, char *value)
 	data->envp[i + 1] = NULL;
 	return (OK);
 }
-// OJO EXIT PORQUE SALIDA CRITICA
 
+/**
+ * @brief Updates the last command argument in the environment.
+ *
+ * This function searches for an environment variable with the given name (e.g., "_") and updates its value.
+ * If the variable is found, it frees the old string and allocates a new one in the format "name=value".
+ * If the variable is not found, it creates the new variable using set_exp.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param name The name of the environment variable to update.
+ * @param value The new value to assign to the variable.
+ */
 void	set_last_cmd_arg(t_data *data, char *name, char *value)
 {
 	int	i;
@@ -83,4 +102,3 @@ void	set_last_cmd_arg(t_data *data, char *name, char *value)
 	}
 	set_exp(data, name, value);
 }
-// OJO EXIT PORQUE SALIDA CRITICA

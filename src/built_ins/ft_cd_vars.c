@@ -1,17 +1,16 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_cd_vars.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/28 15:31:40 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:04:16 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Updates the value of an exported environment variable.
+ * 
+ * This function frees the previous value of the variable and assigns it a new one.
+ * If `unset_pwd` is set and the key is "OLDPWD", it sets the value to an empty string.
+ * 
+ * @param tmp_vars Pointer to the variable to be updated.
+ * @param key The name of the variable.
+ * @param value The new value to assign.
+ * @param data Pointer to the minishell data structure.
+ */
 static void	update_exp_var_value(t_vars *tmp_vars, char *key, char *value,
 		t_data *data)
 {
@@ -27,6 +26,15 @@ static void	update_exp_var_value(t_vars *tmp_vars, char *key, char *value,
 	}
 }
 
+/**
+ * @brief Searches for an exported variable and updates its value.
+ * 
+ * Iterates through the exported variables (`exp_vars`) and updates the value if the key is found.
+ * 
+ * @param data Pointer to the minishell data structure.
+ * @param key The name of the variable to update.
+ * @param value The new value to assign.
+ */
 static void	find_and_update_exp_var(t_data *data, char *key, char *value)
 {
 	t_vars	*tmp_vars;
@@ -43,6 +51,17 @@ static void	find_and_update_exp_var(t_data *data, char *key, char *value)
 	}
 }
 
+/**
+ * @brief Updates an environment variable in `envp` at a specific index.
+ * 
+ * If `unset_pwd` is set and the key is "OLDPWD", the value is removed.
+ * Otherwise, it constructs a new key-value pair and updates the array.
+ * 
+ * @param data Pointer to the minishell data structure.
+ * @param i Index of the variable in `envp`.
+ * @param key The name of the variable.
+ * @param value The new value to assign.
+ */
 static void	update_envp_var(t_data *data, int i, char *key, char *value)
 {
 	char	*tmp;
@@ -69,8 +88,16 @@ static void	update_envp_var(t_data *data, int i, char *key, char *value)
 	}
 }
 
-static void	find_and_update_envp(t_data *data, char *key,
-		char *value)
+/**
+ * @brief Searches for an environment variable in `envp` and updates its value.
+ * 
+ * Iterates through `envp` to find the key and updates its value if found.
+ * 
+ * @param data Pointer to the minishell data structure.
+ * @param key The name of the variable to update.
+ * @param value The new value to assign.
+ */
+static void	find_and_update_envp(t_data *data, char *key, char *value)
 {
 	int	i;
 
@@ -86,6 +113,16 @@ static void	find_and_update_envp(t_data *data, char *key,
 	}
 }
 
+/**
+ * @brief Updates both exported variables and environment variables.
+ * 
+ * Calls `find_and_update_exp_var` and `find_and_update_envp` to ensure both
+ * exported and environment variables are updated.
+ * 
+ * @param data Pointer to the minishell data structure.
+ * @param key The name of the variable to update.
+ * @param value The new value to assign.
+ */
 void	update_env_var(t_data *data, char *key, char *value)
 {
 	find_and_update_exp_var(data, key, value);

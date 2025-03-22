@@ -1,17 +1,19 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parser_utils.c                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/27 09:18:33 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 09:18:40 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Allocates and initializes a new command structure.
+ *
+ * This function allocates memory for a new t_command structure and initializes its members
+ * to default values:
+ * - args, eof, redir, next are set to NULL.
+ * - eof_count and arg_count are set to 0.
+ * - append is set to 0.
+ * - export is set to false.
+ * - first is set to true.
+ *
+ * @return t_command* Pointer to the newly allocated and initialized command structure,
+ * or NULL if memory allocation fails.
+ */
 t_command	*initialize_command(void)
 {
 	t_command	*command;

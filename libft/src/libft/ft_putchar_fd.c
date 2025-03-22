@@ -1,18 +1,14 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_putchar_fd.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42madrid>       +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/20 19:49:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/20 19:50:28 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Writes a character to a file descriptor.
+ *
+ * Outputs the character 'c' to the given file descriptor 'fd'.
+ *
+ * @param c The character to write.
+ * @param fd The file descriptor on which to write the character.
+ */
 void	ft_putchar_fd(char c, int fd)
 {
-	write (fd, &c, 1);
+	write(fd, &c, 1);
 }

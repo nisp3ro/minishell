@@ -1,17 +1,17 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_memmove.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/16 13:57:35 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/18 17:57:09 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Copies memory areas with overlap support.
+ *
+ * Copies n bytes from the source memory area (src) to the destination memory area (dest).
+ * The memory areas may overlap; this function handles overlapping regions correctly.
+ * If the source and destination are the same, or n is 0, the function returns dest immediately.
+ *
+ * @param dest Pointer to the destination memory area.
+ * @param src  Pointer to the source memory area.
+ * @param n    Number of bytes to copy.
+ * @return void* Pointer to the destination memory area (dest).
+ */
 void	*ft_memmove(void *dest, const void *src, size_t n)
 {
 	unsigned char	*pdest;
@@ -23,6 +23,7 @@ void	*ft_memmove(void *dest, const void *src, size_t n)
 		return (dest);
 	if (psrc < pdest)
 	{
+		// Copy backwards to handle overlapping regions
 		while (n > 0)
 		{
 			n--;
@@ -30,6 +31,9 @@ void	*ft_memmove(void *dest, const void *src, size_t n)
 		}
 	}
 	else
+	{
+		// Use ft_memcpy for non-overlapping regions
 		ft_memcpy(pdest, psrc, n);
+	}
 	return (dest);
 }

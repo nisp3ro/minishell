@@ -1,39 +1,40 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_atoi.c                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/17 18:25:16 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/24 16:56:28 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Converts a string to an integer.
+ *
+ * This function parses the given string, skipping any leading whitespace, and converts
+ * the subsequent characters into an integer. It handles an optional '+' or '-' sign.
+ * The conversion is performed by accumulating the result as a negative value to
+ * avoid potential overflow issues, then adjusting the sign at the end.
+ *
+ * @param str The input string containing the representation of an integer.
+ * @return int The converted integer.
+ */
 int	ft_atoi(const char *str)
 {
 	int	i;
-	int	res;
-	int	sing;
+	int	result;
+	int	sign;
 
 	i = 0;
-	res = 0;
-	sing = -1;
-	while (str[i] == 9 || str[i] == 10 || str[i] == 11
-		|| str[i] == 12 || str[i] == 13 || str[i] == 32)
+	result = 0;
+	sign = -1;
+	// Skip leading whitespace characters (tabs, newlines, spaces, etc.)
+	while (ft_isspace(str[i]))
 		i++;
+	// Check for optional sign indicator
 	if (str[i] == '+' || str[i] == '-')
 	{
 		if (str[i] == '-')
-			sing = 1;
+			sign = 1;
 		i++;
 	}
+	// Convert digits to integer by accumulating the result
 	while (ft_isdigit(str[i]))
 	{
-		res = (res * 10) - (int)(str[i] - 48);
+		result = (result * 10) - (str[i] - '0');
 		i++;
 	}
-	return (res * sing);
+	return (result * sign);
 }

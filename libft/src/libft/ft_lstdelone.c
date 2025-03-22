@@ -1,19 +1,18 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_lstdelone.c                               :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/23 08:47:41 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/23 10:47:19 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Deletes a single node from a linked list.
+ *
+ * Frees the memory of the node’s content using the function `del`,
+ * then frees the node itself. The `next` pointer is not affected.
+ *
+ * @param lst The node to delete.
+ * @param del The function used to delete the content of the node.
+ */
 void	ft_lstdelone(t_list *lst, void (*del)(void *))
 {
+	if (!lst || !del)
+		return;
 	del(lst->content);
 	free(lst);
 }

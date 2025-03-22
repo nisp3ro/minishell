@@ -1,37 +1,36 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_strnstr.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/17 15:45:31 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/18 17:57:02 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Locates a substring in a string within a limited number of characters.
+ *
+ * This function searches for the first occurrence of the null-terminated substring s2
+ * within the string s1, but searches only the first n characters of s1.
+ * If s2 is an empty string, s1 is returned.
+ *
+ * @param s1 The string to be searched (haystack).
+ * @param s2 The substring to search for (needle).
+ * @param n The maximum number of characters to search within s1.
+ * @return char* A pointer to the beginning of the located substring within s1,
+ *               or NULL if the substring is not found within the first n characters.
+ */
 char	*ft_strnstr(const char *s1, const char *s2, size_t n)
 {
-	size_t	i1;
-	size_t	i2;
+	size_t	i;
+	size_t	j;
 
-	i1 = 0;
+	/* If s2 is empty, return s1 immediately */
 	if (s2[0] == '\0')
 		return ((char *)s1);
-	while (i1 < n && s1[i1])
+	
+	i = 0;
+	while (s1[i] && i < n)
 	{
-		i2 = 0;
-		while ((i1 + i2) < n && s1[i1 + i2] == s2[i2])
-		{
-			i2++;
-			if (s2[i2] == '\0')
-				return ((char *)&s1[i1]);
-		}
-		i1++;
-		if ((i1 + i2) >= n)
-			return (0);
+		j = 0;
+		while (s1[i + j] && s2[j] && (i + j) < n && s1[i + j] == s2[j])
+			j++;
+		if (s2[j] == '\0')
+			return ((char *)(s1 + i));
+		i++;
 	}
-	return (0);
+	return (NULL);
 }

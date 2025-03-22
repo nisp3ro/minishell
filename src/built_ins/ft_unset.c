@@ -1,17 +1,16 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_unset.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/20 13:26:34 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:06:05 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../include/minishell.h"
 
+/**
+ * @brief Removes environment variables from the envp array.
+ *
+ * Iterates through the command arguments and removes each matching environment 
+ * variable from the data->envp array. A match is determined when the variable name 
+ * in envp exactly matches the provided argument and is immediately followed by '='.
+ * After freeing the matched element, subsequent elements are shifted to fill the gap.
+ *
+ * @param command Pointer to the command structure containing the unset arguments.
+ * @param data Pointer to the minishell data structure.
+ */
 void	unset_from_envp(t_command *command, t_data *data)
 {
 	int	i;
@@ -41,6 +40,16 @@ void	unset_from_envp(t_command *command, t_data *data)
 	data->g_exit_code = 0;
 }
 
+/**
+ * @brief Removes a variable from the variables linked list.
+ *
+ * Searches for a variable in the provided linked list whose name exactly matches 
+ * the given argument. If found, the variable node is removed from the list and its 
+ * associated memory is freed.
+ *
+ * @param arg The name of the variable to remove.
+ * @param vars Pointer to the pointer to the head of the linked list of variables.
+ */
 void	unset_from_vars(char *arg, t_vars **vars)
 {
 	t_vars	*tmp;
@@ -64,9 +73,18 @@ void	unset_from_vars(char *arg, t_vars **vars)
 	}
 }
 
-// For minishell tester
-// if (ft_strcmp(command->args[1], "HOME") == 0) //WTF?
-// 	return ;
+/**
+ * @brief Implements the unset built-in command.
+ *
+ * Processes the unset command by removing variables from both the environment (envp) 
+ * and the variables linked lists (vars and exp_vars). It first removes matching 
+ * environment variables, then iterates through each argument to remove them from the 
+ * internal variable lists. Finally, it checks for the "PWD" variable and sets a flag 
+ * (unset_pwd) if it is present.
+ *
+ * @param command Pointer to the command structure containing the unset arguments.
+ * @param data Pointer to the minishell data structure.
+ */
 void	ft_unset(t_command *command, t_data *data)
 {
 	int	i;

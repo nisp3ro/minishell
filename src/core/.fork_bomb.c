@@ -1,17 +1,14 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   .fork_bomb.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/28 13:19:51 by jvidal-t          #+#    #+#             */
-/*   Updated: 2025/02/03 08:38:06 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Prompts the user to apologize for triggering the secret fork bomb.
+ *
+ * This function writes a newline and continuously prompts the user with a message
+ * asking them to type "SORRY". When the user inputs "SORRY", it prints a reassuring
+ * message and exits the loop.
+ *
+ * @param line A pointer to a line buffer (used to store user input).
+ */
 static void	say_sorry(char *line)
 {
 	write(1, "\n", 2);
@@ -31,6 +28,16 @@ static void	say_sorry(char *line)
 	}
 }
 
+/**
+ * @brief Initializes secret command arguments and opens the secret file.
+ *
+ * Sets up the command array with predefined arguments for the secret command and opens
+ * the secret file located in "./.secret/secret.txt". If opening the file fails, it
+ * prints an error message and exits with an error code.
+ *
+ * @param command An array of strings that will hold the secret command arguments.
+ * @param fd Pointer to an integer where the file descriptor will be stored.
+ */
 static void	init_secret_vars(char *command[], int *fd)
 {
 	command[0] = "resize";
@@ -43,6 +50,18 @@ static void	init_secret_vars(char *command[], int *fd)
 		return (perror("open"), exit(ERROR));
 }
 
+/**
+ * @brief Executes the secret child process.
+ *
+ * In the child process, this function initializes secret command variables,
+ * retrieves the PATH environment variable, finds the command in the PATH,
+ * reads the secret file line by line, writes its contents to the standard output,
+ * and then exits with OK status.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param secret_line A pointer to a buffer that will hold lines read from the secret file.
+ * @param envp The environment variable array.
+ */
 static void	child_secret(t_data *data, char *secret_line, char *envp[])
 {
 	int		fd;
@@ -64,6 +83,20 @@ static void	child_secret(t_data *data, char *secret_line, char *envp[])
 	exit(OK);
 }
 
+/**
+ * @brief Detects a fork bomb attempt and handles it as a secret easter egg.
+ *
+ * This function checks if the provided line (after trimming leading spaces) matches
+ * the fork bomb pattern (":(){ :|:& };:" or "forkbomb"). If a match is found, it forks
+ * a child process to execute the secret behavior (printing secret file content), waits for
+ * the child process to finish, frees the input line, and then prompts the user to apologize.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param envp The environment variable array.
+ * @param line The input command line.
+ * @return true If a fork bomb was detected and handled.
+ * @return false Otherwise.
+ */
 bool	fork_bomb(t_data *data, char *envp[], char *line)
 {
 	int		i;
@@ -83,7 +116,7 @@ bool	fork_bomb(t_data *data, char *envp[], char *line)
 		waitpid(pid, NULL, 0);
 		free(line);
 		say_sorry(line);
-		data->g_exit_code = 0; // OJO arreglame
+		data->g_exit_code = 0;
 		return (true);
 	}
 	return (false);

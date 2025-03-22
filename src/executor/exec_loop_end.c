@@ -1,17 +1,19 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   exec_loop_end.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/20 13:40:12 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/02/03 11:18:53 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Waits for child processes to exit and updates the global exit code.
+ *
+ * This function cleans up the command list and then waits for 'i' child processes
+ * to finish using waitpid(). It updates the global exit code (data->g_exit_code) based
+ * on the exit status of the processes. If a process terminates with status 2 or 3, it
+ * adjusts the exit code by adding 128. The final exit code is taken from the process with
+ * PID equal to the provided pid. Finally, it calls wait_signal() with argument 1.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param i The number of child processes to wait for.
+ * @param pid The PID of the main child process whose exit code should be retained.
+ * @param command Double pointer to the command list to be cleaned.
+ */
 void	wait_exit(t_data *data, int i, int pid, t_command **command)
 {
 	int	temp_pid;
@@ -34,6 +36,17 @@ void	wait_exit(t_data *data, int i, int pid, t_command **command)
 	wait_signal(1);
 }
 
+/**
+ * @brief Handles file descriptor management in the parent process after forking.
+ *
+ * In the parent process, this function closes the input file descriptor if it is not
+ * standard input. If there is a subsequent command in the pipeline, it closes the write
+ * end of the pipe and sets the input file descriptor for the next command to the read end
+ * of the current pipe.
+ *
+ * @param pip Pointer to the structure holding pipe-related variables.
+ * @param command Pointer to the current command in the pipeline.
+ */
 void	father_process(t_pip_vars *pip, t_command *command)
 {
 	if (pip->in_fd != STDIN_FILENO)
@@ -45,6 +58,18 @@ void	father_process(t_pip_vars *pip, t_command *command)
 	}
 }
 
+/**
+ * @brief Handles errors encountered during execve() and exits appropriately.
+ *
+ * Depending on the errno set by a failed execve() call, this function writes an
+ * appropriate error message to the standard error output and exits with a specific
+ * exit code. The exit codes used are:
+ * - 126 for permission issues or execution format errors.
+ * - 127 for file not found or command not found.
+ *
+ * @param command Pointer to the command structure whose execution failed.
+ * @param command_path The path of the command that was attempted to be executed.
+ */
 void	execve_error_exit(t_command *command, char *command_path)
 {
 	if (errno == EACCES)

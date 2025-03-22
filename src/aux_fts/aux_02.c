@@ -1,17 +1,15 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   aux_02.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/20 13:12:21 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/28 17:37:50 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Reallocates and copies an environment variable array.
+ * 
+ * This function creates a new array of strings with an updated size and copies 
+ * the existing environment variables into it.
+ * 
+ * @param envp The current environment variable array.
+ * @param size The new size of the environment variable array.
+ * @return char** A pointer to the new environment array, or NULL on failure.
+ */
 char	**ft_realloc(char **envp, int size)
 {
 	char	**new;
@@ -34,6 +32,15 @@ char	**ft_realloc(char **envp, int size)
 	return (new);
 }
 
+/**
+ * @brief Retrieves the value of an environment variable.
+ * 
+ * This function searches for a given environment variable in the envp array.
+ * 
+ * @param var The name of the variable to find.
+ * @param envp The environment variables array.
+ * @return char* A pointer to the variable's value, or NULL if not found.
+ */
 char	*mini_getenv(char *var, char *envp[])
 {
 	int	i;
@@ -53,6 +60,15 @@ char	*mini_getenv(char *var, char *envp[])
 	return (NULL);
 }
 
+/**
+ * @brief Retrieves the value of a shell variable.
+ * 
+ * This function searches for a variable in a linked list of shell variables.
+ * 
+ * @param vars The linked list of shell variables.
+ * @param name The name of the variable to find.
+ * @return char* A pointer to the variable's value, or NULL if not found.
+ */
 char	*mini_getvars(t_vars *vars, const char *name)
 {
 	t_vars	*current;
@@ -70,6 +86,14 @@ char	*mini_getvars(t_vars *vars, const char *name)
 	return (NULL);
 }
 
+/**
+ * @brief Sorts a linked list of shell variables alphabetically by name.
+ * 
+ * This function rearranges the linked list in alphabetical order using insertion sort.
+ * 
+ * @param head Pointer to the head of the linked list.
+ * @param current The current node being processed.
+ */
 void	sort_list(t_vars **head, t_vars *current)
 {
 	t_vars	*sorted;

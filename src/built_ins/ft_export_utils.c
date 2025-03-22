@@ -1,17 +1,15 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_export_utils.c                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/28 16:44:45 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:05:31 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Checks if a given string is a valid identifier.
+ *
+ * This function verifies that the provided string conforms to the rules of a valid
+ * identifier. A valid identifier must not start with a digit or an '=' character,
+ * and it can only contain alphanumeric characters or underscores until an '=' is encountered.
+ *
+ * @param str The string to validate.
+ * @return int Returns OK if the identifier is valid, or ERROR otherwise.
+ */
 int	is_valid_identifier(const char *str)
 {
 	int	i;
@@ -28,6 +26,15 @@ int	is_valid_identifier(const char *str)
 	return (OK);
 }
 
+/**
+ * @brief Prints all exported variables in a formatted manner.
+ *
+ * This function iterates through the exported variables list (data->exp_vars)
+ * and prints each variable in the format:
+ * "declare -x VARIABLE_NAME="VARIABLE_VALUE""
+ *
+ * @param data Pointer to the minishell data structure containing the exported variables.
+ */
 void	print_exported_vars(t_data *data)
 {
 	t_vars	*tmp;
@@ -44,6 +51,15 @@ void	print_exported_vars(t_data *data)
 	}
 }
 
+/**
+ * @brief Handles an invalid identifier error.
+ *
+ * Prints an error message to STDERR indicating that the identifier is invalid,
+ * sets the global exit code to 1, and increments the provided index.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param i Pointer to an index that is incremented to skip the invalid identifier.
+ */
 void	handle_invalid_identifier(t_data *data, int *i)
 {
 	write(STDERR_FILENO, " not a valid identifier\n", 24);

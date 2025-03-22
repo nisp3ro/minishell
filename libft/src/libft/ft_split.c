@@ -1,88 +1,98 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_split.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/20 14:55:44 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/20 20:47:12 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Frees an array of strings.
+ *
+ * Frees each allocated string in the array `res` up to index `n - 1`, then frees the array.
+ *
+ * @param res The array of strings to free.
+ * @param n The number of allocated strings in the array.
+ */
 static void	ft_freeall(char **res, int n)
 {
-	int	i;
-
-	i = 0;
+	int i = 0;
 	while (i < n)
-	{
-		free(res[i]);
-		i++;
-	}
+		free(res[i++]);
 	free(res);
 }
 
+/**
+ * @brief Counts words separated by a given delimiter.
+ *
+ * Iterates through the string `str` and counts words, where a word is a sequence of characters
+ * not equal to the delimiter `c`.
+ *
+ * @param str The input string.
+ * @param c The delimiter character.
+ * @return int The number of words found.
+ */
 static int	ft_wordcounter(char const *str, char c)
 {
-	int	isword;
-	int	words;
-
-	isword = 0;
-	words = 0;
+	int words = 0;
 	while (*str)
 	{
 		while (*str == c)
-		{
-			isword = 0;
 			str++;
-		}
-		if (*str != c && *str != '\0' && isword == 0)
-			words += 1;
-		while (*str != c && *str)
+		if (*str)
 		{
-			isword = 1;
-			str++;
+			words++;
+			while (*str && *str != c)
+				str++;
 		}
 	}
 	return (words);
 }
 
+/**
+ * @brief Splits the string into words and allocates each word.
+ *
+ * Uses ft_substr to allocate and copy each word from `str` (separated by delimiter `c`)
+ * into the array `res`. If allocation fails for any word, frees all previously allocated words.
+ *
+ * @param res The array to store allocated words.
+ * @param str The input string.
+ * @param c The delimiter character.
+ * @param words The total number of words expected.
+ * @return int Returns 1 on success, or 0 on memory allocation failure.
+ */
 static int	ft_splitter(char **res, char const *str, char c, int words)
 {
-	int	wcount;
-	int	len;
-	int	i;
+	int w = 0;
+	int len;
 
-	wcount = -1;
-	while (++wcount < words)
+	while (w < words)
 	{
-		i = 0;
-		len = 0;
 		while (*str == c)
 			str++;
-		while (str[i] != c && str[i++])
+		len = 0;
+		while (str[len] && str[len] != c)
 			len++;
-		res[wcount] = (char *)malloc(sizeof(char) * (len + 1));
-		if (!res[wcount])
+		res[w] = ft_substr(str, 0, len);
+		if (!res[w])
 		{
-			ft_freeall(res, wcount);
+			ft_freeall(res, w);
 			return (0);
 		}
-		i = 0;
-		while (i < len)
-			res[wcount][i++] = *str++;
-		res[wcount][i] = '\0';
+		str += len;
+		w++;
 	}
 	return (1);
 }
 
+/**
+ * @brief Splits a string into an array of substrings using a delimiter.
+ *
+ * Allocates and returns an array of strings by splitting `str` using the delimiter `c`.
+ * The array is terminated with a NULL pointer. Returns NULL if allocation fails.
+ *
+ * @param str The string to split.
+ * @param c The delimiter character.
+ * @return char** Pointer to the array of substrings, or NULL if allocation fails.
+ */
 char	**ft_split(char const *str, char c)
 {
-	int		words;
 	char	**res;
+	int		words;
 
 	if (!str)
 		return (NULL);
@@ -90,7 +100,7 @@ char	**ft_split(char const *str, char c)
 	res = (char **)malloc(sizeof(char *) * (words + 1));
 	if (!res)
 		return (NULL);
-	if (!(ft_splitter(res, str, c, words)))
+	if (!ft_splitter(res, str, c, words))
 		return (NULL);
 	res[words] = NULL;
 	return (res);

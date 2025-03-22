@@ -1,17 +1,20 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   vars_expander.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/26 15:41:14 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:10:12 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Expands a variable reference in the token value.
+ *
+ * Starting at index *i (which points to a '$'), this function extracts the variable name
+ * by scanning alphanumeric characters and underscores. It then retrieves the variable's value
+ * from the environment or internal variables. The retrieved value is appended to the string
+ * pointed to by *expanded. The variable name (including the '$') is temporarily stored in a
+ * buffer, which is freed before returning.
+ *
+ * @param token_value The token string containing the variable reference.
+ * @param i Pointer to the current index in token_value; updated to the end of the variable name.
+ * @param expanded Pointer to the accumulated expanded string.
+ * @param data Pointer to the minishell data structure.
+ * @return char* The updated expanded string, or NULL on failure.
+ */
 static char	*handle_variable_expansion(char *token_value, int *i,
 		char **expanded, t_data *data)
 {
@@ -42,6 +45,17 @@ static char	*handle_variable_expansion(char *token_value, int *i,
 	return (free(var_val[0]), *expanded);
 }
 
+/**
+ * @brief Expands the special variable '$?' with the exit code.
+ *
+ * Converts the global exit code to a string using ft_itoa, appends it to the string
+ * pointed to by *expanded, and advances the index *i by 2 (skipping "$?").
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param i Pointer to the current index in the token string; will be advanced by 2.
+ * @param expanded Pointer to the accumulated expanded string.
+ * @return char* The updated expanded string, or NULL on failure.
+ */
 char	*handle_exit_code_expansion(t_data *data, int *i, char **expanded)
 {
 	char	*tmp;
@@ -61,6 +75,17 @@ char	*handle_exit_code_expansion(t_data *data, int *i, char **expanded)
 	return (*expanded);
 }
 
+/**
+ * @brief Appends a literal character to the expanded string.
+ *
+ * Allocates a temporary string containing the single character, appends it to *expanded
+ * using ft_strjoin, frees the temporary string and the old expanded string, and updates
+ * *expanded with the new string.
+ *
+ * @param c The literal character to append.
+ * @param expanded Pointer to the accumulated expanded string.
+ * @return char* The updated expanded string, or NULL on failure.
+ */
 char	*append_literal_char(char c, char **expanded)
 {
 	char	*tmp;
@@ -81,6 +106,21 @@ char	*append_literal_char(char c, char **expanded)
 	return (*expanded);
 }
 
+/**
+ * @brief Processes a single character or variable reference in the token.
+ *
+ * Depending on the characters at the current index in token_value:
+ * - If a '$' is followed by an alphanumeric character or '_', calls handle_variable_expansion().
+ * - If a '$' is followed by '?', calls handle_exit_code_expansion().
+ * - Otherwise, appends the literal character using append_literal_char().
+ * Advances the index accordingly.
+ *
+ * @param token_value The token string being processed.
+ * @param i Pointer to the current index in token_value.
+ * @param expanded Pointer to the accumulated expanded string.
+ * @param data Pointer to the minishell data structure.
+ * @return int Returns OK on success, or ERROR on failure.
+ */
 static int	process_token_character(char *token_value, int *i, char **expanded,
 		t_data *data)
 {
@@ -103,6 +143,18 @@ static int	process_token_character(char *token_value, int *i, char **expanded,
 	return (OK);
 }
 
+/**
+ * @brief Expands variable references in a token string.
+ *
+ * Allocates a new string to accumulate the expanded result and iterates through the
+ * input token_value character by character. For each character, it processes variable
+ * expansions or appends literal characters using process_token_character(). Returns the
+ * fully expanded string.
+ *
+ * @param token_value The original token string containing variable references.
+ * @param data Pointer to the minishell data structure.
+ * @return char* The expanded token string, or NULL on failure.
+ */
 char	*expand_variables(char *token_value, t_data *data)
 {
 	char	*expanded;
@@ -121,4 +173,3 @@ char	*expand_variables(char *token_value, t_data *data)
 	}
 	return (expanded);
 }
-// OJO check liberaciones expan si error

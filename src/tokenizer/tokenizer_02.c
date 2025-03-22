@@ -1,17 +1,16 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   tokenizer_02.c                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/25 08:08:51 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 19:12:58 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Processes the accumulated token value as a TOKEN_WORD.
+ *
+ * If the provided token_value is non-empty, this function adds it as a TOKEN_WORD
+ * token to the tokenizer's token list.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param tok Double pointer to the tokenizer structure.
+ * @param token_value The string value to process.
+ * @return t_token* Pointer to the newly added token, or NULL if token_value is empty.
+ */
 t_token	*process_token_value(t_data *data, t_tokenizer **tok, char *token_value)
 {
 	if (token_value && token_value[0])
@@ -21,6 +20,17 @@ t_token	*process_token_value(t_data *data, t_tokenizer **tok, char *token_value)
 	return (NULL);
 }
 
+/**
+ * @brief Handles a word token by extracting a substring and expanding variables.
+ *
+ * This function extracts a substring from the full command based on the current tokenizer index,
+ * expands any variables in the substring using expand_variables(), and accumulates the result
+ * into the tokenizer's token_value. The final token value is returned.
+ *
+ * @param tok Double pointer to the tokenizer structure.
+ * @param data Pointer to the minishell data structure.
+ * @return char* The processed word token value, or NULL on error.
+ */
 char	*handle_word(t_tokenizer **tok, t_data *data)
 {
 	char	*tmp;
@@ -47,6 +57,19 @@ char	*handle_word(t_tokenizer **tok, t_data *data)
 	return ((*tok)->token_value);
 }
 
+/**
+ * @brief Handles a quoted token by extracting its content and expanding variables if needed.
+ *
+ * This function parses a quoted segment from the full command. It extracts the substring between
+ * the starting index and the matching quote, and if the quote is not a single quote, expands any
+ * variables within the substring. The result is concatenated into the tokenizer's token_value.
+ *
+ * @param tok Double pointer to the tokenizer structure.
+ * @param data Pointer to the minishell data structure.
+ * @param start The starting index of the quoted segment.
+ * @param tmp An array of two char pointers used for temporary storage.
+ * @return char* The updated token_value containing the processed quoted content, or NULL on error.
+ */
 char	*handle_quotes(t_tokenizer **tok, t_data *data, int start, char **tmp)
 {
 	while ((*tok)->full_cmd[(*tok)->i]
@@ -76,6 +99,18 @@ char	*handle_quotes(t_tokenizer **tok, t_data *data, int start, char **tmp)
 	return ((*tok)->token_value);
 }
 
+/**
+ * @brief Manages quotes within the tokenization process.
+ *
+ * Checks if the current character in the full command is a quote (and not in a here-document)
+ * and, if so, processes the quoted string using handle_quotes(). The tokenizer's quote flag is
+ * set and then cleared after processing.
+ *
+ * @param tok Double pointer to the tokenizer structure.
+ * @param full_cmd The full command string being tokenized.
+ * @param data Pointer to the minishell data structure.
+ * @return true if a quoted segment was successfully processed (OK), false otherwise.
+ */
 bool	manage_quotes(t_tokenizer **tok, char *full_cmd, t_data *data)
 {
 	char	*tmp[2];
@@ -92,6 +127,19 @@ bool	manage_quotes(t_tokenizer **tok, char *full_cmd, t_data *data)
 	return (ERROR);
 }
 
+/**
+ * @brief Tokenizes a segment of the full command string.
+ *
+ * This function is the inner loop for tokenization. It processes the full command string,
+ * handling quoted segments with manage_quotes() and unquoted words with handle_word(). When a delimiter
+ * is encountered or the end of the string is reached, it finalizes the current token by calling
+ * process_token_value() and returns the token.
+ *
+ * @param tok Double pointer to the tokenizer structure.
+ * @param data Pointer to the minishell data structure.
+ * @param current Pointer to the current token pointer.
+ * @return t_token* Pointer to the token generated from the current segment.
+ */
 t_token	*token_inner_loop(t_tokenizer **tok, t_data *data, t_token **current)
 {
 	while (1 && (*tok)->stop == false)
@@ -119,4 +167,3 @@ t_token	*token_inner_loop(t_tokenizer **tok, t_data *data, t_token **current)
 	}
 	return (*current);
 }
-// OJO Comprobar free de linea 109 y 118 ¿?¿¿? nose si siempre hay que liberar

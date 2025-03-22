@@ -1,17 +1,16 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   tokenizer_utils.c                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/25 08:56:25 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/02/03 09:05:53 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Determines whether token parsing should continue.
+ *
+ * This function checks the current character in the full command and returns true if
+ * parsing should continue. Parsing continues if the current character is not a delimiter,
+ * not a quote (unless in a here-document context), or if it is in a here-document context and
+ * not a delimiter.
+ *
+ * @param tok Double pointer to the tokenizer structure.
+ * @return true if parsing should continue, false otherwise.
+ */
 bool	should_continue_parsing(t_tokenizer **tok)
 {
 	if ((*tok)->full_cmd[(*tok)->i]
@@ -25,6 +24,16 @@ bool	should_continue_parsing(t_tokenizer **tok)
 		return (false);
 }
 
+/**
+ * @brief Handles a tokenizer error by stopping further tokenization.
+ *
+ * Sets the stop flag in the tokenizer to true and, if a syntax error is indicated,
+ * prints a syntax error message to standard error and sets the global exit code to 2.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param tok Double pointer to the tokenizer structure.
+ * @param syntax_error Boolean flag indicating if the error is a syntax error.
+ */
 void	tokenizer_error(t_data *data, t_tokenizer **tok, bool syntax_error)
 {
 	(*tok)->stop = true;

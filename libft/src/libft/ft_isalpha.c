@@ -1,17 +1,16 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_isalpha.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/16 12:03:54 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/18 17:57:16 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Checks if a character is an alphabetic letter.
+ *
+ * This function reimplements the standard `isalpha` function.
+ * It verifies whether the given character is a letter (either uppercase 
+ * or lowercase) based on the ASCII character set.
+ *
+ * @param c The character to check (passed as an int, but typically 
+ *          expected to be an unsigned char or EOF).
+ * @return 1 if `c` is an alphabetic character, 0 otherwise.
+ */
 int	ft_isalpha(int c)
 {
 	if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))

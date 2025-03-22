@@ -1,17 +1,14 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   signals.c                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/17 17:10:01 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:09:25 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Handles SIGINT in the main process.
+ *
+ * This signal handler is used for interactive input.
+ * When SIGINT is received, it clears the current readline input, prints a newline,
+ * and resets the prompt line.
+ *
+ * @param signal The signal number received.
+ */
 static void	signal_handler(int signal)
 {
 	if (signal == SIGINT)
@@ -24,6 +21,15 @@ static void	signal_handler(int signal)
 	return ;
 }
 
+/**
+ * @brief Handles SIGINT during a here-document session.
+ *
+ * This signal handler is set during here-document processing.
+ * When SIGINT is received, it prints a newline and forcefully terminates the process
+ * by sending SIGKILL to itself.
+ *
+ * @param signal The signal number received.
+ */
 static void	here_doc_handler(int signal)
 {
 	if (signal == SIGINT)
@@ -37,6 +43,14 @@ static void	here_doc_handler(int signal)
 	return ;
 }
 
+/**
+ * @brief Handles SIGINT in a child process.
+ *
+ * This signal handler is used in child processes to simply print a newline
+ * when SIGINT is received.
+ *
+ * @param signal The signal number received.
+ */
 static void	child_handler(int signal)
 {
 	if (signal == SIGINT)
@@ -44,6 +58,19 @@ static void	child_handler(int signal)
 	return ;
 }
 
+/**
+ * @brief Configures signal handling based on the provided mode.
+ *
+ * This function sets up the signal handler for SIGINT and ignores SIGQUIT.
+ * The handler for SIGINT is selected based on the parameter:
+ * - i == 1: Uses signal_handler (for the main process).
+ * - i == 0: Uses child_handler (for child processes).
+ * - i == 2: Uses here_doc_handler (for here-document processing).
+ * The SA_RESTART flag is set so that system calls are restarted if interrupted.
+ *
+ * @param i An integer flag indicating which signal handler to install:
+ *          1 for the main process, 0 for child processes, 2 for here-documents.
+ */
 void	wait_signal(int i)
 {
 	struct sigaction	sa;

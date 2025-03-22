@@ -1,17 +1,14 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_env.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/20 13:26:02 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:04:48 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../include/minishell.h"
 
+/**
+ * @brief Prints the environment variables.
+ *
+ * This function iterates through the environment variable array stored in the minishell
+ * data structure and prints each variable that contains an '=' character. After printing,
+ * it sets the global exit code to 0.
+ *
+ * @param data Pointer to the minishell data structure.
+ */
 void	ft_env(t_data *data)
 {
 	int	i;

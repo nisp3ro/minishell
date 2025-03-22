@@ -1,17 +1,19 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_strlcat.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/16 15:07:14 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/18 17:57:04 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Concatenates two strings with size limitation.
+ *
+ * This function appends the NUL-terminated string src to the end of dst.
+ * It will append at most (dsize - strlen(dst) - 1) bytes, NUL-terminating the
+ * result (as long as dsize is greater than strlen(dst)).
+ *
+ * @param dst Destination string, which must be NUL-terminated.
+ * @param src Source string to be appended to dst.
+ * @param dsize Full size of the destination buffer.
+ * @return size_t The total length of the string it tried to create (i.e., the
+ *                initial length of dst plus the length of src). If the return
+ *                value is >= dsize, truncation occurred.
+ */
 size_t	ft_strlcat(char *dst, const char *src, size_t dsize)
 {
 	size_t	i;
@@ -31,5 +33,5 @@ size_t	ft_strlcat(char *dst, const char *src, size_t dsize)
 		i++;
 	}
 	dst[dlen + i] = '\0';
-	return (slen + dlen);
+	return (dlen + slen);
 }

@@ -1,17 +1,16 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   core_loop.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/20 13:10:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/02/03 10:07:28 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Processes a single command input.
+ *
+ * This function trims leading spaces, checks if the command starts correctly,
+ * handles unfinished pipes, cleans the input line, expands variables before tokenizing,
+ * and finally parses and executes the command if it's not empty.
+ *
+ * @param input The raw input string entered by the user.
+ * @param data Pointer to the minishell data structure.
+ * @return int Returns OK if the command was processed successfully, or ERROR otherwise.
+ */
 int	process_command(char *input, t_data *data)
 {
 	char	*line[2];
@@ -39,6 +38,17 @@ int	process_command(char *input, t_data *data)
 	return (OK);
 }
 
+/**
+ * @brief Runs the interactive mode of the minishell.
+ *
+ * This function continuously prompts the user for input, processes the command,
+ * and handles the fork bomb easter egg. It loops indefinitely until an EOF
+ * condition is encountered (e.g., Ctrl-D), at which point it prints "exit" and returns.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param envp The environment variable array.
+ * @return int The global exit code after shell termination.
+ */
 int	interactive_mode(t_data *data, char *envp[])
 {
 	char	*line;

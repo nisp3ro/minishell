@@ -1,17 +1,16 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_isprint.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/16 12:25:56 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/18 17:57:13 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Checks if a character is printable.
+ *
+ * This function reimplements the standard `isprint` function.
+ * It determines whether the given character is a printable ASCII character,
+ * including space (32) and all visible characters up to 126.
+ *
+ * @param c The character to check (passed as an int, but typically
+ *          expected to be an unsigned char or EOF).
+ * @return 1 if `c` is a printable character, 0 otherwise.
+ */
 int	ft_isprint(int c)
 {
 	if (c >= 32 && c <= 126)

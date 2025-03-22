@@ -1,17 +1,14 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_pwd.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/20 13:26:58 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:05:49 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Prints the current working directory.
+ *
+ * This function writes the current working directory stored in data->pwd to the
+ * standard output. If data->pwd is NULL, an error message is printed to standard error,
+ * and the global exit code is set to 1.
+ *
+ * @param data Pointer to the minishell data structure.
+ */
 void	ft_pwd(t_data *data)
 {
 	if (data->pwd == NULL)

@@ -1,22 +1,24 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_isspace.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/05 14:16:39 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/05 14:17:50 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Checks if a character is a whitespace character.
+ *
+ * This function checks if the given character (passed as an int) is a whitespace character.
+ * The following characters are considered whitespace:
+ *  - Space (' ')
+ *  - Form feed ('\f')
+ *  - Newline ('\n')
+ *  - Carriage return ('\r')
+ *  - Horizontal tab ('\t')
+ *  - Vertical tab ('\v')
+ *
+ * @param c The character to check.
+ * @return int Returns 1 if c is a whitespace character, otherwise returns 0.
+ */
 int	ft_isspace(int c)
 {
-	c = (unsigned char)c;
-	if (c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r'
-		|| c == ' ')
+	if (c == ' ' || c == '\f' || c == '\n' || c == '\r' || c == '\t'
+		|| c == '\v')
 		return (1);
 	return (0);
 }

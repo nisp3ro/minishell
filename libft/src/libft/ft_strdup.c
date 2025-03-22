@@ -1,34 +1,26 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_strdup.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/18 12:04:04 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/14 18:32:34 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Duplicates a string.
+ *
+ * Allocates sufficient memory for a copy of the string src, copies the string into
+ * the allocated memory, and returns a pointer to it. The duplicated string is
+ * null-terminated.
+ *
+ * @param src The source string to duplicate.
+ * @return char* Pointer to the newly allocated duplicate string, or NULL if memory
+ *               allocation fails.
+ */
 char	*ft_strdup(const char *src)
 {
-	int		i;
+	size_t	len;
 	char	*dup;
 
-	if (!src)
-		return (NULL);
-	i = ft_strlen(src);
-	dup = (char *)malloc(sizeof(char) * (i + 1));
+	len = ft_strlen(src);
+	dup = (char *)malloc(sizeof(char) * (len + 1));
 	if (dup == NULL)
 		return (NULL);
-	i = 0;
-	while (src[i])
-	{
-		dup[i] = src[i];
-		i++;
-	}
-	dup[i] = '\0';
+	ft_memcpy(dup, src, len);
+	dup[len] = '\0';
 	return (dup);
 }

@@ -1,17 +1,17 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   exec_redirs.c                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/28 17:18:36 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/02/03 10:25:58 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Processes a single redirection for a command.
+ *
+ * Depending on the type of redirection (INPUT or OUTPUT), this function updates the
+ * corresponding file descriptor in the provided redirection variables structure.
+ * For input redirection, it opens the specified file in read-only mode. For output
+ * redirection, it opens the file in write-only mode with either append or truncate
+ * flags based on the command's append flag. On error, it prints an error message and exits.
+ *
+ * @param command Pointer to the command structure containing redirection information.
+ * @param red Pointer to the redirection variables structure that holds file descriptors and flags.
+ */
 void	redir(t_command *command, t_redir_vars *red)
 {
 	if (command->redir->type == INPUT)
@@ -39,8 +39,15 @@ void	redir(t_command *command, t_redir_vars *red)
 	}
 	command->redir = command->redir->next;
 }
-//OJO LIMPIAR EN LOS RETRUN?
 
+/**
+ * @brief Initializes the redirection variables.
+ *
+ * This function sets the default file descriptors for input and output to STDIN and STDOUT,
+ * and initializes the redirection flags to false.
+ *
+ * @param red Pointer to the redirection variables structure to initialize.
+ */
 void	init_redir_vars(t_redir_vars *red)
 {
 	red->fd_in = STDIN_FILENO;
@@ -49,6 +56,14 @@ void	init_redir_vars(t_redir_vars *red)
 	red->output_redirection = false;
 }
 
+/**
+ * @brief Applies the redirections using dup2.
+ *
+ * If input or output redirection has been set, this function duplicates the corresponding
+ * file descriptor to STDIN_FILENO or STDOUT_FILENO and then closes the original descriptor.
+ *
+ * @param red Pointer to the redirection variables structure containing redirection settings.
+ */
 void	manage_redirections(t_redir_vars *red)
 {
 	if (red->input_redirection)
@@ -63,6 +78,23 @@ void	manage_redirections(t_redir_vars *red)
 	}
 }
 
+/**
+ * @brief Manages redirections for a command and returns the command path.
+ *
+ * This function first initializes redirection variables and determines the command path.
+ * If the command contains a '/' in its arguments, a custom path is created;
+ * otherwise, the command is searched in the PATH. It then applies any inherited input redirection
+ * from the pipeline, processes each redirection associated with the command, and finally,
+ * if there is a next command in the pipeline, sets up the output redirection accordingly.
+ * After processing all redirections, it applies them using manage_redirections() and returns
+ * the final command path.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param command Pointer to the command structure.
+ * @param envp The environment variable array.
+ * @param pip Pointer to the pipeline variables structure.
+ * @return char* The full path of the command to be executed.
+ */
 char	*manage_redirs(t_data *data, t_command *command, char **envp,
 			t_pip_vars *pip)
 {

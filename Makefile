@@ -33,8 +33,9 @@ OBJ_DIR		=		./obj
 OBJS		=		$(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 # Secret
-SECRET_URL	=		https://github.com/Flingocho/secret_minishell.git
-SECRET		=		.secret
+# In the Makefile, the "Secret" section is used to clone a private repository when Minishell is compiled for the first time.
+# SECRET_URL	=		"https://github.com/..."
+# SECRET		=		.secret
 
 # Compiler
 CFLAGS		=		-Wall -Wextra -Werror
@@ -82,12 +83,12 @@ ascii_art:
 
 $(NAME): $(OBJS)
 	@printf "$(NC)"
-	@make -C $(LIBFT) plus > /dev/null
+	@make -C $(LIBFT) > /dev/null
 	@$(CC) $(CFLAGS) $(OBJS) -L$(LIBFT) -lft -o $(NAME) $(LDFLAGS) && \
 	(printf "$(UGREEN)\n%s$(NC)" "[minishell]"; printf "$(GREEN)%s$(NC)\n" "Compiled successfully.")
-	@if [ ! -d "$(SECRET)" ]; then \
-		git clone $(SECRET_URL) $(SECRET) > /dev/null 2>&1; \
-	fi
+# 	@if [ ! -d "$(SECRET)" ]; then \
+# 		git clone $(SECRET_URL) $(SECRET) > /dev/null 2>&1; \
+# 	fi
 
 
 $(OBJ_DIR)/%.o:	$(SRC_DIR)/%.c $(HEADER_FILE)

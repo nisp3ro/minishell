@@ -1,17 +1,15 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   clean_tools_02.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/28 17:28:54 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/02/03 11:03:10 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Frees memory allocated in the minishell data structure.
+ *
+ * This function cleans up the minishell data structure by freeing:
+ * - The linked lists of variables (data->vars and data->exp_vars).
+ * - The environment variables matrix (data->envp).
+ * - The strings for the current working directory (data->pwd) and the previous directory (data->oldpwd).
+ *
+ * @param data Pointer to the minishell data structure.
+ */
 void	clean_data(t_data *data)
 {
 	clean_variables(data->vars);
@@ -21,6 +19,13 @@ void	clean_data(t_data *data)
 	free(data->oldpwd);
 }
 
+/**
+ * @brief Frees a linked list of redirections.
+ *
+ * Iterates through the redirection list and frees each node's value and the node itself.
+ *
+ * @param redir Pointer to the pointer to the head of the redirection list.
+ */
 void	clean_redir_list(t_redir **redir)
 {
 	t_redir	*tmp;
@@ -34,6 +39,15 @@ void	clean_redir_list(t_redir **redir)
 	}
 }
 
+/**
+ * @brief Frees a linked list of commands.
+ *
+ * Iterates through the command list and frees each command node, including:
+ * - The arguments matrix (tmp->args) and the EOF matrix (tmp->eof) if they exist.
+ * - The redirection list within the command.
+ *
+ * @param command Pointer to the first command in the linked list.
+ */
 void	clean_cmd(t_command *command)
 {
 	t_command	*tmp;

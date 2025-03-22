@@ -1,17 +1,15 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   exec_path_utils.c                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/03 08:57:11 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/02/03 08:59:13 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Retrieves the PATH variable from the environment.
+ *
+ * This function attempts to get the "PATH" variable from the provided envp array.
+ * If it is not found there, it looks for it in the minishell variables (data->vars).
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param envp The environment variable array.
+ * @return char* Pointer to the PATH string, or NULL if not found.
+ */
 static char	*get_path_var(t_data *data, char **envp)
 {
 	char	*path;
@@ -22,6 +20,19 @@ static char	*get_path_var(t_data *data, char **envp)
 	return (path);
 }
 
+/**
+ * @brief Finds the full path of a command using the PATH variable.
+ *
+ * This function splits the PATH variable into directories, then iterates through each
+ * directory, constructing a full path by appending "/" and the command name. It checks
+ * if the constructed path is executable using access(). If an executable is found, it
+ * returns the full path. Otherwise, it frees the allocated memory and returns NULL.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param command The command name to search for.
+ * @param envp The environment variable array.
+ * @return char* The full path to the command if found, or NULL otherwise.
+ */
 char	*find_command_in_path(t_data *data, char *command, char **envp)
 {
 	t_search_command	vars;

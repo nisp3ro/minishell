@@ -1,17 +1,15 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_history.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jvidal-t <jvidal-t@student.42madrid.com    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/20 11:20:00 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/29 17:55:11 by jvidal-t         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Saves the history to the history file.
+ *
+ * This function retrieves the user's history file path using ft_get_user_home,
+ * opens the file in read/write mode (creating/truncating it if necessary), and
+ * writes the in-memory history stored in data->history to the file. Each history
+ * line is followed by a newline if the line is not empty.
+ *
+ * @param data Pointer to the minishell data structure.
+ */
 void	ft_save_history(t_data *data)
 {
 	int		i;
@@ -35,6 +33,17 @@ void	ft_save_history(t_data *data)
 	close(data->fd);
 }
 
+/**
+ * @brief Writes a line to the history.
+ *
+ * Checks if the provided line already exists in the history using exist_on_history.
+ * If it does not exist or the line is empty, it adds the line to the history using
+ * add_history, updates the in-memory history matrix stored in data->history, and then
+ * saves the history to the file using ft_save_history.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param line The history line to write.
+ */
 void	ft_write_history(t_data *data, char *line)
 {
 	int	i;
@@ -61,6 +70,15 @@ void	ft_write_history(t_data *data, char *line)
 	}
 }
 
+/**
+ * @brief Constructs a history file path based on the user's name.
+ *
+ * Creates a new path string in the format:
+ * "/home/{name}/.minishell_history"
+ *
+ * @param name The user's name.
+ * @return char* A pointer to the newly allocated path string, or NULL on failure.
+ */
 char	*make_path(char *name)
 {
 	char	*new_path;
@@ -77,6 +95,17 @@ char	*make_path(char *name)
 	return (new_path);
 }
 
+/**
+ * @brief Retrieves the user's history file path.
+ *
+ * First, the function attempts to get the home directory from the environment variable
+ * "HOME" via mini_getenv. If that is not available, it opens the "/home" directory and
+ * searches for a user directory (skipping entries like "Desktop"). If a valid user directory
+ * is found and the corresponding history file exists, it returns the path to that file.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @return char* A pointer to the history file path, or NULL if not found.
+ */
 char	*ft_get_user_home(t_data *data)
 {
 	DIR				*dir;

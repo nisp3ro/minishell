@@ -1,17 +1,17 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   tokenizer_01.c                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/25 08:04:07 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:31:32 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Adds a new token to the token list.
+ *
+ * Allocates a new t_token node, sets its type and value, and appends it to the end of the
+ * tokenizer's token list. If memory allocation fails, it calls tokenizer_error() and returns NULL.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param tok Double pointer to the tokenizer structure.
+ * @param type The type of the token to add.
+ * @param value The value of the token.
+ * @return t_token* Pointer to the newly created token, or NULL on error.
+ */
 t_token	*add_token(t_data *data, t_tokenizer **tok, t_token_type type,
 		char *value)
 {
@@ -38,6 +38,18 @@ t_token	*add_token(t_data *data, t_tokenizer **tok, t_token_type type,
 	return (new_token);
 }
 
+/**
+ * @brief Creates a token for redirection or here-document.
+ *
+ * Depending on the token type provided, sets the token value to the corresponding symbol.
+ * It then calls add_token() to create and append the token to the tokenizer's token list.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param tok Double pointer to the tokenizer structure.
+ * @param type The type of the token to create.
+ * @param hd_val Boolean flag indicating if the token is associated with a here-document.
+ * @return t_token* Pointer to the created token.
+ */
 t_token	*check_hd_and_create_tok(t_data *data, t_tokenizer **tok,
 		enum e_token_type type, bool hd_val)
 {
@@ -60,6 +72,17 @@ t_token	*check_hd_and_create_tok(t_data *data, t_tokenizer **tok,
 	return (current);
 }
 
+/**
+ * @brief Handles a delimiter token and creates the corresponding token.
+ *
+ * Checks the character at the current tokenizer index in the full command and creates a token
+ * based on the delimiter encountered (pipe, here-document, redirection in, append out, or redirection out).
+ * Increments the tokenizer index appropriately.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param tok Double pointer to the tokenizer structure.
+ * @return t_token* Pointer to the created token.
+ */
 t_token	*handle_delimiter(t_data *data, t_tokenizer **tok)
 {
 	t_token	*cur;
@@ -87,6 +110,16 @@ t_token	*handle_delimiter(t_data *data, t_tokenizer **tok)
 	return (cur);
 }
 
+/**
+ * @brief Initializes the tokenizer structure.
+ *
+ * Sets the tokenizer's index, quote flag, full command string, token value, here-document flag,
+ * token list, and stop flag to their initial values.
+ *
+ * @param tokenizer Double pointer to the tokenizer structure to initialize.
+ * @param current Pointer to the current token (set to NULL).
+ * @param full_cmd The full command string to be tokenized.
+ */
 void	init_tokenizer(t_tokenizer **tokenizer,
 					t_token **current,
 					char *full_cmd)
@@ -104,6 +137,17 @@ void	init_tokenizer(t_tokenizer **tokenizer,
 	*current = NULL;
 }
 
+/**
+ * @brief Tokenizes a full command string into a list of tokens.
+ *
+ * Allocates a tokenizer structure, initializes it, and iterates through the full command string,
+ * calling handle_delimiter() for delimiter characters and token_inner_loop() for other tokens.
+ * If an error occurs during tokenization (indicated by the stop flag), it frees the tokens and returns NULL.
+ *
+ * @param full_cmd The full command string to tokenize.
+ * @param data Pointer to the minishell data structure.
+ * @return t_token* Pointer to the head of the generated token list, or NULL on error.
+ */
 t_token	*tokenize(char *full_cmd, t_data *data)
 {
 	t_token		*current;

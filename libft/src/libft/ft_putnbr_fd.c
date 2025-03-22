@@ -1,17 +1,15 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_putnbr_fd.c                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42madrid>       +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/20 20:01:19 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/20 20:07:46 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Writes an integer to a file descriptor.
+ *
+ * This function converts the integer `n` to its string representation and writes it
+ * to the given file descriptor `fd`. It handles negative numbers by writing a '-' sign
+ * before the digits.
+ *
+ * @param n The integer to output.
+ * @param fd The file descriptor on which to write the integer.
+ */
 void	ft_putnbr_fd(int n, int fd)
 {
 	unsigned int	nb;
@@ -24,6 +22,6 @@ void	ft_putnbr_fd(int n, int fd)
 	else
 		nb = n;
 	if (nb > 9)
-		ft_putnbr_fd((nb / 10), fd);
-	ft_putchar_fd(((nb % 10) + 48), fd);
+		ft_putnbr_fd(nb / 10, fd);
+	ft_putchar_fd((nb % 10) + '0', fd);
 }

@@ -1,17 +1,16 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   built_ins_redirs.c                                 :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/27 09:54:19 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/27 17:48:43 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Handles input redirection by opening the specified file.
+ * 
+ * If an input redirection (`< file`) is found, this function opens the file 
+ * in read-only mode and updates the file descriptor.
+ * 
+ * @param redir The redirection structure containing the filename.
+ * @param fd_in Pointer to the input file descriptor.
+ * @return true If the file was successfully opened.
+ * @return false If there was an error opening the file.
+ */
 static bool	handle_input_redirection(t_redir *redir, int *fd_in)
 {
 	if (*fd_in != STDIN_FILENO)
@@ -25,6 +24,18 @@ static bool	handle_input_redirection(t_redir *redir, int *fd_in)
 	return (true);
 }
 
+/**
+ * @brief Handles output redirection by opening/creating the specified file.
+ * 
+ * If an output redirection (`> file` or `>> file`) is found, this function opens 
+ * or creates the file with the appropriate mode (overwrite or append).
+ * 
+ * @param redir The redirection structure containing the filename.
+ * @param fd_out Pointer to the output file descriptor.
+ * @param append If true, appends to the file (`>>`), otherwise overwrites (`>`).
+ * @return true If the file was successfully opened/created.
+ * @return false If there was an error opening/creating the file.
+ */
 static bool	handle_output_redirection(t_redir *redir, int *fd_out, bool append)
 {
 	if (*fd_out != STDOUT_FILENO)
@@ -41,6 +52,18 @@ static bool	handle_output_redirection(t_redir *redir, int *fd_out, bool append)
 	return (true);
 }
 
+/**
+ * @brief Processes all redirections for a given command.
+ * 
+ * Iterates through the command's redirections and applies input/output handling.
+ * 
+ * @param command The command structure containing redirections.
+ * @param fd_in_out Array of file descriptors for input [0] and output [1].
+ * @param i_redir Pointer to a boolean indicating if input redirection was found.
+ * @param o_redir Pointer to a boolean indicating if output redirection was found.
+ * @return true If all redirections were processed successfully.
+ * @return false If any redirection failed.
+ */
 static bool	process_redirections(t_command *command, int *fd_in_out,
 		bool *i_redir, bool *o_redir)
 {
@@ -64,6 +87,16 @@ static bool	process_redirections(t_command *command, int *fd_in_out,
 	return (true);
 }
 
+/**
+ * @brief Checks and applies input/output redirections for a command.
+ * 
+ * This function processes redirections and applies them using `dup2()`, 
+ * redirecting `stdin` and `stdout` as necessary.
+ * 
+ * @param command The command structure containing redirections.
+ * @return true If all redirections were applied successfully.
+ * @return false If any redirection failed.
+ */
 bool	check_redirs(t_command *command)
 {
 	int		fd_in_out[2];

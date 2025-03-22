@@ -1,31 +1,30 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_lstmap.c                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/23 08:50:26 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/23 10:47:37 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Creates a new list by applying a function to each node’s content.
+ *
+ * Iterates through the list `lst`, applies function `f` to each node’s content,
+ * and creates a new list with the transformed content. If allocation fails, the
+ * function clears and frees the new list using `del`.
+ *
+ * @param lst The original list.
+ * @param f Function to apply to each node's content.
+ * @param del Function to free content in case of failure.
+ * @return t_list* New list with modified content, or NULL if allocation fails.
+ */
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
 {
 	t_list	*newlist;
 	t_list	*newnode;
-	void	*content;
 
+	if (!lst || !f || !del)
+		return (NULL);
 	newlist = NULL;
 	while (lst)
 	{
-		content = f(lst->content);
-		newnode = ft_lstnew(content);
+		newnode = ft_lstnew(f(lst->content));
 		if (!newnode)
 		{
-			del(content);
 			ft_lstclear(&newlist, del);
 			return (NULL);
 		}

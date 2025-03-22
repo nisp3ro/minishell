@@ -1,17 +1,15 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_prompt.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/25 07:42:03 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/02/03 09:05:34 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../include/minishell.h"
 
+/**
+ * @brief Trims the host string to extract a simplified hostname.
+ *
+ * This function searches for the first '/' character in the host string and then
+ * finds the next '.' character after that. It allocates a new string containing
+ * the characters between these two positions. If allocation fails, it returns NULL.
+ *
+ * @param host The original host string.
+ * @return char* The trimmed host string, or NULL on allocation failure.
+ */
 static char	*host_trim(char *host)
 {
 	char	*trimmed;
@@ -37,6 +35,19 @@ static char	*host_trim(char *host)
 	return (trimmed);
 }
 
+/**
+ * @brief Retrieves the host name from the environment.
+ *
+ * This function attempts to get the host name by checking the "HOST" and "HOSTNAME"
+ * environment variables. If neither is found, it then checks "SESSION_MANAGER". If
+ * a value is obtained from "SESSION_MANAGER", it is trimmed using host_trim() and marked
+ * for freeing by setting *free_host to true. If no host is found, it defaults to "42madrid".
+ *
+ * @param envp The environment variable array.
+ * @param free_host Pointer to a boolean flag that is set to true if the returned host
+ *                  string must be freed by the caller.
+ * @return char* The host name string.
+ */
 char	*get_host(char **envp, bool *free_host)
 {
 	char	*host;
@@ -63,6 +74,16 @@ char	*get_host(char **envp, bool *free_host)
 	return (host);
 }
 
+/**
+ * @brief Appends the current working directory to the prompt.
+ *
+ * If the current directory (data->pwd) starts with the user's home directory (data->home),
+ * the function appends a tilde ('~') followed by the remainder of the path to the prompt.
+ * Otherwise, it appends the full current directory path.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param prompt The prompt string being built.
+ */
 static void	make_pwd(t_data *data, char *prompt)
 {
 	if (data->home && ft_strncmp(data->pwd, data->home,
@@ -75,6 +96,19 @@ static void	make_pwd(t_data *data, char *prompt)
 		ft_strcat(prompt, data->pwd);
 }
 
+/**
+ * @brief Constructs and prints the prompt string.
+ *
+ * Builds the prompt string using the user name, host, and current working directory.
+ * If a Git repository is detected, it appends Git branch information to the prompt.
+ * Finally, it appends a status symbol to indicate the command prompt.
+ *
+ * @param prompt The buffer to hold the constructed prompt string.
+ * @param user The user name.
+ * @param host The host name.
+ * @param data Pointer to the minishell data structure.
+ * @return int Returns OK on success.
+ */
 static int	print_prompt(char *prompt, char *user, char *host, t_data *data)
 {
 	bool	git_found;
@@ -84,7 +118,8 @@ static int	print_prompt(char *prompt, char *user, char *host, t_data *data)
 	ft_strcpy(prompt, user);
 	ft_strcat(prompt, "@");
 	ft_strcat(prompt, host);
-	ft_strcat(prompt, ":" BRIGHT_CYAN);
+	ft_strcat(prompt, ":"
+		BRIGHT_CYAN);
 	make_pwd(data, prompt);
 	if (is_a_git(data, &git_found, &name) == OK && git_found)
 	{
@@ -99,8 +134,18 @@ static int	print_prompt(char *prompt, char *user, char *host, t_data *data)
 	ft_strcat(prompt, RESET_COLOR);
 	return (free(name), OK);
 }
-//OJO COMPROBAR name siempre es algo o NULL antes de liberar en return ¿?
 
+/**
+ * @brief Retrieves and constructs the command prompt.
+ *
+ * This function gets the user's home directory, user name, and host name from the environment.
+ * It then calls print_prompt() to build the prompt string and duplicates it using ft_strdup()
+ * for use by the shell. If the host string was dynamically allocated, it frees it before returning.
+ *
+ * @param p Pointer to the location where the prompt string will be stored.
+ * @param data Pointer to the minishell data structure.
+ * @return int Returns OK on success or ERROR on failure.
+ */
 int	get_prompt(char **p, t_data *data)
 {
 	char	*user;

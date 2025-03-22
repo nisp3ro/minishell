@@ -1,27 +1,15 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_bzero.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/16 13:38:59 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/18 17:57:19 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Sets a block of memory to zero.
+ *
+ * This function writes zeroes to the first n bytes of the memory area
+ * pointed to by str.
+ *
+ * @param str Pointer to the memory area to clear.
+ * @param n   Number of bytes to set to zero.
+ */
 void	ft_bzero(void *str, size_t n)
 {
-	unsigned char	*pstr;
-	size_t			i;
-
-	i = 0;
-	pstr = (unsigned char *)str;
-	while (i < n)
-	{
-		pstr[i] = 0;
-		i++;
-	}
+	ft_memset(str, 0, n);
 }

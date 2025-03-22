@@ -1,17 +1,17 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_exit.c                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/20 13:29:06 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/02/03 15:08:07 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../include/minishell.h"
 
+/**
+ * @brief Validates that the provided exit argument is numeric.
+ *
+ * Iterates through the characters of the exit argument (command->args[1]) and 
+ * verifies that each character is a digit or a valid sign ('-' or '+'). If an 
+ * invalid character is found, it prints an error message, sets the global exit 
+ * code to 2, and exits the program.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param command Pointer to the command structure containing the arguments.
+ * @param i Initial index for iteration (usually 0).
+ */
 static void	validate_numeric_argument(t_data *data, t_command *command, int i)
 {
 	while (command->args[1][i])
@@ -27,6 +27,16 @@ static void	validate_numeric_argument(t_data *data, t_command *command, int i)
 	}
 }
 
+/**
+ * @brief Checks if the numeric exit argument exceeds allowed limits.
+ *
+ * This function verifies that the numeric argument provided for exit does not 
+ * exceed the limits of a 64-bit signed integer. If it does, an error message is 
+ * printed, the global exit code is set to 2, and the program exits.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param command Pointer to the command structure containing the arguments.
+ */
 static void	check_numeric_limits(t_data *data, t_command *command)
 {
 	if ((ft_strlen(command->args[1]) == 19 && ft_strncmp(command->args[1],
@@ -41,6 +51,16 @@ static void	check_numeric_limits(t_data *data, t_command *command)
 	}
 }
 
+/**
+ * @brief Sets the exit code based on the provided numeric argument.
+ *
+ * Converts the argument string to an integer using ft_atoi. If the number is 
+ * negative, it is adjusted to fit into the 0-255 range. The resulting number is 
+ * then assigned to the global exit code.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param command Pointer to the command structure containing the arguments.
+ */
 static void	set_exit_code(t_data *data, t_command *command)
 {
 	int	num;
@@ -51,6 +71,17 @@ static void	set_exit_code(t_data *data, t_command *command)
 	data->g_exit_code = num;
 }
 
+/**
+ * @brief Implements the exit built-in command.
+ *
+ * Prints "exit" to the standard output and processes the provided exit argument 
+ * if available. It validates the numeric argument, checks for extra arguments, 
+ * sets the exit code, clears the command history, cleans up command and data 
+ * structures, and then terminates the program.
+ *
+ * @param data Pointer to the minishell data structure.
+ * @param command Pointer to the command structure containing the arguments.
+ */
 void	ft_exit(t_data *data, t_command *command)
 {
 	int	i;

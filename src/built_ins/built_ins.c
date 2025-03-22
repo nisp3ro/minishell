@@ -1,17 +1,16 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   built_ins.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/20 13:24:46 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/30 13:03:40 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../include/minishell.h"
 
+/**
+ * @brief Checks if a command is a built-in and executes it.
+ * 
+ * This function compares the command's first argument with the known built-ins
+ * and executes the corresponding function if there is a match.
+ * 
+ * @param command The command structure containing arguments.
+ * @param data The minishell data structure.
+ * @return true If the command is a built-in and was executed.
+ * @return false If the command is not a built-in.
+ */
 bool	check_builtin(t_command *command, t_data *data)
 {
 	if (!command->args)

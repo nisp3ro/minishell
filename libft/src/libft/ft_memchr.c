@@ -1,22 +1,22 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_memchr.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/17 14:10:59 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/18 17:57:12 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Searches for a character in a memory block.
+ *
+ * This function scans the first n bytes of the memory area pointed to by str
+ * for the first occurrence of the character c (converted to an unsigned char).
+ *
+ * @param str Pointer to the memory block to search.
+ * @param c   The character to search for, passed as an int (converted internally).
+ * @param n   The number of bytes to search.
+ * @return void* A pointer to the first occurrence of the character in the memory area,
+ *               or NULL if the character is not found within the first n bytes.
+ */
 void	*ft_memchr(const void *str, int c, size_t n)
 {
+	size_t			i;
 	unsigned char	*pstr;
 	unsigned char	ch;
-	size_t			i;
 
 	pstr = (unsigned char *)str;
 	ch = (unsigned char)c;
@@ -27,5 +27,5 @@ void	*ft_memchr(const void *str, int c, size_t n)
 			return ((void *)(pstr + i));
 		i++;
 	}
-	return (0);
+	return (NULL);
 }

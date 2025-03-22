@@ -1,24 +1,24 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_strlcpy.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/16 14:57:44 by mrubal-c          #+#    #+#             */
-/*   Updated: 2024/09/18 17:56:54 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "../../include/libft.h"
 
-#include "libft.h"
-
+/**
+ * @brief Copies a string into a sized buffer.
+ *
+ * This function copies up to (dsize - 1) characters from the NUL-terminated
+ * string src to dst, NUL-terminating the result if dsize is not 0.
+ * It returns the total length of the string src.
+ *
+ * @param dst Destination buffer.
+ * @param src Source string.
+ * @param dsize Size of the destination buffer.
+ * @return size_t Length of src.
+ */
 size_t	ft_strlcpy(char *dst, const char *src, size_t dsize)
 {
 	size_t	i;
 	size_t	len;
 
 	len = ft_strlen(src);
-	if (dsize < 1)
+	if (dsize == 0)
 		return (len);
 	i = 0;
 	while (src[i] != '\0' && i < (dsize - 1))

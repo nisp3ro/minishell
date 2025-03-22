@@ -1,17 +1,14 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_strcpy.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrubal-c <mrubal-c@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/05 13:41:44 by mrubal-c          #+#    #+#             */
-/*   Updated: 2025/01/05 13:42:53 by mrubal-c         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-#include "libft.h"
-
+/**
+ * @brief Copies a null-terminated string from source to destination.
+ *
+ * This function copies the string pointed to by 'src' (including the terminating null byte)
+ * into the buffer pointed to by 'dest'. It is assumed that 'dest' has enough space to hold
+ * the source string.
+ *
+ * @param dest Pointer to the destination buffer where the content is to be copied.
+ * @param src Pointer to the null-terminated source string to be copied.
+ * @return char* Pointer to the destination string 'dest'.
+ */
 char	*ft_strcpy(char *dest, char *src)
 {
 	int	i;
